@@ -18,10 +18,10 @@ Other things completed:
 - Individual git exercises
 
 
-# Week (3): Sept 25 - Oct 1
+# Week (4): Sept 25 - Oct 1
 
 ## Tasks Completed:
-
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/0ae39310-5f36-44db-9034-60149385125e)
 
 ## Goal Recap:
 Things I worked on:

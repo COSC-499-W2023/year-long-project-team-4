@@ -19,7 +19,8 @@
 
 
 ## Weekly Report Details:
-** Weekly Task Board:**
+
+**Weekly Task Board:**
 
 ![TaskListWeek4](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/e944b4ee-7290-4d40-b0cf-fd62f09a1ffb)
 

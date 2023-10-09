@@ -30,3 +30,23 @@ Tasks from the project board:
 
 Completed:
 - Project Charter
+
+# Week 5: Oct 2 - Oct 8
+
+## Tasks Completed:
+![Week5act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/3326c8f3-d620-46a1-9121-7d513e2abcd9)
+
+## Goal Recap:
+- Branding
+- Database research
+- Video play research
+
+Tasks from project board:
+- Individual log
+- Branding
+- Research
+
+Completed:
+- All tasks are still in progress
+- Logo creation
+- Login & home page design

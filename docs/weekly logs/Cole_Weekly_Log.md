@@ -34,3 +34,19 @@ Tasks from the project board relevant to things I worked on:
 
 Other things completed:
 - Setup branch for merging logs
+
+
+# Week (5): Oct 2 - Oct 8
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/0aebb82d-2fd1-41f7-b547-85925c065ff8)
+
+## Goal Recap:
+Things I worked on:
+- Flask research
+- PR review
+- Feature planning
+  
+Tasks from the project board relevant to things I worked on:
+- User login w/ permissions (research)
+- Video submissions (research)

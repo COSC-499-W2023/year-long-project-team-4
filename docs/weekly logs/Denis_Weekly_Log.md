@@ -44,3 +44,26 @@ Completed:
 
 Additional Context:
 - This was a light week since we are still beginning the project. We created the git repo & added items to the project board.
+
+
+# Week 5: Oct 1 - Oct 8 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![2023-10-08](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/50066e7f-c132-4067-ad80-b7c96b512e94)
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Research into setting up Databases on AWS, and linking with Python
+
+Taks from the Project Board:
+- Database creation
+
+Completed:
+- Completed research and made a temporary database instance with an EC2 container for it
+- This feature is not finished yet as this was mainly research
+
+Aditional Context:
+- There wasn't much code for me to do this week, mainly understanding and learning AWS and how to get Mysql running and connectable
+
+
+

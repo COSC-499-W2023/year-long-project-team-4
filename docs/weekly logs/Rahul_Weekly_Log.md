@@ -16,4 +16,18 @@ Reflection/Learning:
 - Helped in decision-making and adding to the project charter.
 - Brainstormed and added relevant information pertaining to my role and competencies in this project.
 - Worked on weekly logs and project charter. 
+# Week (5): Oct 2nd - Oct 9th:
+## Tasks Completed:
+![week5](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/46a503c5-2d9f-4582-a94d-ec1dc51b0680)
+
+- Created a wireframe for the project, which can be accessed at the following link:
+https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project?type=design&node-id=0%3A1&mode=design&t=MeT0DvXLwfBUPHp5-1
+
+- Created a basic web app structure for features due at the end of the month.
+## In progress:
+
+- Creating testing for basic web app, along with other features for the end of the month.
+
   
+
+

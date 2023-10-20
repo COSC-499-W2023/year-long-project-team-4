@@ -35,15 +35,11 @@ def insert_user(username:str, email:str, password:str, firstname:str, lastname:s
         result = insert_user("new_username", "new_email", "hashed_password", "John", "Doe")
     '''
     db = None
-    result = 0
+    result = None
     try:
         # Creates the SSH tunnel to connect to the DB
-        with SSHTunnelForwarder(
-            ('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
-            ssh_username=dbConfig.ssh_username,
-            ssh_pkey=dbConfig.key_Path, 
-            remote_bind_address=('team4-db.cc4e8pqxmsac.ca-central-1.rds.amazonaws.com',3306)
-        ) as tunnel:
+        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=dbConfig.ssh_username,ssh_pkey=dbConfig.key_Path, remote_bind_address=('team4-db.cc4e8pqxmsac.ca-central-1.rds.amazonaws.com',3306)) as tunnel:
+
             print("SSH Tunnel Established")
             #Db connection string
             db = pymysql.connect(host=dbConfig.HOST, user=dbConfig.USER, password=dbConfig.PASS, port=tunnel.local_bind_port, database=dbConfig.MYDB)
@@ -59,7 +55,8 @@ def insert_user(username:str, email:str, password:str, firstname:str, lastname:s
                 db.commit()
                 #Returns 1 if successful
                 result = 1
-    except pymysql.Error as e:
+    #except pymysql.Error as e:
+    except Exception as e:
         print(e)
         # Returns 1 if errors
         result = -1
@@ -110,7 +107,7 @@ def update_user(user_id:int,new_data:dict) -> int:
                 # Construct the SET clause dynamically based on the update_data dictionary
                 set_clause = ", ".join(f"{field} = %s" for field in new_data.keys())
 
-                query = f"UPDATE userprofile SET {set_clause} WHERE user_id = %s"
+                query = f"UPDATE userprofile SET {set_clause} WHERE id = %s"
                 
                 # Append the user_id to the values list
                 new_data["user_id"] = user_id
@@ -120,7 +117,7 @@ def update_user(user_id:int,new_data:dict) -> int:
                 db.commit()
                 cur.close()
                 result = 1  # Set result to 1 to indicate success
-    except pymysql.Error as e:
+    except Exception as e:
         print(e)
         result = -1  # Set result to -1 to indicate an error
     finally:
@@ -167,7 +164,7 @@ def query_records(table_name: str, fields: str, condition: str = "", condition_v
                     query += f" WHERE {condition}"
                 cur.execute(query, condition_values)
                 records = [dict(zip([desc[0] for desc in cur.description], row)) for row in cur.fetchall()]
-    except pymysql.Error as e:
+    except Exception as e:
         print(e)
     finally:
         if db:
@@ -208,7 +205,7 @@ def delete_record(table_name: str, condition: str, condition_values: tuple) -> i
                 db.commit()
                 cur.close()
                 result = 1
-    except pymysql.Error as e:
+    except Exception as e:
         print(e)
         result = -1
     finally:
@@ -217,7 +214,7 @@ def delete_record(table_name: str, condition: str, condition_values: tuple) -> i
         return result
     
     
-def authenticate(username: str, password: str) -> bool:
+def authenticate(username: str, password: str) -> bool: 
     """
     Authenticate a user by checking if the provided password matches the password stored in the database.
 
@@ -247,10 +244,35 @@ def authenticate(username: str, password: str) -> bool:
 
                 if stored_password and stored_password[0] == password:
                     return True  # Authentication successful
-    except pymysql.Error as e:
+    except Exception as e:
         print(e)
     finally:
         if db:
             db.close()
 
     return False  # Authentication failed
+
+def resetTable(tableName:str)-> bool:
+    db = None
+    try:
+        with SSHTunnelForwarder(
+            ('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'),
+            ssh_username=dbConfig.ssh_username,
+            ssh_pkey=dbConfig.key_Path,
+            remote_bind_address=('team4-db.cc4e8pqxmsac.ca-central-1.rds.amazonaws.com', 3306)
+        ) as tunnel:
+            print("SSH Tunnel Established")
+            db = pymysql.connect(host=dbConfig.HOST, user=dbConfig.USER, password=dbConfig.PASS, port=tunnel.local_bind_port, database=dbConfig.MYDB)
+            if db:
+                cur = db.cursor()
+                query = f"TRUNCATE TABLE {tableName}"
+                cur.execute(query)
+                query = f"ALTER TABLE {tableName} AUTO_INCREMENT = 1;"
+                cur.execute(query)
+                return True  # Reset successful
+    except Exception as e:
+        print(e)
+    finally:
+        if db:
+            db.close()
+    return False  # Reset failed

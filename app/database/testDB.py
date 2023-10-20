@@ -1,23 +1,41 @@
-import pymysql
-from sshtunnel import SSHTunnelForwarder
-import dbConfig
-import databaseUtil
+import pytest
+import databaseUtil as dbUtil
+import time
 
-databaseUtil.insert_user("MadeUpUser","madeupUser@hotmail.com","PlainText Pass","Denis","Gauthier")
+def test_insert():
+    result1 = dbUtil.insert_user("test_user", "updated@example.com", "password123", "John", "Doe")
+    result2 = dbUtil.insert_user("MadeUpUser", "Test@example.com", "password12233", "John", "Doe")
 
-# with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=dbConfig.ssh_username,ssh_pkey=dbConfig.key_Path, remote_bind_address=('team4-db.cc4e8pqxmsac.ca-central-1.rds.amazonaws.com',3306)) as tunnel:
-#     print("SSH Tunnel Established")
-#     db = pymysql.connect(host=dbConfig.HOST, user=dbConfig.USER, password=dbConfig.PASS, port=tunnel.local_bind_port, database=dbConfig.MYDB)
+    assert result1 == 1  # Assuming insertion was successful
+    assert result2 == 1  # Assuming insertion was successful
+
+
+def test_update():
+    update_data = {
+        "username": "updated_user",
+        "email": "Testingupdate@example.com"
+    }
+    result = dbUtil.update_user(1, update_data)  # Assuming user_id 1 exists
+    assert result == 1  # Assuming the update was successful
+
+def test_delete():
+    result = dbUtil.delete_record("userprofile", "id = %s", (1,))  # Assuming user_id 1 exists
+    assert result == 1  # Assuming the deletion was successful
     
-#     try:
-#           # Print all the databases
-#         with db.cursor() as cur:
-#             # Print all the tables from the database
-#             query = 'INSERT INTO userprofile (username, email, password_hash, firstname, lastname) values (%s,%s,%s,%s,%s)'
-#             data = ("DenisGa","madeup1@hotmail.com","Unhashedpassword12311","Den","Gauthier")
-#             cur.execute(query,data)
-#             print("Insertion complete")
-                
-#     finally:
-#         db.close()
-        
+def test_authenticate():
+    assert dbUtil.authenticate("test_user", "password123") is True  # Assuming correct username and password
+    assert dbUtil.authenticate("MadeUpUser", "wrong_password") is False  # Assuming incorrect username and password    
+
+def test_reset():
+    assert dbUtil.resetTable("userprofile") is True
+    
+if __name__ == "__main__":
+    
+    start_time = time.time()
+    test_reset()
+    test_insert()
+    test_update()
+    test_delete()   
+    end_time = time.time()
+    print("Time taken: ",end_time - start_time,"seconds")
+    

@@ -1,5 +1,5 @@
 import pytest
-import databaseUtil as dbUtil
+from app.database import databaseUtil as dbUtil
 import time
 
 def test_insert():

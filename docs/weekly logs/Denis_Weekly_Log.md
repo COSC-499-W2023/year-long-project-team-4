@@ -62,8 +62,29 @@ Completed:
 - Completed research and made a temporary database instance with an EC2 container for it
 - This feature is not finished yet as this was mainly research
 
-Aditional Context:
+Additional Context:
 - There wasn't much code for me to do this week, mainly understanding and learning AWS and how to get Mysql running and connectable
 
 
+# Week 6/7: Oct 8 - Oct 22 (Monday to Sunday (2 weeks worth))
+## Tasks Worked this Week:
+
+![WeeklyTask](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/67ed2a7b-53ff-4f43-aa4f-ad288539960c)
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Creating the Database
+- Setting up a Database Utility file
+- Testing the file
+
+Taks from the Project Board:
+- Database creation/Integration
+
+Completed:
+- Created the Database connection & utility file
+- Setup testing for the file
+
+Additional Context:
+- Nothing of note for these two weeks. Was just coding database stuff and doing the test cases for it. 
 

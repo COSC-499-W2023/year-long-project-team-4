@@ -44,3 +44,25 @@ Completed:
 Additional Context:
 - There wasn't much code for me to do this week, mainly understanding and learning React JS, Flask and Jest
 
+
+# Week 6/7: Oct 8 - Oct 22 (Monday to Sunday (2 weeks worth))
+## Tasks Worked this Week:
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Creating Tests for the front-end components using Jest
+- Researching how to integrate the React-app (frontend) to the Flask app (backend)
+- Understand the database creation and authentication so that it can be integrated with the frontend
+
+Taks from the Project Board:
+- Creating Tests for the front-end components using Jest
+- Researching how to integrate the React-app (frontend) to the Flask app (backend)
+- Understand the database creation and authentication so that it can be integrated with the frontend
+
+Completed:
+- Creating Tests for the front-end components using Jest
+- Researching how to integrate the React-app (frontend) to the Flask app (backend)
+- Understand the database creation and authentication so that it can be integrated with the frontend
+
+Additional Context:
+- Nothing of note for these two weeks. Worked on testing and understanding the code written by other team members

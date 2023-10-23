@@ -6,7 +6,7 @@ import {
 } from "../Path";
 const RecieveAndSendPage = () => {
   return (
-    <div class="position-absolute top-50 start-50 translate-middle">
+    <div className="position-absolute top-50 start-50 translate-middle">
        <div className="d-grid gap-2">
         <Button size="lg" href={uploadVideoPath}> Send Videos</Button> {" "}
         <Button size="lg" href={viewVideoPath}> Receive Videos</Button>

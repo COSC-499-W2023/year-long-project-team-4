@@ -28,6 +28,17 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 
 - Creating testing for basic web app, along with other features for the end of the month.
 
+# Week (6-7): Oct 8th - Oct 22nd:
+## Tasks Completed:
+![week5-6](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/0f8e9247-b6d1-40bf-911f-f9bba5e893e7)
+
+- Committed time to research to finally come up with how to create and design the upload video page. 
+
+- Created upload video page and video preview of the video uploaded.
+## In progress:
+
+- Creating a send video page to view the video sent to a user.
+
   
 
 

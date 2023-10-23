@@ -11,6 +11,8 @@
 * Authentication code
 * Database Utility code
 * Database creation and implementation
+* Frontend Testing
+* Frontent Integration
 
 **Milestone Recap:** 
 * Begin video submission capabilities
@@ -34,3 +36,7 @@
 **Test Report:**
 - Database Test: 
 ![TestCap](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/667b72ce-1b57-4ff8-8170-b6841ba90ab0)
+
+- Frontend Test (Jest):
+<img width="638" alt="Screen Shot 2023-10-22 at 11 41 07 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/5fd0aa3b-3ca4-42c3-8525-700087fd145c">
+

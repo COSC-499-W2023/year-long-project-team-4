@@ -50,3 +50,17 @@ Things I worked on:
 Tasks from the project board relevant to things I worked on:
 - User login w/ permissions (research)
 - Video submissions (research)
+
+
+# Week (6/7): Oct 8 - Oct 22 2 weeks worth)
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/b19f7b22-2c18-43fc-a7d1-a80709eb8824)
+
+## Goal Recap:
+Things I worked on:
+- Flask research
+- Flask authentication implementation
+
+Tasks from the project board relevant to things I worked on:
+- User login w/ permissions

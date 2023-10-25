@@ -8,7 +8,7 @@ key_Path = ''
 
 USER='admin'
 #Repalce with the password
-PASS='password123'
+PASS=''
 HOST='127.0.0.1'
 #Change to the db name
-MYDB='mydatabase'
+MYDB=''

@@ -67,4 +67,11 @@ def login():
 @auth.route('/logout')
 def logout():
     session.pop('username', None)
-    return 'Successful logout', 200
+    return jsonify({'success': 'Successful logout'}), 200
+
+
+@auth.route('/currentuser')
+def get_current_user():
+    if 'username' in session:
+        return jsonify({'username': session['username']}), 200
+    return jsonify({'error': 'No user currently logged in'}), 401

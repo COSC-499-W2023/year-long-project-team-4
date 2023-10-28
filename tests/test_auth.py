@@ -20,7 +20,7 @@ def client(app):
 
 # Test that user can sign up
 def test_signup_success(client):
-	database.resetTable("userprofile")
+	assert database.resetTable("userprofile")
 	post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
 
 	session_username_pre_signup = json.loads(client.get('/auth/currentuser').data.decode('utf-8'))
@@ -33,7 +33,7 @@ def test_signup_success(client):
 
 # Test that signing up with a username/email that already exists will cause an error
 def test_signup_fail(client):
-	database.resetTable("userprofile")
+	assert database.resetTable("userprofile")
 	post_object = {'username': 'test123', 'email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
 
 	response_first = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
@@ -44,7 +44,7 @@ def test_signup_fail(client):
 
 # Creates account, logs out, then tests that the account can be logged into
 def test_login_success(client):
-	database.resetTable("userprofile")
+	assert database.resetTable("userprofile")
 	username = 'test123'
 	post_object = {'username': username, 'email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
 
@@ -58,7 +58,7 @@ def test_login_success(client):
 
 # Attempt to login with invalid credentials, ensure it fails
 def test_login_fail(client):
-	database.resetTable("userprofile")
+	assert database.resetTable("userprofile")
 	post_object = {'username': 'test123', 'email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
 
 	current_user = json.loads(client.get('/auth/currentuser').data.decode('utf-8'))
@@ -71,7 +71,7 @@ def test_login_fail(client):
 	assert 'error' in current_user # Ensure we are not currently logged in
 
 def test_logout(client):
-	database.resetTable("userprofile")
+	assert database.resetTable("userprofile")
 	post_object = {'username': 'test123', 'email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
 
 	client.post('/auth/signup', data=post_object)

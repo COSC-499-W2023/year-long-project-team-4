@@ -88,3 +88,26 @@ Completed:
 Additional Context:
 - Nothing of note for these two weeks. Was just coding database stuff and doing the test cases for it. 
 
+
+# Week 8: Oct 22 - Oct 29 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![Screenshot 2023-10-29 184803](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/b7405b26-2ee1-4d0f-9ba4-24b23f00fa99)
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Creating the Database video table
+- Assisting with database changes
+- Fixing database testing for the new table
+- Help with presentation
+
+Taks from the Project Board:
+- Database creation/Integration
+- Presentation
+
+Completed:
+- New table creation and implementation
+
+Additional Context:
+- Most of my work this week was just helping and overseeing database stuff. Such as adding a new table, and helping debug certain issues relating to the database. 

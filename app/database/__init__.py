@@ -1,1 +1,1 @@
-from .databaseUtil import query_records, insert_user, update_user, resetTable, delete_record, authenticate
+from .databaseUtil import query_records, insert_user, update_user, resetTable, delete_record, authenticate, insert_video

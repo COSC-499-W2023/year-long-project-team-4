@@ -48,7 +48,7 @@ const RecieveAndSendPage = () => {
   };
 
   return (
-    <div class="position-absolute top-50 start-50 translate-middle">
+    <div className="position-absolute top-50 start-50 translate-middle">
       {currentUser && <h3>Welcome, {currentUser}!</h3>}
        <div className="d-grid gap-2">
         <Button size="lg" href={uploadVideoPath}> Send Videos</Button> {" "}

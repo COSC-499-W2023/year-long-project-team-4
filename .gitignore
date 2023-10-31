@@ -1,0 +1,3 @@
+app/database/dbConfig.py
+*.pem
+*__pycache__

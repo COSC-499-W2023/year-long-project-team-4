@@ -14,12 +14,11 @@ const RegisterPage = () => {
    };
 
   return (
-  <div class="position-absolute top-50 start-50 translate-middle">          
+    <div className="position-absolute top-50 start-50 translate-middle">          
     <Card border="primary" style={{ width: "16rem" }}>  
-      <Card.Body class="text-center">
-        <Card.Title>Register</Card.Title>
-        <Form onSubmit={handleSubmit}>
-          <Form.Group class="p-3">
+      <Card.Body className="text-center">
+        <Card.Title as="h1">Register</Card.Title>
+          <Form.Group className="p-3">
             <Form.Label>Username</Form.Label>
               <Form.Control
                 type="text"
@@ -34,7 +33,7 @@ const RegisterPage = () => {
           <Button className="mb-2" variant="primary" type="submit"> Register </Button>
         </Form>
       </Card.Body>
-      <Card.Link class="text-center" href={loginPath}>Have an account?</Card.Link>
+      <Card.Link className="text-center" href={loginPath}>Have an account?</Card.Link>
     </Card>
   </div>
   )

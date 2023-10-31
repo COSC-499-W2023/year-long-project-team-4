@@ -1,9 +1,37 @@
-from flask import Blueprint, request, session, jsonify
+from flask import Blueprint, request, session, jsonify, make_response
 
 import database
 from . import bcrypt
 
 auth = Blueprint('auth', __name__)
+
+#@auth.route('/new_cookie')
+#def new_cookie():
+    #response = make_response("Hello World")
+    #response.set_cookie("mycookie", "myvalue")
+    #return response
+
+#@auth.route('/show_cookie')
+#def show_cookie():
+    #cookie_value = request.cookies.get("mycookie")
+    #return cookie_value
+
+
+#@auth.route('/set-test-session')
+#def set_test_session():
+    #session['test'] = 'hello'
+    #return "Test session set!"
+
+#@auth.route('/get-test-session')
+#def get_test_session():
+    #print(session)
+    #return session.get('test', 'No session value set')
+
+@auth.route('/checking', methods=['GET'])
+def message():
+    return jsonify({
+        'message': "Hello World"
+    })
 
 @auth.route('/signup', methods=['POST'])
 def signup():
@@ -60,18 +88,33 @@ def login():
     if not bcrypt.check_password_hash(stored_hashed_password, password):
         return jsonify({'error': 'Incorrect password'}), 401
 
-    session['username'] = username
-    return jsonify({'username': username}), 200
+    #session['username'] = username
+    #print("login:")
+    #print(session)
+    #return jsonify({'username': username}), 200
+
+    response = make_response(jsonify({'username': username}), 200)
+    response.set_cookie("username_cookie", username)  # Store username in the cookie
+    return response
 
 
 @auth.route('/logout')
 def logout():
-    session.pop('username', None)
-    return jsonify({'success': 'Successful logout'}), 200
+    #session.pop('username', None)
+    #return jsonify({'success': 'Successful logout'}), 200
+
+    response = make_response(jsonify({'success': 'Successful logout'}), 200)
+    response.delete_cookie("username_cookie")
+    return response
 
 
 @auth.route('/currentuser')
 def get_current_user():
-    if 'username' in session:
-        return jsonify({'username': session['username']}), 200
+    #if 'username' in session:
+    #    return jsonify({'username': session['username']}), 200
+    #return jsonify({'error': 'No user currently logged in'}), 401
+
+    username = request.cookies.get("username_cookie")
+    if username:
+        return jsonify({'username': username}), 200
     return jsonify({'error': 'No user currently logged in'}), 401

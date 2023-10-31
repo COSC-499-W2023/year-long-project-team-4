@@ -69,3 +69,28 @@ Completed:
 
 Additional Context:
 - Nothing of note for these two weeks. Worked on testing and understanding the code written by other team members
+
+# Week 8: Oct 22 - Oct 29 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="833" alt="Screen Shot 2023-10-30 at 9 44 53 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/1b3f5506-7cbf-492c-ac39-d55c9467d244">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Designing and finalizing few branding items (Logo for the website)
+- Reviewing Authentication and Database code, in order to integrate it
+- Integrating the react app to the flask app, to fetch data from the endpoints
+- Help with presentation and complete my parts (Testing, Frontend, Integration)
+
+Taks from the Project Board:
+- User Login w/ permissions
+- Frontend to Backend integration
+- Presentation
+
+Completed:
+- User Login w/ permissions
+- Frontend to Backend integration
+- Presentation
+
+Additional Context:
+- This week was challenging and very code heavy as I only had previous experience with React and not Flask. Having to integrate the frontend and the backend had its challenges and I will be working more on it in the future.

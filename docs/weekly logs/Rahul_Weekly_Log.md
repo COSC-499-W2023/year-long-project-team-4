@@ -39,6 +39,16 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 
 - Creating a send video page to view the video sent to a user.
 
-  
+# Week 8: Oct 22nd - Oct 29th:
+## Tasks Completed:
+![week 8](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/475e7d10-f365-4d87-9eb1-a3184ec962af)
+
+- Created view video page to view videos uploaded to the backend along with cleaning up the register and login page for a live demo.
+
+## In progress:
+
+- Working on connecting the backend and front end together to create a usable web app. 
+
+
 
 

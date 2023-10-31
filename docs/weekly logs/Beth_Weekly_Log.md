@@ -66,3 +66,18 @@ Completed:
 
 Additional Context:
 - Couldn't get much done these two weeks, had family issues.
+
+  # Week 8: Oct 23 - Oct 29
+
+## Tasks Completed:
+![Week8act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/dd3587c5-497a-4cd1-8882-c68b0b3615e9)
+
+## Goal Recap:
+
+Tasks from project board:
+- Database Creation
+
+Completed:
+- Created one of the two tables in the database
+- Made tests for the new table
+- Bug fixing

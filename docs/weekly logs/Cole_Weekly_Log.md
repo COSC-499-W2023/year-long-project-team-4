@@ -64,3 +64,18 @@ Things I worked on:
 
 Tasks from the project board relevant to things I worked on:
 - User login w/ permissions
+
+
+# Week (8): Oct 22 - Oct 29
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/a0bd251a-9017-4a34-b21a-e7942cf708ee)
+
+## Goal Recap:
+Things I worked on:
+- Authentication testcases
+- Code reviews
+  
+Tasks from the project board relevant to things I worked on:
+- User login w/ permissions (write testcases)
+- Front end to Back end Integration (code review)

@@ -5,33 +5,6 @@ from . import bcrypt
 
 auth = Blueprint('auth', __name__)
 
-#@auth.route('/new_cookie')
-#def new_cookie():
-    #response = make_response("Hello World")
-    #response.set_cookie("mycookie", "myvalue")
-    #return response
-
-#@auth.route('/show_cookie')
-#def show_cookie():
-    #cookie_value = request.cookies.get("mycookie")
-    #return cookie_value
-
-
-#@auth.route('/set-test-session')
-#def set_test_session():
-    #session['test'] = 'hello'
-    #return "Test session set!"
-
-#@auth.route('/get-test-session')
-#def get_test_session():
-    #print(session)
-    #return session.get('test', 'No session value set')
-
-@auth.route('/checking', methods=['GET'])
-def message():
-    return jsonify({
-        'message': "Hello World"
-    })
 
 @auth.route('/signup', methods=['POST'])
 def signup():

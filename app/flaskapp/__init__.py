@@ -2,7 +2,6 @@ from flask import Flask, session
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from datetime import timedelta
-from flask_session import Session
 
 bcrypt = Bcrypt()
 

@@ -12,7 +12,7 @@ def create_app():
     app.config["SESSION_COOKIE_SECURE"] = False
     app.config["SESSION_COOKIE_SAMESITE"] = "None"
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
-    app.config['SECRET_KEY'] = 'Lk10@410210'
+    app.config['SECRET_KEY'] = 'INSECURE_KEY_PLEASE_CHANGE_ME_BEFORE_ANYTHING_IMPORTANT'
 
     bcrypt.init_app(app)
 

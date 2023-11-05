@@ -9,8 +9,8 @@ import database
 
 
 def test_reset():
-    assert database.resetTable(True, "userprofileTest") is True
-    assert database.resetTable(True, "videosTest") is True
+    assert database.resetTable(True, "userprofile") is True
+    assert database.resetTable(True, "videos") is True
 
 def test_insert_user():
     result1 = database.insert_user(True,"test_user", "updated@example.com", "password123", "John", "Doe")
@@ -37,8 +37,8 @@ def test_authenticate():
     assert database.authenticate(True, "MadeUpUser", "wrong_password") is False  # Assuming incorrect username and password 
 
 def test_delete():
-    result1 = database.delete_record(True, "userprofileTest", "id = %s", (1,))  # Assuming user_id 1 exists
-    result2 = database.delete_record(True, "videosTest", "videoID = %s", (1,)) # Assuming user_id 1 exists
+    result1 = database.delete_record(True, "userprofile", "id = %s", (1,))  # Assuming user_id 1 exists
+    result2 = database.delete_record(True, "videos", "videoID = %s", (1,)) # Assuming user_id 1 exists
     assert result1 == 1  # Assuming the deletion was successful
     assert result2 == 1  # Assuming the deletion was successful
        

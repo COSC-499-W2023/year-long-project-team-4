@@ -46,7 +46,7 @@ def insert_user(testcase:bool, username:str, email:str, password:str, firstname:
                 if db:
                     cur = db.cursor()
                     #Insert String
-                    query = "INSERT INTO userprofileTest (username, email, password_hash, firstname, lastname) values (%s,%s,%s,%s,%s)"
+                    query = "INSERT INTO userprofile(username, email, password_hash, firstname, lastname) values (%s,%s,%s,%s,%s)"
                     #Creates list of the insertations 
                     data = (username,email,password,firstname,lastname)
                     #Executes the query w/ the corrosponding data
@@ -127,7 +127,7 @@ def insert_video(testcase:bool, subDate:str, retDate:str, senderID:str, reciever
                 if db:
                     cur = db.cursor()
                     #Insert String
-                    query = "INSERT INTO videosTest (subDate, retDate, senderID, recieverID) values (%s,%s,%s,%s)"
+                    query = "INSERT INTO videos(subDate, retDate, senderID, recieverID) values (%s,%s,%s,%s)"
                     #Creates list of the insertations 
                     data = (subDate, retDate, senderID, recieverID)
                     #Executes the query w/ the corrosponding data
@@ -217,7 +217,7 @@ def update_user(testcase:bool, user_id:int,new_data:dict) -> int:
                     # Construct the SET clause dynamically based on the update_data dictionary
                     set_clause = ", ".join(f"{field} = %s" for field in new_data.keys())
 
-                    query = f"UPDATE userprofileTest SET {set_clause} WHERE id = %s"
+                    query = f"UPDATE userprofile SET {set_clause} WHERE id = %s"
                 
                     # Append the user_id to the values list
                     new_data["user_id"] = user_id
@@ -428,7 +428,7 @@ def authenticate(testcase:bool, username: str, password: str) -> bool:
                 db = pymysql.connect(host=dbConfig.HOST, user=dbConfig.USER, password=dbConfig.PASS, port=tunnel.local_bind_port, database="Team4dbTest")
                 if db:
                     cur = db.cursor()
-                    query = "SELECT password_hash FROM userprofileTest WHERE username = %s"
+                    query = "SELECT password_hash FROM userprofile WHERE username = %s"
                     cur.execute(query, (username,))
                     stored_password = cur.fetchone()
 

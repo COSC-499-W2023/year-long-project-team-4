@@ -110,4 +110,28 @@ Completed:
 - New table creation and implementation
 
 Additional Context:
-- Most of my work this week was just helping and overseeing database stuff. Such as adding a new table, and helping debug certain issues relating to the database. 
+- Most of my work this week was just helping and overseeing database stuff. Such as adding a new table, and helping debug certain issues relating to the database.
+  
+
+# Week 9: Oct 29 - Nov 5 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![PersonalTasks](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/1f9f949d-16ec-4f0d-8d8f-8b88f6ed6213)
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Adding a test database for test cases
+- Setting up the s3 bucket for use
+- Added new columns to the database for key generation 
+- Completed the presentation
+
+Taks from the Project Board:
+- Data retention for videos
+- Public/Private Key Generation
+- Encryption/Decryption
+
+Completed:
+- Currently no completed task for this week
+
+Additional Context:
+- Waiting for other things before I can continue work for this week. 

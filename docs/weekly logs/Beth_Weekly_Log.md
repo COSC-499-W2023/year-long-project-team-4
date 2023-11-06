@@ -90,14 +90,16 @@ Completed:
 ## Goal Reacp:
 
 Tasks from project board/Started tasks:
+- Slideshow design
+- Presentation
 - Connecting to the database S3 bucket with Boto3
 - Branding
 - Site design/Figma design
 
 Completed:
+- Slideshow presentation
 - Naming brand
 - Logo Design
-- Experimenting with Boto3/Research
 
 
 

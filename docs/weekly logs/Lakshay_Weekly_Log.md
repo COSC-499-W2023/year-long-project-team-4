@@ -91,3 +91,26 @@ Completed:
 
 Additional Context:
 - This week was challenging and very code heavy as I only had previous experience with React and not Flask. Having to integrate the frontend and the backend had its challenges and I will be working more on it in the future.
+
+
+# Week 9: Oct 29 - Nov 5 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="819" alt="Screen Shot 2023-11-05 at 10 47 42 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/e76b01ec-58a7-4a9a-b481-8a235caebb12">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Fixing app integration bugs and error while authenticating user login 
+- Completed the presentation
+
+Taks from the Project Board:
+- App Integration
+- Presentation
+
+Completed:
+- Currently no completed task for this week
+
+Additional Context:
+- The issue with user login is stil work in progress. After debugging and troubleshooting I have recognized a couple of implementable solutions. Preparing for two midterms due next week, hence took up fewer tasks for this week.
+
+

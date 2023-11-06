@@ -67,7 +67,7 @@ Completed:
 Additional Context:
 - Couldn't get much done these two weeks, had family issues.
 
-  # Week 8: Oct 23 - Oct 29
+# Week 8: Oct 23 - Oct 29
 
 ## Tasks Completed:
 ![Week8act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/dd3587c5-497a-4cd1-8882-c68b0b3615e9)
@@ -81,3 +81,25 @@ Completed:
 - Created one of the two tables in the database
 - Made tests for the new table
 - Bug fixing
+
+# Week 9: Oct 30 - Nov 5
+
+## Tasks Completed:
+![Week9act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/15afe675-c450-471e-b946-9c9921d1eae4)
+
+## Goal Reacp:
+
+Tasks from project board/Started tasks:
+- Slideshow design
+- Presentation
+- Connecting to the database S3 bucket with Boto3
+- Branding
+- Site design/Figma design
+
+Completed:
+- Slideshow presentation
+- Naming brand
+- Logo Design
+
+
+

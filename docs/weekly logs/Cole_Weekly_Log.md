@@ -79,3 +79,19 @@ Things I worked on:
 Tasks from the project board relevant to things I worked on:
 - User login w/ permissions (write testcases)
 - Front end to Back end Integration (code review)
+
+
+# Week (9): Oct 29 - Nov 5
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/fa3b9a4a-7dda-4847-8aa1-363571d3c655)
+
+## Goal Recap:
+Things I worked on:
+- Code reviews
+- Presentation (preparation and presenting)
+- Researching encryption methods
+  
+Tasks from the project board relevant to things I worked on:
+- Public / Private key generation (research)
+- Encryption / decryption of videos (research)

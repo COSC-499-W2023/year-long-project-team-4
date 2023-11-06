@@ -49,6 +49,15 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 
 - Working on connecting the backend and front end together to create a usable web app. 
 
+# Week 9: Oct 30th - Nov 5th:
+## Tasks Completed:
+
+![week 9](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/0b93d6c1-4736-4f37-832f-6aaa35d7c05b)
+- Updated Figma file and helped with creating backgrounds, logos and branding for our application. 
+
+## In progress:
+
+- Finishing up Figma file and working on implementing further additions from our figma file. 
 
 
 

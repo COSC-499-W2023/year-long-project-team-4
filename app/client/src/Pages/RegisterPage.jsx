@@ -18,6 +18,7 @@ const RegisterPage = () => {
     <Card border="primary" style={{ width: "16rem" }}>  
       <Card.Body className="text-center">
         <Card.Title as="h1">Register</Card.Title>
+        <Form>
           <Form.Group className="p-3">
             <Form.Label>Username</Form.Label>
               <Form.Control

@@ -1,7 +1,7 @@
 import boto3
 import sys,os
 from dotenv import load_dotenv, dotenv_values
-
+from io import BytesIO
 
 sys.path.append(os.path.abspath('../app'))
 load_dotenv()
@@ -47,14 +47,17 @@ def already_existing_file(bucket_name, obj_path):
         return False
     
     
-def upload_file(file_name,bucket,store_as=None):
+def upload_file(file_content,bucket,store_as=None):
     try:
         if store_as is None:
-            store_as=file_name
-        s3_client.upload_file(file_name,bucket,store_as)
+            raise ValueError("store_as must be specified to upload a file")
+
+        file_stream = BytesIO(file_content)
+        
+        s3_client.upload_fileobj(file_stream, bucket, store_as)
         return True
     except Exception as e:
-        print(f"Failed to upload file {file_name}: {e}")
+        print(f"Failed to upload file content to {bucket}/{store_as}: {e}")
         return False
 
     
@@ -78,9 +81,21 @@ def get_metadata(bucket_name, obj_path):
         return {}
     
     
-#def search_bucket():
+def list_objs(bucket_name):
+    try:
+        response = s3_client.list_objects(Bucket=bucket_name)
+        
+        print(f"Objects in {bucket_name}")
+        for obj in response.get('Contents',[]):
+            print(obj['Key'])
 
-
+        return True
+    
+    except Exception as e:
+        print(f"Failed to list objs in {bucket_name}: {e}")
+        return False
+    
+    
 def delete_file(bucket_name, obj_path):
     try:
         s3_client.delete_object(Bucket=bucket_name, Key=obj_path)
@@ -92,3 +107,4 @@ def delete_file(bucket_name, obj_path):
 
 # if __name__ == "__main__":
 #     list_buckets()
+#     list_objs('team4-s3')

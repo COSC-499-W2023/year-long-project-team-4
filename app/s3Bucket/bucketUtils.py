@@ -118,6 +118,18 @@ def download_files(bucket_name, path_to_download, save_as=None):
         return False
 
 
+def get_object_content(bucket_name,obj_path):
+    try:
+        response = s3_client.get_object(Bucket=bucket_name, Key=obj_path)
+        
+        content = response['Body'].read().decode('utf-8')
+        
+        print(f'Content of {obj_path}:\n{content}')
+        return True
+    except Exception as e:
+        print(f"Error retrieving content from {obj_path}: {e}")
+        return False
+
 def get_metadata(bucket_name, obj_path):
     """
     Retrieves metadata for a specified object in an S3 bucket.
@@ -180,6 +192,7 @@ def delete_file(bucket_name, obj_path):
         print(f'Error deleting file {obj_path}: {e}')
         return False
 
-# if __name__ == "__main__":
-#     list_buckets()
-#     list_objs('team4-s3')
+if __name__ == "__main__":
+    list_buckets()
+    list_objs('team4-s3')
+    get_object_content('team4-s3',"test.txt")

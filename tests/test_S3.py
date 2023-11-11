@@ -41,7 +41,7 @@ if __name__ == "__main__":
     
     start_time = time.time()
     test_list_buckets()
-    #test_upload_file()
+    test_upload_file()
     test_existing_file()
     test_download_file()
     test_delete_file()

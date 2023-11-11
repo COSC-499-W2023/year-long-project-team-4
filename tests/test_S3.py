@@ -24,7 +24,7 @@ def test_existing_file():
     assert result2 == False
     
 def test_download_file():
-    result1 = s3Bucket.download_files('team4-s3', 'testFile.txt','/tmp/testFile.text')
+    result1 = s3Bucket.download_files('team4-s3', 'testFile.txt','testFile.text')
     
     assert result1 == True #Assuming upload was successful
     

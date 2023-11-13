@@ -134,4 +134,23 @@ Completed:
 - Currently no completed task for this week
 
 Additional Context:
+- Waiting for other things before I can continue work for this week.
+
+# Week 10: Nov 5 - Nov 12 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![PersonTask](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/63c5470e-ef53-48f0-8dca-dde434c09f02)
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Creating S3bucket utility file to make accessing the bucket easier
+
+Tasks from the Project Board:
+- Data retention for videos
+- Public/Private Key Generation
+
+Completed:
+- S3bucket is set up and ready to be connected with the encryption/decryption side of the code
+
+Additional Context:
 - Waiting for other things before I can continue work for this week. 

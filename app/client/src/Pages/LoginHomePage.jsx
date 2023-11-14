@@ -5,36 +5,36 @@ import {
   recieveAndSendPath,
   registerPath,
 } from "../Path";
+import axios from 'axios'
+
 const LoginHomePage = () => {
 
   const [errorMessage, setErrorMessage] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
-  const handleLogin = (username, password) => {
-    fetch('http://localhost:8080/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `username=${username}&password=${password}`,
-      credentials: 'include',
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.username) {
-          setCurrentUser(data.username);
-          console.log(data)
-          navigate(recieveAndSendPath);
-        } else {
-          console.error(data.error);
-          setErrorMessage(data.error);
-        }
-      })
-      .catch(error => {
-        console.error('There was an error logging in', error);
-        setErrorMessage('An error occurred. Please try again.');
+  const handleLogin = async (username, password) => {
+    try {
+      const response = await axios.post('http://localhost:8080/auth/login', {
+        username: username,
+        password: password
+      }, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        withCredentials: true
       });
+  
+      if (response.data.username) {
+        setCurrentUser(response.data.username);
+        navigate(recieveAndSendPath);
+      } else {
+        setErrorMessage(response.data.error);
+      }
+    } catch (error) {
+      console.error('There was an error logging in', error);
+      setErrorMessage('An error occurred. Please try again.');
+    }
   };
 
   const handleSubmit = (e) => {
@@ -43,11 +43,6 @@ const LoginHomePage = () => {
     const password = e.target.elements[1].value;  // Assuming the second input is the password
     handleLogin(username, password);
   };
-
-  {/*const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate(recieveAndSendPath);
-  }*/}
   
   
    return (

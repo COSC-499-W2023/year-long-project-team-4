@@ -8,31 +8,33 @@ const RegisterPage = () => {
 
   const navigate = useNavigate();
 
-  const handleSignup = (firstname, lastname, email, username, password) => {
-    const formData = new URLSearchParams();
-    formData.append('firstname', firstname);
-    formData.append('lastname', lastname);
-    formData.append('email', email);
-    formData.append('username', username);
-    formData.append('password', password); // Add other form details as needed.
+const handleSignup = async (firstname, lastname, email, username, password) => {
+  const formData = new URLSearchParams();
+  formData.append('firstname', firstname);
+  formData.append('lastname', lastname);
+  formData.append('email', email);
+  formData.append('username', username);
+  formData.append('password', password); // Add other form details as needed.
 
-    fetch('http://localhost:8080/auth/signup', {
-        method: 'POST',
-        body: formData,
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.username) {
-                console.log(formData);
-                navigate(loginPath); // navigate to login after successful registration.
-            } else {
-                console.error(data.error);
-            }
-        })
-        .catch(error => {
-            console.error('There was an error signing up', error);
-        });
+  try {
+    const response = await fetch('http://localhost:8080/auth/signup', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (data.username) {
+      console.log('Signup successful');
+      navigate(loginPath); // navigate to login after successful registration.
+    } else {
+      console.error(data.error);
+    }
+  } catch (error) {
+    console.error('There was an error signing up', error);
+  }
 };
+
 
 
 
@@ -45,11 +47,8 @@ const handleSubmit = (e) => {
     const password = e.target.elements[4].value;  // Assuming the second input is the password
     handleSignup(firstname,lastname, email, username, password);
 };
-  
-  {/*const handleSubmit =(e)=>{
-    e.preventDefault();
-    navigate(loginPath);
-   };*/}
+
+
 
   return (
   <div className="position-absolute top-50 start-50 translate-middle">          

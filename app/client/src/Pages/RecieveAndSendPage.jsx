@@ -6,46 +6,51 @@ import {
   uploadVideoPath,
   loginPath,
 } from "../Path";
+import axios from 'axios'
+
 const RecieveAndSendPage = () => {
 
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
 
-  useEffect(() => {
-    fetch('http://localhost:8080/auth/currentuser', {
-      method: 'GET',  
-    credentials: 'include'})
-      .then(response => response.json())
-      .then(data => {
-        if (data.username) {
-          setCurrentUser(data.username);
-        }
-      })
-      .catch(error => {
-        console.error('There was an error fetching the current user', error);
+  const handleLogout = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/auth/logout', {
+        withCredentials: true  // Important for handling sessions with cookies
       });
-  }, []);
-
-  const handleLogout = () => {
-    fetch('http://localhost:8080/auth/logout', 
-    {
-      credentials: 'include',
+  
+      if (response.data.success) {
+        // Handle successful logout
+        console.log("Logged out successfully");
+        setCurrentUser(null);
+        navigate(loginPath);
+      } else {
+        console.error('Logout error:', response.data.error);
+      }
+    } catch (error) {
+      console.error('There was an error logging out', error);
     }
-    )
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // Handle successful logout
-          console.log("success");
-          navigate(loginPath);
-        } else {
-          console.error('Logout error:', data.error);
-        }
-      })
-      .catch(error => {
-        console.error('There was an error logging out', error);
-      });
   };
+  
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/auth/currentuser', {
+          withCredentials: true
+        });
+  
+        if (response.data.username) {
+          setCurrentUser(response.data.username);
+        } else {
+          console.error('No user currently logged in');
+        }
+      } catch (error) {
+        console.error('There was an error fetching the current user', error);
+      }
+    };
+  
+    fetchCurrentUser();
+  }, []);  
 
   return (
     <div className="position-absolute top-50 start-50 translate-middle">

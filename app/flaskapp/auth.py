@@ -5,7 +5,6 @@ from . import bcrypt
 
 auth = Blueprint('auth', __name__)
 
-
 @auth.route('/signup', methods=['POST'])
 def signup():
     username = request.form.get('username')
@@ -61,33 +60,20 @@ def login():
     if not bcrypt.check_password_hash(stored_hashed_password, password):
         return jsonify({'error': 'Incorrect password'}), 401
 
-    #session['username'] = username
-    #print("login:")
-    #print(session)
-    #return jsonify({'username': username}), 200
-
-    response = make_response(jsonify({'username': username}), 200)
-    response.set_cookie("username_cookie", username)  # Store username in the cookie
-    return response
+    session['username'] = username
+    print("login:")
+    print(session)
+    return jsonify({'username': username}), 200
 
 
 @auth.route('/logout')
 def logout():
-    #session.pop('username', None)
-    #return jsonify({'success': 'Successful logout'}), 200
-
-    response = make_response(jsonify({'success': 'Successful logout'}), 200)
-    response.delete_cookie("username_cookie")
-    return response
+    session.pop('username', None)
+    return jsonify({'success': 'Successful logout'}), 200
 
 
 @auth.route('/currentuser')
 def get_current_user():
-    #if 'username' in session:
-    #    return jsonify({'username': session['username']}), 200
-    #return jsonify({'error': 'No user currently logged in'}), 401
-
-    username = request.cookies.get("username_cookie")
-    if username:
-        return jsonify({'username': username}), 200
+    if 'username' in session:
+        return jsonify({'username': session['username']}), 200
     return jsonify({'error': 'No user currently logged in'}), 401

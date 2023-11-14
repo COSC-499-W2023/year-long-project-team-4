@@ -101,5 +101,19 @@ Completed:
 - Naming brand
 - Logo Design
 
+# Week 10: Nov 6 - 12
+
+## Tasks Completed:
+![Week10act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/45357d9e-7c9a-4365-a739-b539316a6315)
+
+## Goal Recap:
+
+Tasks from project board:
+- Writing tests for S3 bucket
+
+Completed:
+- Manually tested S3
+- Wrote tests for S3, all of them pass
+
 
 

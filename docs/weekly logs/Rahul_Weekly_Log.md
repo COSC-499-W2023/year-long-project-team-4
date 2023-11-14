@@ -59,5 +59,12 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 
 - Finishing up Figma file and working on implementing further additions from our figma file. 
 
+# Week 10: Nov 6th - Nov 12th:
+## Tasks Completed:
+![week10](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/1ea8bb5f-c60c-4520-a758-e83c82ba31f3)
+- Tentatively finished Figma file while starting work on a recording feature for our front end. 
 
+## In progress:
+
+- Finishing up work on the recording function on front end. 
 

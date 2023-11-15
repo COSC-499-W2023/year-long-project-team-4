@@ -117,3 +117,22 @@ Additional Context:
 - The issue with user login is stil work in progress. After debugging and troubleshooting I have recognized a couple of implementable solutions. Preparing for two midterms due next week, hence took up fewer tasks for this week.
 
 
+# Week 10: Nov 5 - Nov 12 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="869" alt="Screen Shot 2023-11-13 at 10 20 54 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/c71e150b-2122-4a0c-b178-e6e1fce9f834">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Adding Session management for user authentication
+
+Tasks from the Project Board:
+- App Integration
+
+Completed:
+- Session management using Flask-Session module
+- Used session cookies to make user authentication more secure
+
+Additional Context:
+- Will take up new integration task, encryption code is added.
+- Will be working on Documentation and updated frontend test-cases

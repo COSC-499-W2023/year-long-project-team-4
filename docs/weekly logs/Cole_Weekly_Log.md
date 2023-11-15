@@ -95,3 +95,16 @@ Things I worked on:
 Tasks from the project board relevant to things I worked on:
 - Public / Private key generation (research)
 - Encryption / decryption of videos (research)
+
+# Week (10): Nov 5 - Nov 12
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/e8c15e9b-9821-4adb-8d10-f9d36cea0a46)
+
+## Goal Recap:
+Things I worked on:
+- Researching RSA key generation methods
+  
+Tasks from the project board relevant to things I worked on:
+- Public / Private RSA key generation (more research, implementation next)
+- Encryption / decryption of data (Implemented)

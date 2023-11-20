@@ -1,4 +1,4 @@
-from flask import Blueprint, request, session, jsonify, make_response
+from flask import Blueprint, request, session, jsonify, make_response, current_app
 
 import database
 from . import bcrypt

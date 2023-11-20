@@ -10,6 +10,7 @@ import axios from 'axios'
 
 const RecieveAndSendPage = () => {
 
+  const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -28,7 +29,11 @@ const RecieveAndSendPage = () => {
         console.error('Logout error:', response.data.error);
       }
     } catch (error) {
-      console.error('There was an error logging out', error);
+      if (error.response && error.response.data.error) {
+        setErrorMessage(error.response.data.error);
+      } else {
+        setErrorMessage('There was an error Logging out');
+      }
     }
   };
   
@@ -55,6 +60,7 @@ const RecieveAndSendPage = () => {
   return (
     <div className="position-absolute top-50 start-50 translate-middle">
       {currentUser && <h3>Welcome, {currentUser}!</h3>}
+      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
        <div className="d-grid gap-2">
         <Button size="lg" href={uploadVideoPath}> Send Videos</Button> {" "}
         <Button size="lg" href={viewVideoPath}> Receive Videos</Button>

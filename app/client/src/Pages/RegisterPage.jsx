@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {Card, Button, Form} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom'
 import {
@@ -6,6 +6,7 @@ import {
   } from "../Path";
 const RegisterPage = () => {
 
+  const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
 
 const handleSignup = async (firstname, lastname, email, username, password) => {
@@ -31,7 +32,11 @@ const handleSignup = async (firstname, lastname, email, username, password) => {
       console.error(data.error);
     }
   } catch (error) {
-    console.error('There was an error signing up', error);
+    if (error.response && error.response.data.error) {
+      setErrorMessage(error.response.data.error);
+    } else {
+      setErrorMessage('There was an error signing up');
+    }
   }
 };
 
@@ -55,6 +60,7 @@ const handleSubmit = (e) => {
     <Card border="primary" style={{ width: "16rem" }}>  
       <Card.Body className="text-center">
         <Card.Title>Register</Card.Title>
+        {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="p-3">
             <Form.Label>First Name</Form.Label>

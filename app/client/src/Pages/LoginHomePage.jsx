@@ -32,8 +32,11 @@ const LoginHomePage = () => {
         setErrorMessage(response.data.error);
       }
     } catch (error) {
-      console.error('There was an error logging in', error);
-      setErrorMessage('An error occurred. Please try again.');
+      if (error.response && error.response.data.error) {
+        setErrorMessage(error.response.data.error);
+      } else {
+        setErrorMessage('An error occurred. Please try again.');
+      }
     }
   };
 

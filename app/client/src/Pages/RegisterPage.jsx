@@ -4,44 +4,48 @@ import {useNavigate} from 'react-router-dom'
 import {
     loginPath,
   } from "../Path";
+import axios from 'axios'
+
 const RegisterPage = () => {
 
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
 
 const handleSignup = async (firstname, lastname, email, username, password) => {
-  const formData = new URLSearchParams();
+  const formData = new FormData();
   formData.append('firstname', firstname);
   formData.append('lastname', lastname);
   formData.append('email', email);
   formData.append('username', username);
   formData.append('password', password); // Add other form details as needed.
 
-  try {
-    const response = await fetch('http://localhost:8080/auth/signup', {
-      method: 'POST',
-      body: formData,
-    });
+try {
+  const response = await axios({
+    method: 'post',
+    url: 'http://localhost:8080/auth/signup',
+    data: formData,
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
 
-    const data = await response.json();
+  const data = response.data;
 
-    if (data.username) {
-      console.log('Signup successful');
-      navigate(loginPath); // navigate to login after successful registration.
-    } else {
-      console.error(data.error);
-    }
-  } catch (error) {
-    if (error.response && error.response.data.error) {
-      setErrorMessage(error.response.data.error);
-    } else {
-      setErrorMessage('There was an error signing up');
-    }
+  if (data.username) {
+    console.log('Signup successful');
+    navigate(loginPath); // navigate to login after successful registration.
+  } else {
+    // Set the error message from the response
+    setErrorMessage(data.error);
   }
+} catch (error) {
+  // Check if the error has a response with a specific error message
+  if (error.response && error.response.data && error.response.data.error) {
+    setErrorMessage(error.response.data.error);
+  } else {
+    // Set a generic error message for other types of errors
+    setErrorMessage('There was an error signing up');
+  }
+}
 };
-
-
-
 
 const handleSubmit = (e) => {
     e.preventDefault();
@@ -52,8 +56,6 @@ const handleSubmit = (e) => {
     const password = e.target.elements[4].value;  // Assuming the second input is the password
     handleSignup(firstname,lastname, email, username, password);
 };
-
-
 
   return (
   <div className="position-absolute top-50 start-50 translate-middle">          

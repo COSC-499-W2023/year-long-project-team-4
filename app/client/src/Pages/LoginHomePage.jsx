@@ -32,9 +32,10 @@ const LoginHomePage = () => {
         setErrorMessage(response.data.error);
       }
     } catch (error) {
-      if (error.response && error.response.data.error) {
+      if (error.response && error.response.data && error.response.data.error) {
         setErrorMessage(error.response.data.error);
-      } else {
+      }
+      else{
         setErrorMessage('An error occurred. Please try again.');
       }
     }

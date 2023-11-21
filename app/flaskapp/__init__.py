@@ -8,7 +8,7 @@ bcrypt = Bcrypt()
 # Function to create and configure the Flask application
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'asdasdlkmpiianweoian'
+    app.config['SECRET_KEY'] = 'INSECURE_KEY_PLEASE_CHANGE_ME_BEFORE_ANYTHING_IMPORTANT'
 
     # Configure CORS to handle cross-origin requests
     CORS(app, origins="http://localhost:3000", supports_credentials=True)

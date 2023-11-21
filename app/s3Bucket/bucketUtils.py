@@ -10,11 +10,13 @@ SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
 
 
-s3_client = boto3.client(
-'s3',
-aws_access_key_id=ACCESS_KEY,
-aws_secret_access_key=SECRET_KEY,
-aws_session_token=SESSION_TOKEN)
+# s3_client = boto3.client(
+# 's3',
+# aws_access_key_id=ACCESS_KEY,
+# aws_secret_access_key=SECRET_KEY,
+# aws_session_token=SESSION_TOKEN)
+boto3.setup_default_session(profile_name='team4-dev')
+s3_client = boto3.client('s3')
 
 
 def list_buckets():

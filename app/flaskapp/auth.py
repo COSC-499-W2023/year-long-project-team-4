@@ -1,8 +1,13 @@
 from flask import Blueprint, request, session, jsonify, make_response, current_app
-
+import os 
+from dotenv import load_dotenv, dotenv_values
+import sys 
 import database
 from . import bcrypt
 
+sys.path.append(os.path.abspath('../app'))
+load_dotenv()
+Test = os.getenv("TEST")
 #Added this function to create a new instance of auth every time flask app is called for testing
 def create_auth_blueprint():
     auth = Blueprint('auth', __name__)
@@ -28,12 +33,19 @@ def create_auth_blueprint():
             return jsonify({'error': 'Missing last name'}), 400
 
         # Ensure user doesn't already exist
-        existing_user = database.query_records(table_name='userprofile', fields='username', condition=f'username = %s', condition_values=(username,))
+        if Test:
+            existing_user = database.query_records(table_name='userprofile', fields='username', condition=f'username = %s', condition_values=(username,),testcase=True)
+        else:
+            existing_user = database.query_records(table_name='userprofile', fields='username', condition=f'username = %s', condition_values=(username,))
         if existing_user:
             return jsonify({'error': 'User already exists'}), 409
 
         hashed_password = bcrypt.generate_password_hash(password).decode()
-        result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname)
+        #check if testcase
+        if Test:
+            result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname,testcase=True)
+        else:
+            result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname)
         if result == 1:
             session['username'] = username
             return jsonify({'username': username}), 200
@@ -53,7 +65,11 @@ def create_auth_blueprint():
             return jsonify({'error': 'Missing password'}), 400
 
         # Check username exists
-        existing_user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=(username,))
+        if Test: #Test env flag check
+            existing_user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=(username,),testcase=True)
+
+        else:
+            existing_user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=(username,))
         if not existing_user_password:
             return jsonify({'error': 'User not found under specified username'}), 404
 

@@ -74,18 +74,18 @@ def insert_user(username:str, email:str, password:str, firstname:str, lastname:s
                 print("SSH Tunnel Established")
                 #Db connection string
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
-            if db:
-                cur = db.cursor()
-                #Insert String
-                query = "INSERT INTO userprofile (username, email, password_hash, firstname, lastname) values (%s,%s,%s,%s,%s)"
-                #Creates list of the insertations 
-                data = (username,email,password,firstname,lastname)
-                #Executes the query w/ the corrosponding data
-                cur.execute(query,data)
-                print("Insertation Complete")
-                db.commit()
-                #Returns 1 if successful
-                result = 1
+                if db:
+                    cur = db.cursor()
+                    #Insert String
+                    query = "INSERT INTO userprofile (username, email, password_hash, firstname, lastname) values (%s,%s,%s,%s,%s)"
+                    #Creates list of the insertations 
+                    data = (username,email,password,firstname,lastname)
+                    #Executes the query w/ the corrosponding data
+                    cur.execute(query,data)
+                    print("Insertation Complete")
+                    db.commit()
+                    #Returns 1 if successful
+                    result = 1
     #except pymysql.Error as e:
     except Exception as e:
         print(e)

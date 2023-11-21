@@ -1,96 +1,77 @@
-from flask import Blueprint, request, session, jsonify, make_response, current_app
-import os 
-from dotenv import load_dotenv, dotenv_values
-import sys 
+from flask import Blueprint, request, session, jsonify, current_app
+
 import database
 from . import bcrypt
 
-sys.path.append(os.path.abspath('../app'))
-load_dotenv()
-Test = os.getenv("TEST")
-#Added this function to create a new instance of auth every time flask app is called for testing
-def create_auth_blueprint():
-    auth = Blueprint('auth', __name__)
+auth = Blueprint('auth', __name__)
 
-    @auth.route('/signup', methods=['POST'])
-    def signup():
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        firstname = request.form.get('firstname')
-        lastname = request.form.get('lastname')
+@auth.route('/signup', methods=['POST'])
+def signup():
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    firstname = request.form.get('firstname')
+    lastname = request.form.get('lastname')
 
-        # Ensure request is valid
-        if username is None:
-            return jsonify({'error': 'Missing username'}), 400
-        if email is None:
-            return jsonify({'error': 'Missing email'}), 400
-        if password is None:
-            return jsonify({'error': 'Missing password'}), 400
-        if firstname is None:
-            return jsonify({'error': 'Missing first name'}), 400
-        if lastname is None:
-            return jsonify({'error': 'Missing last name'}), 400
+    # Ensure request is valid
+    if username is None:
+        return jsonify({'error': 'Missing username'}), 400
+    if email is None:
+        return jsonify({'error': 'Missing email'}), 400
+    if password is None:
+        return jsonify({'error': 'Missing password'}), 400
+    if firstname is None:
+        return jsonify({'error': 'Missing first name'}), 400
+    if lastname is None:
+        return jsonify({'error': 'Missing last name'}), 400
 
-        # Ensure user doesn't already exist
-        if Test:
-            existing_user = database.query_records(table_name='userprofile', fields='username', condition=f'username = %s', condition_values=(username,),testcase=True)
-        else:
-            existing_user = database.query_records(table_name='userprofile', fields='username', condition=f'username = %s', condition_values=(username,))
-        if existing_user:
-            return jsonify({'error': 'User already exists'}), 409
+    # Ensure user doesn't already exist
+    existing_user = database.query_records(table_name='userprofile', fields='username', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)
+    if existing_user:
+        return jsonify({'error': 'User already exists'}), 409
 
-        hashed_password = bcrypt.generate_password_hash(password).decode()
-        #check if testcase
-        if Test:
-            result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname,testcase=True)
-        else:
-            result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname)
-        if result == 1:
-            session['username'] = username
-            return jsonify({'username': username}), 200
-        else:
-            return jsonify({'error': 'Unknown error adding user'})
-
-
-    @auth.route('/login', methods=['POST'])
-    def login():
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        # Ensure request is valid
-        if username is None:
-            return jsonify({'error': 'Missing username'}), 400
-        if password is None:
-            return jsonify({'error': 'Missing password'}), 400
-
-        # Check username exists
-        if Test: #Test env flag check
-            existing_user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=(username,),testcase=True)
-
-        else:
-            existing_user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=(username,))
-        if not existing_user_password:
-            return jsonify({'error': 'User not found under specified username'}), 404
-
-        # Check password is correct
-        stored_hashed_password = existing_user_password[0]['password_hash']
-        if not bcrypt.check_password_hash(stored_hashed_password, password):
-            return jsonify({'error': 'Incorrect password'}), 401
-
+    hashed_password = bcrypt.generate_password_hash(password).decode()
+    result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname, testcase=current_app.testing)
+    if result == 1:
         session['username'] = username
         return jsonify({'username': username}), 200
+    else:
+        return jsonify({'error': 'Unknown error adding user'})
 
 
-    @auth.route('/logout')
-    def logout():
-        session.pop('username', None)
-        return jsonify({'success': 'Successful logout'}), 200
+@auth.route('/login', methods=['POST'])
+def login():
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    # Ensure request is valid
+    if username is None:
+        return jsonify({'error': 'Missing username'}), 400
+    if password is None:
+        return jsonify({'error': 'Missing password'}), 400
+
+    # Check username exists
+    existing_user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)
+    if not existing_user_password:
+        return jsonify({'error': 'User not found under specified username'}), 404
+
+    # Check password is correct
+    stored_hashed_password = existing_user_password[0]['password_hash']
+    if not bcrypt.check_password_hash(stored_hashed_password, password):
+        return jsonify({'error': 'Incorrect password'}), 401
+
+    session['username'] = username
+    return jsonify({'username': username}), 200
 
 
-    @auth.route('/currentuser')
-    def get_current_user():
-        if 'username' in session:
-            return jsonify({'username': session['username']}), 200
-        return jsonify({'error': 'No user currently logged in'}), 401
-    return auth
+@auth.route('/logout')
+def logout():
+    session.pop('username', None)
+    return jsonify({'success': 'Successful logout'}), 200
+
+
+@auth.route('/currentuser')
+def get_current_user():
+    if 'username' in session:
+        return jsonify({'username': session['username']}), 200
+    return jsonify({'error': 'No user currently logged in'}), 401

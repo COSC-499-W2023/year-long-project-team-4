@@ -16,8 +16,7 @@ def create_app():
     # Initialize Bcrypt for hashing passwords
     bcrypt.init_app(app)
 
-    from .auth import create_auth_blueprint
-    auth = create_auth_blueprint()
+    from .auth import auth
 
     # Register the authentication blueprint
     app.register_blueprint(auth, url_prefix='/auth')

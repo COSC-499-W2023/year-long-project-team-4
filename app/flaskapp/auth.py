@@ -35,7 +35,8 @@ def signup():
 
     salt_hash = os.urandom(64)
     hashed_password = bcrypt.generate_password_hash(password).decode()
-    result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash.hex(), testcase=current_app.testing)
+    result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash.hex(), pubKey='', testcase=current_app.testing)
+
     if result == 1:
         session['username'] = username
         session['pkey_seed'] = password + salt_hash.hex()

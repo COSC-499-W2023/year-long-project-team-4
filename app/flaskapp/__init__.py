@@ -9,7 +9,9 @@ def create_app():
     bcrypt.init_app(app)
 
     from .auth import auth
+    from .bucket_interface import bucket
 
     app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(bucket, url_prefix='/bucket')
 
     return app

@@ -13,14 +13,14 @@ def test_reset():
     assert database.resetTable("videos",True) is True
 
 def test_insert_user():
-    result1 = database.insert_user("test_user", "updated@example.com", "password123", "John", "Doe",True)
-    result2 = database.insert_user("MadeUpUser", "Test@example.com", "password12233", "John", "Doe",True)
+    result1 = database.insert_user("test_user", "updated@example.com", "password123", "John", "Doe","","",True)
+    result2 = database.insert_user("MadeUpUser", "Test@example.com", "password12233", "John", "Doe","","",True)
 
     assert result1 == 1  # Assuming insertion was successful
     assert result2 == 1  # Assuming insertion was successful
 
 def test_insert_video():
-    result = database.insert_video(True,"29-10-23T10:34:09", "01-01-24T01:00:00", "1", "2")
+    result = database.insert_video(True,"29-10-23T10:34:09", "01-01-24T01:00:00", "1", "2","")
 
     assert result == 1  # Assuming insertion was successful
 

@@ -1,18 +1,45 @@
 import React, {useState} from 'react'
 import {Form,Button, ToggleButtonGroup, ToggleButton} from 'react-bootstrap'
 import {useNavigate} from 'react-router-dom'
-import { useReactMediaRecorder } from "react-media-recorder";
-import {
-  viewVideoPath,
-} from "../Path"
-
+import Webcam from 'react-webcam';
+import {viewVideoPath} from "../Path"
+import record from "../Assets/record-btn.svg"
 const UploadVideoPage = () => {
   const navigate = useNavigate();
   const [type, setType] = useState(1);
   const [file, setFile] = useState(null);
   const [disable, setDisable] = useState(true);
-  const { status, startRecording, stopRecording, mediaBlobUrl } =
-    useReactMediaRecorder({ video: true });
+  const [disableRecord, setDisableRecord] = useState(false);
+  const webcamRef = React.useRef(null);
+  const mediaRecorderRef = React.useRef(null);
+  const [capturing, setCapturing] = React.useState(false);
+  const [recordedChunks, setRecordedChunks] = React.useState([]);
+    
+  const handleStartRecord = React.useCallback(() => {
+    setCapturing(true);
+    mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
+      mimeType: "video/webm"
+      });
+    mediaRecorderRef.current.addEventListener(
+      "dataavailable",
+      handleDataAvailable
+      );
+    mediaRecorderRef.current.start();
+    }, [webcamRef, setCapturing, mediaRecorderRef]);
+    
+    const handleDataAvailable = React.useCallback(
+      ({ data }) => {
+        if (data.size > 0) {
+          setRecordedChunks((prev) => prev.concat(data));
+        }
+      },
+      [setRecordedChunks]
+    );
+    const handleStopRecord = React.useCallback(() => {
+      setDisableRecord(true);
+      mediaRecorderRef.current.stop();
+      setCapturing(false);
+    }, [mediaRecorderRef, webcamRef, setCapturing]);
 
   const handleSubmit =(e)=>{
     e.preventDefault();
@@ -22,18 +49,25 @@ const UploadVideoPage = () => {
    const handleChange = (event) => {
     try {
     setFile(URL.createObjectURL(event.target.files[0]));
-    //post request
     } catch(error) {
       setFile(null);
     }
   };
 
+  const handleRetake = () => {
+    setFile(null);
+    setCapturing(false);
+    setDisableRecord(false);
+  }
+
   const handleRecord = (mediaContent) => {
     try {
-      setFile(mediaContent);
+      const mediablob = new Blob(mediaContent,{type: "video/mp4"});
+      setFile(URL.createObjectURL(mediablob));
       setDisable(false);
-      console.log("Media Blob URL:", mediaBlobUrl);
+      console.log("Media Blob URL:", mediablob);
     } catch(error) {
+      console.log(error);
       setFile(null);
       setDisable(true);
     }
@@ -55,7 +89,7 @@ const UploadVideoPage = () => {
       (
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="formFileLg" className="d-grid gap-2">
-          <Form.Label className="display-4 " >Upload Video</Form.Label>
+          <Form.Label className="display-4 text-white">Upload Video</Form.Label>
           <Form.Control 
             type="file" 
             required 
@@ -71,9 +105,10 @@ const UploadVideoPage = () => {
             </>
             ):(
               <video 
+                className="record"
                 src={file}
-                width="500" 
-                height="400" 
+                width="640" 
+                height="360" 
                 controls
               /> 
             )}
@@ -85,24 +120,37 @@ const UploadVideoPage = () => {
       (
       <>
       <Form onSubmit={handleSubmit}>
-        <p>{status}</p>
         <div className="mb-2"> 
-          <Button onClick={startRecording}>Start Recording</Button> {' '}
-          <Button onClick={stopRecording}>Stop Recording</Button>
+        {capturing? 
+          ( <>
+              <Button variant= "danger" active>
+                <img width="16" height="22" src={record}/> 
+              </Button> {' '}
+              <Button onClick={handleStopRecord}>Stop Recording</Button>
+            </>
+          ):(
+            <> 
+              <Button variant= "secondary" active>
+                <img width="16" height="22" src={record}/> 
+              </Button> {' '}
+              <Button onClick={handleStartRecord} disabled={disableRecord}>Start Recording</Button>
+            </> 
+          )
+        }
         </div> 
         <>
-         {file=== null? 
+         {file === null? 
          (
-         <>
-         </>
+          <Webcam  width="640" height="360" audio={true} ref={webcamRef}/>
          ):(
-          <video width="500" height="400" controls>
+          <video  width="640" height="360" controls>
             <source src={file} type="video/mp4"/>
           </video>  
          )}
         </>
         <div className="mb-2">
-          <Button onClick={()=>{handleRecord(mediaBlobUrl)}}>Upload file</Button> {' '}
+          <Button onClick={()=>{handleRecord(recordedChunks)}}>Upload file</Button> {' '}
+          <Button onClick={()=>{handleRetake()}} disabled={disable}>Retake recording</Button> {' '}
           <Button type="submit" disabled={disable}>Send video</Button>
         </div> 
       </Form>   

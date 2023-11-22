@@ -7,7 +7,8 @@ from Crypto import Random
 from Crypto.Cipher import AES, PKCS1_v1_5
 from Crypto.PublicKey import RSA
 
-#import database
+import s3Bucket
+import database
 
 bucket = Blueprint('bucket', __name__)
 
@@ -41,6 +42,10 @@ def rsa_decrypt_aes256_key(encrypted_aes256_key, rsa_private_key):
     decipher = PKCS1_v1_5.new(rsa_private_key)
     aes256_key = decipher.decrypt(encrypted_aes256_key, None)
     return aes256_key
+
+@bucket.route('/upload', methods=['POST'])
+def upload_video():
+    pass
 
 
 if __name__ == '__main__':

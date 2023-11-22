@@ -1,4 +1,7 @@
+import os
+
 from flask import Blueprint, request, session, jsonify, current_app
+from rsa import generate_key
 
 import database
 from . import bcrypt
@@ -30,10 +33,12 @@ def signup():
     if existing_user:
         return jsonify({'error': 'User already exists'}), 409
 
+    salt_hash = os.urandom(64)
     hashed_password = bcrypt.generate_password_hash(password).decode()
-    result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname, testcase=current_app.testing)
+    result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash.hex(), testcase=current_app.testing)
     if result == 1:
         session['username'] = username
+        session['pkey_seed'] = password + salt_hash.hex()
         return jsonify({'username': username}), 200
     else:
         return jsonify({'error': 'Unknown error adding user'})
@@ -60,13 +65,17 @@ def login():
     if not bcrypt.check_password_hash(stored_hashed_password, password):
         return jsonify({'error': 'Incorrect password'}), 401
 
+    salt_hash = database.query_records(table_name='userprofile', fields='salthash', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)
+
     session['username'] = username
+    session['pkey_seed'] = password + salt_hash
     return jsonify({'username': username}), 200
 
 
 @auth.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('pkey_seed', None)
     return jsonify({'success': 'Successful logout'}), 200
 
 

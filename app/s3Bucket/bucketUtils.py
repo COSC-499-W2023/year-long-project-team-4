@@ -3,6 +3,7 @@ import sys,os
 from dotenv import load_dotenv, dotenv_values
 from io import BytesIO
 
+
 sys.path.append(os.path.abspath('../app'))
 load_dotenv()
 ACCESS_KEY = os.getenv("ACCESSKEY")
@@ -130,6 +131,7 @@ def get_object_content(bucket_name,obj_path):
         print(f"Error retrieving content from {obj_path}: {e}")
         return False
 
+
 def get_metadata(bucket_name, obj_path):
     """
     Retrieves metadata for a specified object in an S3 bucket.
@@ -191,6 +193,7 @@ def delete_file(bucket_name, obj_path):
     except Exception as e:
         print(f'Error deleting file {obj_path}: {e}')
         return False
+
 
 if __name__ == "__main__":
     list_buckets()

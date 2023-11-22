@@ -17,7 +17,7 @@ HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
 
 
-def insert_user(username:str, email:str, password:str, firstname:str, lastname:str,salthash, pubKey, testcase:bool=False) -> int:
+def insert_user(username:str, email:str, password:str, firstname:str, lastname:str, salthash, pubKey, testcase:bool=False) -> int:
     '''
     Insert a new user into the database.
 

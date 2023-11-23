@@ -3,9 +3,9 @@ from sshtunnel import SSHTunnelForwarder
 import os 
 from dotenv import load_dotenv, dotenv_values
 import sys 
+import datetime
 
 sys.path.append(os.path.abspath('../app'))
-
 load_dotenv()
 SSHUSER = os.getenv("SSHUSER")
 KPATH = os.getenv("KEYPATH")
@@ -355,11 +355,18 @@ def delete_record(table_name: str, condition: str, condition_values: tuple,testc
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database='Team4dbTest')
                 if db:
                     cur = db.cursor()
-                    query = f"DELETE FROM {table_name} WHERE {condition}"
-                    cur.execute(query, condition_values)
-                    db.commit()
-                    cur.close()
-                    result = 1
+                    query1 = f"START TRANSACTION"
+                    cur.execute(query1)
+                    query2 = f"DELETE FROM {table_name} WHERE {condition}"
+                    cur.execute(query2, condition_values)
+                    value = True # Connect this to S3 bucket
+                    if(value):
+                        db.commit()
+                        cur.close()
+                        result = 1
+                    else:
+                        db.rollback()
+                        result = -1
         except Exception as e:
             print(e)
             result = -1
@@ -501,3 +508,60 @@ def resetTable(tableName:str,testcase:bool=False)-> bool:
         if db:
             db.close()
     return False  # Reset failed
+
+def get_passed_retDates(testcase:bool=False) -> int:
+    """
+    Get a list of the videos needed to be deleted.
+
+    Returns:
+        - list: The videoIDs with a retDate that has passed.
+        - int: -1 if an error occured during retrieval.
+        
+    """
+    db = None
+    result = 0
+    if(testcase):
+        try:
+            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+                print("SSH Tunnel Established")
+                #Db connection string
+                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database='Team4dbTest')
+                if db:
+                    cur = db.cursor(dictionary = True)
+                    present = datetime.datetime.now()
+                    query = f"SELECT videoID FROM videos WHERE retDate >= '{present}'"
+                    cur.execute(query)
+                    data = list(cur.fetchall())
+                    cur.close()
+                    result = data
+        except Exception as e:
+            print(e)
+            result = -1
+        finally:
+            if db:
+                db.close()
+        return result
+    
+    try:
+        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
+                ssh_username=SSHUSER,
+                ssh_pkey=KPATH, 
+                 remote_bind_address=(ADDRESS,PORT)
+        )as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            if db:
+                cur = db.cursor(dictionary = True)
+                query = f"SELECT videoID FROM videos WHERE retDate >= '{present}'"
+                cur.execute(query)
+                data = list(cur.fetchall())
+                cur.close()
+                result = data
+    except Exception as e:
+        print(e)
+        result = -1
+    finally:
+        if db:
+            db.close()
+        return result

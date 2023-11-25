@@ -4,6 +4,7 @@ import RecieveAndSendPage from "./Pages/RecieveAndSendPage";
 import UploadVideoPage from "./Pages/UploadVideoPage";
 import ViewVideoPage from "./Pages/ViewVideoPage";
 import RegisterPage from "./Pages/RegisterPage";
+import "./app.css";
 import {
   loginPath,
   recieveAndSendPath,

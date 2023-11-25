@@ -32,7 +32,7 @@ def get_passed_retDates(testcase:bool=False) -> int:
     Get a list of the videos needed to be deleted.
 
     Returns:
-        - list: The videoIDs with a retDate that has passed.
+        - list: The videoNames with a retDate that has passed.
         - int: -1 if an error occured during retrieval.
         
     """
@@ -47,7 +47,7 @@ def get_passed_retDates(testcase:bool=False) -> int:
                 if db:
                     cur = db.cursor(dictionary = True)
                     present = datetime.datetime.now()
-                    query = f"SELECT videoID FROM videos WHERE retDate >= '{present}'"
+                    query = f"SELECT videoName FROM videos WHERE retDate >= '{present}'"
                     cur.execute(query)
                     data = list(cur.fetchall())
                     cur.close()
@@ -71,7 +71,7 @@ def get_passed_retDates(testcase:bool=False) -> int:
             db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
             if db:
                 cur = db.cursor(dictionary = True)
-                query = f"SELECT videoID FROM videos WHERE retDate >= '{present}'"
+                query = f"SELECT videoName FROM videos WHERE retDate >= '{present}'"
                 cur.execute(query)
                 data = list(cur.fetchall())
                 cur.close()
@@ -205,9 +205,12 @@ def retention(testcase:bool=False) -> int:
     try:
         data = list(get_passed_retDates())
         for items in data:
-            retention_delete("videos", "videoID = %s", (data[items],),True)
+            retention_delete("videoName = %s", (data[items],), data[items], True)
         return True
     except Exception as e:
         print(e)
         return False
         
+        
+# Run function everyday at 11:59PM        
+retention(True)

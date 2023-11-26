@@ -35,7 +35,9 @@ def test_delete_file():
     assert result1 == True #Assuming upload was successful
 
 
-
+def test_encrpyted_insert():
+    result1 = s3Bucket.encrypt_insert("team4-s3",b'test test file for encrpyt', '/test/testFile.txt', "2022-01-22 11:59:00", 2, "MadeUpUser", "as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
+    assert result1 == True
 
 if __name__ == "__main__":
     

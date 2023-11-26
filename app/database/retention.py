@@ -4,7 +4,7 @@ from sshtunnel import SSHTunnelForwarder
 import os
 from dotenv import load_dotenv, dotenv_values
 import sys 
-import datetime
+from datetime import datetime, timezone
 
 sys.path.append(os.path.abspath('../app'))
 load_dotenv()
@@ -20,6 +20,7 @@ DBNAME = os.getenv("MYDB")
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
+
 
 s3_client = boto3.client(
 's3',
@@ -45,13 +46,12 @@ def get_passed_retDates(testcase:bool=False) -> int:
                 #Db connection string
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database='Team4dbTest')
                 if db:
-                    cur = db.cursor(dictionary = True)
-                    present = datetime.datetime.now()
-                    query = f"SELECT videoName FROM videos WHERE retDate >= '{present}'"
-                    cur.execute(query)
-                    data = list(cur.fetchall())
+                    cur = db.cursor()
+                    now = datetime.now(timezone.utc)
+                    query = f"SELECT videoName FROM videos WHERE retDate <= %s"
+                    cur.execute(query,(now,))
+                    result = cur.fetchall()
                     cur.close()
-                    result = data
         except Exception as e:
             print(e)
             result = -1
@@ -70,12 +70,12 @@ def get_passed_retDates(testcase:bool=False) -> int:
             #Db connection string
             db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
             if db:
-                cur = db.cursor(dictionary = True)
-                query = f"SELECT videoName FROM videos WHERE retDate >= '{present}'"
-                cur.execute(query)
-                data = list(cur.fetchall())
+                cur = db.cursor()
+                now = datetime.now(timezone.utc)
+                query = f"SELECT videoName FROM videos WHERE retDate <= %s"
+                cur.execute(query,(now,))
+                result = cur.fetchall()
                 cur.close()
-                result = data
     except Exception as e:
         print(e)
         result = -1
@@ -141,7 +141,7 @@ def retention_delete(condition: str, condition_values: tuple, obj_path: str, tes
                     if(proceed):
                         db.commit()
                         cur.close()
-                        s3_client.delete_object('team4-s3', obj_path)
+                        s3_client.delete_object(Bucket='team4-s3',Key=obj_path)
                         result = 1
                     else:
                         db.rollback()
@@ -174,7 +174,7 @@ def retention_delete(condition: str, condition_values: tuple, obj_path: str, tes
                     if(proceed):
                         db.commit()
                         cur.close()
-                        s3_client.delete_object('team4-s3', obj_path)
+                        s3_client.delete_object(Bucket='team4-s3',Key=obj_path)
                         result = 1
                     else:
                         db.rollback()
@@ -193,17 +193,12 @@ def retention_delete(condition: str, condition_values: tuple, obj_path: str, tes
 def retention(testcase:bool=False) -> int:
     """
     Gets list of videos with passed retention dates and deletes them from the S3 bucket and database.
-    
-    Args:
-        table_name (str): The name of the table from which records will be deleted.
-        condition (str): The WHERE clause condition for deletion.
-        condition_values (tuple): Values to replace placeholders in the condition.
 
     Returns:
        bool: True if the deletion is successful, False otherwise.
     """
     try:
-        data = list(get_passed_retDates())
+        data = get_passed_retDates()
         for items in data:
             retention_delete("videoName = %s", (data[items],), data[items], True)
         return True

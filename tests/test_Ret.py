@@ -2,9 +2,10 @@ import pytest
 import time
 import sys
 import os
+import boto3
+from io import BytesIO
 
 sys.path.append(os.path.abspath('../app'))
-
 import database
 import s3Bucket
 
@@ -14,14 +15,13 @@ def test_passed_retDates():
     assert result1 != -1
     
     # Can't test for actual videoNames with passed retDates because videoNames are random/unkown before calling this function
-
     
 def test_retention_delete():
-    database.insert_video("29-10-23T10:34:09", "01-01-22T01:00:00", "1", "2", True) # Insert videos with passed retention dates
-    database.insert_video("29-10-23T10:34:09", "01-01-22T01:00:00", "2", "1", True)
-    database.insert_video("29-10-23T10:34:09", "01-01-22T01:00:00", "1", "2", True)
+    database.insert_video("Test3.mp4","2022-01-22 11:59:00", "3", "2","", True)
+    s3Bucket.upload_file(b'This is test content', 'team4-s3', 'Test3.mp4')
     
-    result1 = database.retention_delete('videoName = %s', ('TestFile.txt',), 'TestFile.txt', True)
+    
+    result1 = database.retention_delete('videoName = %s', ('Test3.mp4',), 'Test3.mp4', True)
     
     assert  result1 == 1 # Assuming insert was successful
     

@@ -20,7 +20,7 @@ def test_insert_user():
     assert result2 == 1  # Assuming insertion was successful
 
 def test_insert_video():
-    result = database.insert_video("Test.mp4","29-10-23T10:34:09", "01-01-24T01:00:00", "1", "2","",testcase=True)
+    result = database.insert_video("Test.mp4", "01-01-24 11:59:00", "1", "2","",testcase=True)
 
     assert result == 1  # Assuming insertion was successful
 

@@ -21,7 +21,7 @@ def test_retention_delete():
     s3Bucket.upload_file(b'This is test content', 'team4-s3', 'Test3.mp4')
     
     
-    result1 = database.retention_delete('videoName = %s', ('Test3.mp4',), 'Test3.mp4', True)
+    result1 = database.retention_delete('videoName = %s', ('Test3.mp4',), 'Test3.mp4')
     
     assert  result1 == 1 # Assuming insert was successful
     
@@ -29,7 +29,7 @@ def test_ret():
     database.insert_video("Test4.mp4","2022-01-22 11:59:00", "3", "2","", True)
     s3Bucket.upload_file(b'This is test content', 'team4-s3', 'Test4.mp4')
     
-    result1 = database.retention(True)
+    result1 = database.retention()
     
     assert  result1 == True
     

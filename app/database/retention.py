@@ -20,7 +20,7 @@ DBNAME = os.getenv("MYDB")
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
-
+TEST = os.getenv("TEST")
 
 s3_client = boto3.client(
 's3',
@@ -28,7 +28,10 @@ aws_access_key_id=ACCESS_KEY,
 aws_secret_access_key=SECRET_KEY,
 aws_session_token=SESSION_TOKEN)
 
-def get_passed_retDates(testcase:bool=False) -> int:
+if(TEST):
+    DBNAME = "Team4dbTest"
+
+def get_passed_retDates() -> int:
     """
     Get a list of the videos needed to be deleted.
 
@@ -38,28 +41,7 @@ def get_passed_retDates(testcase:bool=False) -> int:
         
     """
     db = None
-    result = 0
-    if(testcase):
-        try:
-            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
-                print("SSH Tunnel Established")
-                #Db connection string
-                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database='Team4dbTest')
-                if db:
-                    cur = db.cursor()
-                    now = datetime.now(timezone.utc)
-                    query = f"SELECT videoName FROM videos WHERE retDate <= %s"
-                    cur.execute(query,(now,))
-                    result = cur.fetchall()
-                    cur.close()
-        except Exception as e:
-            print(e)
-            result = -1
-        finally:
-            if db:
-                db.close()
-        return result
-    
+    result = 0   
     try:
         with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
                 ssh_username=SSHUSER,
@@ -108,7 +90,7 @@ def already_existing_file(bucket_name, obj_path):
 
 
 
-def retention_delete(condition: str, condition_values: tuple, obj_path: str, testcase:bool=False) -> int:
+def retention_delete(condition: str, condition_values: tuple, obj_path: str) -> int:
     """
     Delete records that have a passed retention date.
     
@@ -125,35 +107,6 @@ def retention_delete(condition: str, condition_values: tuple, obj_path: str, tes
     
     db = None
     result = 0
-    if(testcase):
-        try:
-            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
-                print("SSH Tunnel Established")
-                #Db connection string
-                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database='Team4dbTest')
-                if db:
-                    cur = db.cursor()
-                    query1 = f"START TRANSACTION"
-                    cur.execute(query1)
-                    query2 = f"DELETE FROM videos WHERE {condition}"
-                    cur.execute(query2, condition_values)
-                    proceed = already_existing_file('team4-s3',obj_path)
-                    if(proceed):
-                        db.commit()
-                        cur.close()
-                        s3_client.delete_object(Bucket='team4-s3',Key=obj_path)
-                        result = 1
-                    else:
-                        db.rollback()
-                        result = -1
-        except Exception as e:
-            print(e)
-            result = -1
-        finally:
-            if db:
-                db.close()
-        return result
-    
     try:
         with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
                 ssh_username=SSHUSER,
@@ -190,7 +143,7 @@ def retention_delete(condition: str, condition_values: tuple, obj_path: str, tes
     
     
    
-def retention(testcase:bool=False) -> int:
+def retention() -> int:
     """
     Gets list of videos with passed retention dates and deletes them from the S3 bucket and database.
 

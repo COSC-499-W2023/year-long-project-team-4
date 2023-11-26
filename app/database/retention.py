@@ -207,5 +207,5 @@ def retention(testcase:bool=False) -> int:
         return False
         
         
-# Run function everyday at 11:59PM        
-retention(True)
+if __name__ == "__main__":
+    retention()

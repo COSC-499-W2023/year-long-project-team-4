@@ -31,7 +31,7 @@ aws_session_token=SESSION_TOKEN)
 if(TEST):
     DBNAME = "Team4dbTest"
 
-def get_passed_retDates() -> int:
+def get_passed_retDates() -> list:
     """
     Get a list of the videos needed to be deleted.
 
@@ -41,7 +41,7 @@ def get_passed_retDates() -> int:
         
     """
     db = None
-    result = 0   
+    result = []
     try:
         with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
                 ssh_username=SSHUSER,
@@ -65,8 +65,7 @@ def get_passed_retDates() -> int:
         if db:
             db.close()
         return result
-    
-    
+       
 # Fuction from bucketUtils.py ------------------------------------    
 def already_existing_file(bucket_name, obj_path):
     """
@@ -87,8 +86,6 @@ def already_existing_file(bucket_name, obj_path):
         print(f"Object {obj_path} does not exist in {bucket_name}")
         return False
 # -----------------------------------------------------------------
-
-
 
 def retention_delete(condition: str, condition_values: tuple, obj_path: str) -> int:
     """
@@ -139,10 +136,7 @@ def retention_delete(condition: str, condition_values: tuple, obj_path: str) -> 
         if db:
             db.close()
         return result
-    
-    
-    
-   
+     
 def retention() -> int:
     """
     Gets list of videos with passed retention dates and deletes them from the S3 bucket and database.
@@ -153,7 +147,7 @@ def retention() -> int:
     try:
         data = get_passed_retDates()
         for items in data:
-            retention_delete("videoName = %s", (data[items],), data[items], True)
+            retention_delete("videoName = %s", (data[items],), data[items])
         return True
     except Exception as e:
         print(e)

@@ -9,6 +9,10 @@ sys.path.append(os.path.abspath('../app'))
 import database
 import s3Bucket
 
+def test_reset():
+    assert database.resetTable("userprofile",True) is True
+    assert database.resetTable("videos",True) is True
+
 def test_passed_retDates():
     result1 = database.get_passed_retDates()
     
@@ -37,6 +41,7 @@ def test_ret():
 if __name__ == "__main__":
     
     start_time = time.time()
+    test_reset()
     test_passed_retDates()
     test_retention_delete()
     test_ret()

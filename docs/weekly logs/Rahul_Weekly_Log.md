@@ -66,5 +66,14 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 
 ## In progress:
 
-- Finishing up work on the recording function on front end. 
+- Finishing up work on the recording function on the front end. 
 
+
+# Week 11-12: Nov 7th - Nov 26th:
+## Tasks Completed:
+![Week11-12](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/badf8958-2c08-4564-869c-89450a07052c)
+- Finished recording function for frontend while also updating the frontend appearance.
+
+## In progress:
+
+- Creating an account page. 

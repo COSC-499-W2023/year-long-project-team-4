@@ -4,9 +4,7 @@ import sys
 import os
 
 sys.path.append(os.path.abspath('../app'))
-
 import database
-
 
 def test_reset():
     assert database.resetTable("userprofile",True) is True
@@ -20,7 +18,7 @@ def test_insert_user():
     assert result2 == 1  # Assuming insertion was successful
 
 def test_insert_video():
-    result = database.insert_video("Test.mp4", "01-01-24 11:59:00", "1", "2","",testcase=True)
+    result = database.insert_video("Test.mp4", "2024-01-24 11:59:00", "1", "2","",testcase=True)
 
     assert result == 1  # Assuming insertion was successful
 

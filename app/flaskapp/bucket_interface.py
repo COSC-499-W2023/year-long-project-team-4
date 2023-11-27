@@ -47,16 +47,19 @@ def rsa_decrypt_aes256_key(encrypted_aes256_key, rsa_private_key):
 
 @bucket.route('/upload', methods=['POST'])
 def upload_video():
-    msg = request.form.get('msg')
-    recipient_username = request.form.get('recipient')
+    print(f'Request files: {request.files.to_dict()}')
+    print(f'Request data: {request.data}')
+    return 'Sample request result'
+    # msg = request.form.get('msg')
+    # recipient_username = request.form.get('recipient')
 
-    recipient_public_key = database.query_records(table_name='userprofile', fields='publickey', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)[0]['publickey']
-    print(recipient_public_key)
+    # recipient_public_key = database.query_records(table_name='userprofile', fields='publickey', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)[0]['publickey']
+    # print(recipient_public_key)
 
-    msg_json, aes_key = aes_encrypt_video(msg)
+    # msg_json, aes_key = aes_encrypt_video(msg)
 
-    rsa_private_key = generate_key(session['pkey_seed'])
-    rsa_public_key = rsa_private_key.public_key()
+    # rsa_private_key = generate_key(session['pkey_seed'])
+    # rsa_public_key = rsa_private_key.public_key()
 
 @bucket.route('/retrieve', methods=['POST'])
 def retrieve_video():

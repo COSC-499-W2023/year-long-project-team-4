@@ -97,7 +97,7 @@ def insert_user(username:str, email:str, password:str, firstname:str, lastname:s
         return result
 
 
-def insert_video(subDate:str, retDate:str, senderID:str, recieverID:str, encrpyt, testcase:bool=False) -> int:
+def insert_video(videoName:str, subDate:str, retDate:str, senderID:str, recieverID:str, encrpyt, testcase:bool=False) -> int:
     '''
     Insert a new video into the database.
 
@@ -128,9 +128,9 @@ def insert_video(subDate:str, retDate:str, senderID:str, recieverID:str, encrpyt
                 if db:
                     cur = db.cursor()
                     #Insert String
-                    query = "INSERT INTO videos(subDate, retDate, senderID, recieverID, encrpyt) values (%s,%s,%s,%s,%s)"
+                    query = "INSERT INTO videos(videoName, subDate, retDate, senderID, recieverID, encrpyt) values (%s, %s, %s, %s, %s, %s)"
                     #Creates list of the insertations 
-                    data = (subDate, retDate, senderID, recieverID, encrpyt)
+                    data = (videoName, subDate, retDate, senderID, recieverID, encrpyt)
                     #Executes the query w/ the corrosponding data
                     cur.execute(query,data)
                     print("Insertation Complete")
@@ -156,9 +156,9 @@ def insert_video(subDate:str, retDate:str, senderID:str, recieverID:str, encrpyt
             if db:
                 cur = db.cursor()
                 #Insert String
-                query = "INSERT INTO videos (subDate, retDate, senderID, recieverID, encrpyt) values (%s,%s,%s,%s,%s)"
+                query = "INSERT INTO videos (videoName, subDate, retDate, senderID, recieverID, encrpyt) values (%s, %s,%s,%s,%s,%s)"
                 #Creates list of the insertations 
-                data = (subDate, retDate, senderID, recieverID, encrpyt)
+                data = (videoName, subDate, retDate, senderID, recieverID, encrpyt)
                 #Executes the query w/ the corrosponding data
                 cur.execute(query,data)
                 print("Insertation Complete")

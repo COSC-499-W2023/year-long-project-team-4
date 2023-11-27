@@ -4,6 +4,7 @@ import {useNavigate} from 'react-router-dom'
 import Webcam from 'react-webcam';
 import {viewVideoPath} from "../Path"
 import record from "../Assets/record-btn.svg"
+import axios from "axios";
 const UploadVideoPage = () => {
   const navigate = useNavigate();
   const [type, setType] = useState(1);
@@ -17,13 +18,16 @@ const UploadVideoPage = () => {
     
   const handleStartRecord = React.useCallback(() => {
     setCapturing(true);
+
     mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
       mimeType: "video/webm"
       });
+
     mediaRecorderRef.current.addEventListener(
       "dataavailable",
       handleDataAvailable
       );
+
     mediaRecorderRef.current.start();
     }, [webcamRef, setCapturing, mediaRecorderRef]);
     
@@ -35,14 +39,24 @@ const UploadVideoPage = () => {
       },
       [setRecordedChunks]
     );
+
     const handleStopRecord = React.useCallback(() => {
       setDisableRecord(true);
+
       mediaRecorderRef.current.stop();
+      
       setCapturing(false);
     }, [mediaRecorderRef, webcamRef, setCapturing]);
 
   const handleSubmit =(e)=>{
     e.preventDefault();
+    
+    axios.post("http://localhost:8080/bucket/upload", {
+      video: file
+    })
+    .then(res => console.log('data posted', res)
+    .catch(err => console.log(err)));
+    
     navigate(viewVideoPath,{state:{file:file}});
    };
 
@@ -56,7 +70,9 @@ const UploadVideoPage = () => {
 
   const handleRetake = () => {
     setFile(null);
+
     setCapturing(false);
+    
     setDisableRecord(false);
   }
 
@@ -64,8 +80,9 @@ const UploadVideoPage = () => {
     try {
       const mediablob = new Blob(mediaContent,{type: "video/mp4"});
       setFile(URL.createObjectURL(mediablob));
+      
       setDisable(false);
-      console.log("Media Blob URL:", mediablob);
+
     } catch(error) {
       console.log(error);
       setFile(null);

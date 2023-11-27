@@ -122,9 +122,9 @@ def retention_delete(condition: str, condition_values: tuple, obj_path: str) -> 
                     cur.execute(query2, condition_values)
                     proceed = already_existing_file('team4-s3',obj_path)
                     if(proceed):
+                        s3_client.delete_object(Bucket='team4-s3',Key=obj_path)
                         db.commit()
                         cur.close()
-                        s3_client.delete_object(Bucket='team4-s3',Key=obj_path)
                         result = 1
                     else:
                         db.rollback()

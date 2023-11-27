@@ -136,3 +136,34 @@ Completed:
 Additional Context:
 - Will take up new integration task, encryption code is added.
 - Will be working on Documentation and updated frontend test-cases
+
+
+# Week 12: Nov 12 - Nov 26 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![PersonalTasks](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/595d2abd-d76e-45a8-ae2a-93571f0b6866)
+
+
+## Goal Recap:
+
+<img width="745" alt="Screen Shot 2023-11-26 at 9 52 55 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/4b2e74df-21de-4799-8ae8-b9cc52ed07d1">
+
+The features that were mine to complete this week were:
+- Fix all bugs and incorporate review in the app-integration branch
+- Improve authentication performance by using front-end session cookies instead of storing authentication details in the backend
+
+Tasks from the Project Board:
+- User Login w/ Permissions
+- Authentication
+- Design Submission
+
+Completed:
+- Received review on the app-integration branch. Incorporated the review changes
+- Fixed error handling for bad/unauthorized requests when user logs into the portal
+- Changed the state management from "filesystem"(backend storage) type session to session-cookie (frontend storage)
+- Researched about best practices to create System Architecture document
+
+Additional Context:
+- I'm waiting for encryption/decryption to be completed so that I can integrate the feature to our frontend
+- Will work on Error Handling front end nagvigation: 404 NOT FOUND
+- Started working on System Architecture Document.

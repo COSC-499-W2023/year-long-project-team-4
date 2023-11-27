@@ -153,4 +153,29 @@ Completed:
 - S3bucket is set up and ready to be connected with the encryption/decryption side of the code
 
 Additional Context:
-- Waiting for other things before I can continue work for this week. 
+- Waiting for other things before I can continue work for this week.
+
+# Week 12: Nov 12 - Nov 26 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![PersonalTasks](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/595d2abd-d76e-45a8-ae2a-93571f0b6866)
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Adding functionality to the database and S3 utility files for others to progress on their code
+- Doing the database ER diagrams
+
+Tasks from the Project Board:
+- Data retention for video
+- Public/Private Key Generation
+- Encryption/Decryption
+- Design Submission
+- Project Presentation
+
+Completed:
+- Finished integration for this current sprint
+- assisted with data retention and the theory on how to implement it 
+
+Additional Context:
+- I'm waiting for others before I can continue work for this week. Need encryption to finish so I can further implement.

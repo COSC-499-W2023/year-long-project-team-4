@@ -1,14 +1,16 @@
 import os
+import sys
 import json
 from base64 import b64encode, b64decode
 
 from flask import Blueprint, request, session, jsonify, current_app
+from rsa import generate_key
 from Crypto import Random
 from Crypto.Cipher import AES, PKCS1_v1_5
 from Crypto.PublicKey import RSA
 
-import s3Bucket
-import database
+#import s3Bucket
+#import database
 
 bucket = Blueprint('bucket', __name__)
 
@@ -45,6 +47,19 @@ def rsa_decrypt_aes256_key(encrypted_aes256_key, rsa_private_key):
 
 @bucket.route('/upload', methods=['POST'])
 def upload_video():
+    msg = request.form.get('msg')
+    recipient_username = request.form.get('recipient')
+
+    recipient_public_key = database.query_records(table_name='userprofile', fields='publickey', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)[0]['publickey']
+    print(recipient_public_key)
+
+    msg_json, aes_key = aes_encrypt_video(msg)
+
+    rsa_private_key = generate_key(session['pkey_seed'])
+    rsa_public_key = rsa_private_key.public_key()
+
+@bucket.route('/retrieve', methods=['POST'])
+def retrieve_video():
     pass
 
 
@@ -53,11 +68,21 @@ if __name__ == '__main__':
     rsa_private_key = RSA.generate(2048)
     rsa_public_key = rsa_private_key.public_key()
 
+    export = rsa_public_key.export_key('DER')
+    print(export.hex())
+    print(sys.getsizeof(export))
+    #print(rsa_public_key.size_in_bytes())
+    encoded = b64encode(export)
+
+
     # msg is our video
     msg = b'this is my message'
 
     # encrypt our video
     msg_json, aes_key = aes_encrypt_video(msg)
+
+    print(aes_key.hex())
+    exit()
 
     # encrypt the AES key used to encrypt the video using our RSA public key
     encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, rsa_public_key)

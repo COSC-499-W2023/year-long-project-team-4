@@ -115,5 +115,19 @@ Completed:
 - Manually tested S3
 - Wrote tests for S3, all of them pass
 
+# Week 11/12: Nov 13 - 26
+
+## Tasks Completed:
+![Week12act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/7f86200d-1a51-4495-96d1-50a9b0de746f)
 
 
+## Goal Recap:
+
+Tasks from project board:
+- Creating video retention feature
+- Creating email notifications
+
+Completed:
+- Finished video retention
+- Tested and recieved reviews on retention feature
+- Research for email notifications

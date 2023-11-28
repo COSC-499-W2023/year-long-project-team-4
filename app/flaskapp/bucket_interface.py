@@ -56,6 +56,8 @@ def rsa_decrypt_aes256_key(encrypted_aes256_key, rsa_private_key):
 def upload_video():
     print(f'Request files: {request.files.to_dict()}')
     print(f'Request data: {request.data}')
+    print(request.files.get('file'))
+    print(request.files.get('video'))
     return 'Sample request result'
     # msg = request.form.get('msg')
     # recipient_username = request.form.get('recipient')

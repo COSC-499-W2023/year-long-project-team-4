@@ -10,9 +10,16 @@ from Crypto.Cipher import AES, PKCS1_v1_5
 from Crypto.PublicKey import RSA
 
 #import s3Bucket
-#import database
+import database
 
 bucket = Blueprint('bucket', __name__)
+
+def get_public_key(email):
+    import_string = database.query_records(table_name='userprofile', fields='publickey', condition=f'email = %s', condition_values=(email,), testcase=current_app.testing)[0]['publickey']
+    return RSA.import_key(import_string)
+
+def get_private_key():
+    return generate_key(session['pkey_seed'])
 
 def aes_encrypt_video(data):
     aes256_key = Random.get_random_bytes(32)
@@ -67,16 +74,27 @@ def retrieve_video():
 
 
 if __name__ == '__main__':
+    key = get_public_key('test123@example.com')
+    print(key.export_key('PEM'))
+    exit()
     # our RSA private and public keys
     rsa_private_key = RSA.generate(2048)
     rsa_public_key = rsa_private_key.public_key()
 
-    export = rsa_public_key.export_key('DER')
-    print(export.hex())
-    print(sys.getsizeof(export))
+    export = rsa_public_key.export_key('PEM')
+    print(export)
+    print(len(export))
+    decoded = export.decode('utf-8')
+    print(decoded)
+    print(len(decoded))
     #print(rsa_public_key.size_in_bytes())
-    encoded = b64encode(export)
-
+    #encoded = b64encode(export)
+    # print(str(export))
+    # stuff = b'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuczR76U9NViOFQy4Fhvl\n1JOeKyWG0Ko3uL1omoWGqZ9fSEElho06c/NsE01Oaj6HZ6h91WrRYTvIttTiCSU/\n7G1pAn6x4IHmDOTFx2fJRgaDJPUXTLnNSEK0iRFJb559tdnjwoM9mdQs+fjvRK/F\nZrohGPe/MeF5LGsg99X81TZbi34Lm3v6k3M7CNYw1YmNMi3zQwZvQxd2XkcodLTt\n3l4V0TNfBsdxuqKAGmIufp+UQ9YgoMGCHSNfS+Bp6m9XXuLmLqU1oLh+R4pk9WnJ\nk1TFRn99TyV7tBQHWUfGwaQ1k4vjbqmRKMDP+dPzVPtDGfzaxOxO4B4tq85bWjEZ\nxQIDAQAB'
+    # print(stuff.hex())
+    # print()
+    # print(b64decode(stuff).hex())
+    exit()
 
     # msg is our video
     msg = b'this is my message'

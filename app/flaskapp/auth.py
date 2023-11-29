@@ -36,13 +36,11 @@ def signup():
     salt_hash = os.urandom(64)
     private_key_seed = password + salt_hash.hex()
     private_key = generate_key(private_key_seed)
-    public_key = private_key.publickey()
-    print(public_key)
-
+    public_key = private_key.publickey().export_key('PEM')
 
     hashed_password = bcrypt.generate_password_hash(password).decode()
-    result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash.hex(), pubKey='', testcase=current_app.testing)
-
+    result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash, pubKey=public_key, testcase=current_app.testing)
+    
     if result == 1:
         session['username'] = username
         session['pkey_seed'] = password + salt_hash.hex()
@@ -75,7 +73,8 @@ def login():
     salt_hash = database.query_records(table_name='userprofile', fields='salthash', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)[0]['salthash']
 
     session['username'] = username
-    session['pkey_seed'] = password + salt_hash.decode('utf-8')
+    session['pkey_seed'] = password + salt_hash.hex()
+
     return jsonify({'username': username}), 200
 
 
@@ -91,11 +90,3 @@ def get_current_user():
     if 'username' in session:
         return jsonify({'username': session['username']}), 200
     return jsonify({'error': 'No user currently logged in'}), 401
-
-# @auth.route('/pkey')
-# def pkey():
-#     if 'username' in session:
-#         print(session['pkey_seed'])
-#     else:
-#         print('error pkey')
-#     return '1'

@@ -210,7 +210,7 @@ def delete_file(bucket_name, obj_path):
         return False
 
 
-def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recieverUserName, encrpytKey):
+def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, receiverEmail, encrpytKey):
     """
     This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
 
@@ -241,35 +241,53 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recie
                     query1 = f"START TRANSACTION"
                     cur.execute(query1)
                     
-                    recQuery = "SELECT id FROM userprofile WHERE username LIKE %s"
-                    cur.execute(recQuery,(recieverUserName,))
+                    recQuery = "SELECT id FROM userprofile WHERE email LIKE %s"
+                    cur.execute(recQuery,(receiverEmail,))
                     recID = cur.fetchone()
+                    
                     if recID:
                         recID = recID[0]
                     else:
-                        raise ValueError("No user found under that username.")
+                        raise ValueError("That email was not found.")
                     
-                    userQuery = "SELECT firstname, lastname from userprofile WHERE id = %s"
-                    cur.execute(userQuery,(senderId,))
-                    userInfo = cur.fetchall()
-                    if userInfo:
-                        userFname = userInfo[0][0]
-                        userLname = userInfo[0][1]
-                    else:
-                        raise ValueError("Error retrieving current users information.")
+                    # Checks to see if guest or not
+                    if senderId:
+                        userQuery = "SELECT firstname, lastname from userprofile WHERE id = %s"
+                        cur.execute(userQuery,(senderId,))
+                        userInfo = cur.fetchall()
+                        
+                        if userInfo:
+                            userFname = userInfo[0][0]
+                            userLname = userInfo[0][1]
+                        else:
+                            raise ValueError("Error retrieving current users information.")
                     
-                    insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderID, senderFName, senderLName, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
-                    data = (obj_path,subDate, retDate, senderId, userFname, userLname, recID, encrpytKey)
-                    cur.execute(insertQuery, data)
-                    proceed = already_existing_file('team4-s3',obj_path)
-                    if(not proceed):
-                        upload_file(file_content, bucket=bucket_name,store_as=obj_path)
-                        db.commit()
-                        cur.close()
-                        result = True
-                    else:
-                        db.rollback()
-                        result = False
+                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderID, senderFName, senderLName, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
+                        data = (obj_path,subDate, retDate, senderId, userFname, userLname, recID, encrpytKey)
+                        cur.execute(insertQuery, data)
+                        proceed = already_existing_file('team4-s3',obj_path)
+                        if(not proceed):
+                            upload_file(file_content, bucket=bucket_name,store_as=obj_path)
+                            db.commit()
+                            cur.close()
+                            result = True
+                        else:
+                            db.rollback()
+                            result = False
+                    #If guest it does the same calls just without senderId
+                    else:        
+                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s)"
+                        data = (obj_path, subDate, retDate, recID, encrpytKey)
+                        cur.execute(insertQuery, data)
+                        proceed = already_existing_file('team4-s3',obj_path)
+                        if(not proceed):
+                            upload_file(file_content, bucket=bucket_name,store_as=obj_path)
+                            db.commit()
+                            cur.close()
+                            result = True
+                        else:
+                            db.rollback()
+                            result = False      
     except Exception as e:
         print(e)
         result = False
@@ -283,3 +301,5 @@ if __name__ == "__main__":
     list_buckets()
     list_objs('team4-s3')
     get_object_content('team4-s3',"test.txt")
+    delete_file("team4-s3", '/test/testFile.txt')
+    delete_file("team4-s3", '/test/testFile2.txt')

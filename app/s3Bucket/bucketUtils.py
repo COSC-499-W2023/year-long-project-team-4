@@ -295,11 +295,11 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recei
         if db:
             db.close()
         return result
-    
-    
+
+
 if __name__ == "__main__":
     list_buckets()
     list_objs('team4-s3')
-    get_object_content('team4-s3',"test.txt")
+    get_object_content('team4-s3',"/test/testFile.txt")
     delete_file("team4-s3", '/test/testFile.txt')
     delete_file("team4-s3", '/test/testFile2.txt')

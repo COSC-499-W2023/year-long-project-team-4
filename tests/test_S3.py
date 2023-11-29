@@ -42,6 +42,11 @@ def test_encrpyted_insert():
     result2 = s3Bucket.encrypt_insert(bucket_name="team4-s3",file_content=b'test test file for encrpyt', obj_path='/test/testFile2.txt', retDate= "2022-01-22 11:59:00", senderId = "", receiverEmail="Test@example.com", encrpytKey="as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
     assert result1 == True
     assert result2 == True
+
+def test_get_object_content():
+    result = s3Bucket.get_object_content('team4-s3','test/testFile.txt')
+    assert result is not None
+
 if __name__ == "__main__":
     
     start_time = time.time()

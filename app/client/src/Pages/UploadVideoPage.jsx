@@ -9,6 +9,7 @@ const UploadVideoPage = () => {
   const navigate = useNavigate();
   const [type, setType] = useState(1);
   const [file, setFile] = useState(null);
+  const [backend, setBackend] = useState(null);
   const [disable, setDisable] = useState(true);
   const [disableRecord, setDisableRecord] = useState(false);
   const webcamRef = React.useRef(null);
@@ -51,17 +52,29 @@ const UploadVideoPage = () => {
   const handleSubmit =(e)=>{
     e.preventDefault();
     
-    axios.post("http://localhost:8080/bucket/upload", {
-      video: file
-    })
-    .then(res => console.log('data posted', res)
-    .catch(err => console.log(err)));
+    const videoData = new FormData();
+
+    videoData.append('file', backend, 'videoFile.mp4');
+
+    // console.log(videoData.get('file'));
+
+    axios.post("http://localhost:8080/bucket/upload", 
+      videoData,
+      {
+        headers: {
+            'Authorization': `Bearer ${'token'}`, 
+            'Content-Type': 'multipart/form-data'
+        },
+      }
+    )
+    .then(res => console.log('data posted', res.data));
     
     navigate(viewVideoPath,{state:{file:file}});
    };
 
    const handleChange = (event) => {
     try {
+    setBackend(event.target.files[0]);
     setFile(URL.createObjectURL(event.target.files[0]));
     } catch(error) {
       setFile(null);
@@ -79,6 +92,7 @@ const UploadVideoPage = () => {
   const handleRecord = (mediaContent) => {
     try {
       const mediablob = new Blob(mediaContent,{type: "video/mp4"});
+      setBackend(mediablob);
       setFile(URL.createObjectURL(mediablob));
       
       setDisable(false);

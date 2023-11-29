@@ -2,21 +2,36 @@ import boto3
 import sys,os
 from dotenv import load_dotenv, dotenv_values
 from io import BytesIO
-
+from sshtunnel import SSHTunnelForwarder
+import pymysql
+from datetime import datetime, timezone
 
 sys.path.append(os.path.abspath('../app'))
 load_dotenv()
+SSHUSER = os.getenv("SSHUSER")
+KPATH = os.getenv("KEYPATH")
+ADDRESS = os.getenv("ADDRESS")
+PORT = int(os.getenv("PORT"))
+DBUSER = os.getenv("DBUSER")
+DBPASS = os.getenv("PASS")
+HOST = os.getenv("HOST")
+DBNAME = os.getenv("MYDB")
+
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
+TEST = os.getenv("TEST")
 
+# s3_client = boto3.client(
+# 's3',
+# aws_access_key_id=ACCESS_KEY,
+# aws_secret_access_key=SECRET_KEY,
+# aws_session_token=SESSION_TOKEN)
+boto3.setup_default_session(profile_name='team4-dev')
+s3_client = boto3.client('s3')
 
-s3_client = boto3.client(
-'s3',
-aws_access_key_id=ACCESS_KEY,
-aws_secret_access_key=SECRET_KEY,
-aws_session_token=SESSION_TOKEN)
-
+if(TEST):
+    DBNAME = 'Team4dbTest'
 
 def list_buckets():
     """
@@ -195,7 +210,96 @@ def delete_file(bucket_name, obj_path):
         return False
 
 
+def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, receiverEmail, encrpytKey):
+    """
+    This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
+
+    Args:
+        bucket_name (str): The bucket to target for s3
+        file_content (bytes): The file after being encrypted 
+        obj_path (str): the path for the obj to be saved under  
+        retDate(dateTime): The date to delete
+        senderId(int): The id of the current user trying to submit the video
+        recieverUserName: The user name of the target person to view the video
+        encrpytKey: The public key of the sender 
+    """
+    db = None
+    result = 0
+    subDate = datetime.now(timezone.utc)
+    try:
+        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
+                ssh_username=SSHUSER,
+                ssh_pkey=KPATH, 
+                remote_bind_address=(ADDRESS,PORT)
+        )as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            if db:
+                if db:
+                    cur = db.cursor()
+                    query1 = f"START TRANSACTION"
+                    cur.execute(query1)
+                    
+                    recQuery = "SELECT id FROM userprofile WHERE email LIKE %s"
+                    cur.execute(recQuery,(receiverEmail,))
+                    recID = cur.fetchone()
+                    
+                    if recID:
+                        recID = recID[0]
+                    else:
+                        raise ValueError("That email was not found.")
+                    
+                    # Checks to see if guest or not
+                    if senderId:
+                        userQuery = "SELECT firstname, lastname from userprofile WHERE id = %s"
+                        cur.execute(userQuery,(senderId,))
+                        userInfo = cur.fetchall()
+                        
+                        if userInfo:
+                            userFname = userInfo[0][0]
+                            userLname = userInfo[0][1]
+                        else:
+                            raise ValueError("Error retrieving current users information.")
+                    
+                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderID, senderFName, senderLName, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
+                        data = (obj_path,subDate, retDate, senderId, userFname, userLname, recID, encrpytKey)
+                        cur.execute(insertQuery, data)
+                        proceed = already_existing_file('team4-s3',obj_path)
+                        if(not proceed):
+                            upload_file(file_content, bucket=bucket_name,store_as=obj_path)
+                            db.commit()
+                            cur.close()
+                            result = True
+                        else:
+                            db.rollback()
+                            result = False
+                    #If guest it does the same calls just without senderId
+                    else:        
+                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s)"
+                        data = (obj_path, subDate, retDate, recID, encrpytKey)
+                        cur.execute(insertQuery, data)
+                        proceed = already_existing_file('team4-s3',obj_path)
+                        if(not proceed):
+                            upload_file(file_content, bucket=bucket_name,store_as=obj_path)
+                            db.commit()
+                            cur.close()
+                            result = True
+                        else:
+                            db.rollback()
+                            result = False      
+    except Exception as e:
+        print(e)
+        result = False
+    finally:
+        if db:
+            db.close()
+        return result
+
+
 if __name__ == "__main__":
     list_buckets()
     list_objs('team4-s3')
-    get_object_content('team4-s3',"test.txt")
+    get_object_content('team4-s3',"/test/testFile.txt")
+    delete_file("team4-s3", '/test/testFile.txt')
+    delete_file("team4-s3", '/test/testFile2.txt')

@@ -35,7 +35,17 @@ def test_delete_file():
     assert result1 == True #Assuming upload was successful
 
 
+# to properly test this file, you must make sure there is no duplicates in the s3 already (Call just s3_bucketUtils.py) 
+#and reset the DB to make sure there are not duplicate obj_path names
+def test_encrpyted_insert():
+    result1 = s3Bucket.encrypt_insert("team4-s3",b'test test file for encrpyt', '/test/testFile.txt', "2022-01-22 11:59:00", 2, "Test@example.com", "as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
+    result2 = s3Bucket.encrypt_insert(bucket_name="team4-s3",file_content=b'test test file for encrpyt', obj_path='/test/testFile2.txt', retDate= "2022-01-22 11:59:00", senderId = "", receiverEmail="Test@example.com", encrpytKey="as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
+    assert result1 == True
+    assert result2 == True
 
+def test_get_object_content():
+    result = s3Bucket.get_object_content('team4-s3','test/testFile.txt')
+    assert result is not None
 
 if __name__ == "__main__":
     

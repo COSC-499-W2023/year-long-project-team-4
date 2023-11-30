@@ -155,8 +155,13 @@ def download_files(bucket_name, path_to_download, save_as=None):
             return False
 
     else:
-        import shutil
-        shutil.copyfile(f'.{path_to_download}', save_as)
+        try:
+            import shutil
+            shutil.copyfile(f'.{path_to_download}', save_as)
+            return True
+        except Exception as e:
+            print(f'Failed to copy from {path_to_download} to {save_as}: {e}')
+            return False
 
 
 def get_object_content(bucket_name,obj_path):

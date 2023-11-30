@@ -205,7 +205,7 @@ def delete_file(obj_path):
         return False
 
 
-def encrypt_insert(file_content, obj_path, retDate, senderEmail, receiverEmail, encryptKey):
+def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, receiverEmail, encryptKey):
     """
     This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
 
@@ -217,7 +217,10 @@ def encrypt_insert(file_content, obj_path, retDate, senderEmail, receiverEmail, 
         senderId(int): The id of the current user trying to submit the video
         recieverUserName: The user name of the target person to view the video
         encrpytKey: The public key of the sender 
+        file_flag: sets the folder to be saved into 
     """
+    obj_path = f"{file_flag}/{senderEmail}/{obj_path}"
+    
     db = None
     result = 0
     subDate = datetime.now(timezone.utc)
@@ -286,6 +289,7 @@ def encrypt_insert(file_content, obj_path, retDate, senderEmail, receiverEmail, 
                             result = False      
     except Exception as e:
         print(e)
+        db.rollback()
         result = False
     finally:
         if db:
@@ -296,6 +300,7 @@ def encrypt_insert(file_content, obj_path, retDate, senderEmail, receiverEmail, 
 if __name__ == "__main__":
     list_buckets()
     list_objs()
-    get_object_content("/test/testFile.txt")
-    delete_file('/test/testFile.txt')
-    delete_file('/test/testFile2.txt')
+    #encrypt_insert("tests",'test test file for encrpyt', 'testFile.txt', "2022-01-22 11:59:00", "Test@example.com", "Test@example.com", "as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
+    get_object_content("/tests/testFile.txt")
+    delete_file('/tests/testFile.txt')
+    delete_file('/tests/testFile2.txt')

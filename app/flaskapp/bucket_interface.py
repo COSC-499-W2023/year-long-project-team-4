@@ -76,10 +76,8 @@ def upload_video():
 
     # Ensure that we actually got a file and that the recipient email is valid
     if file is None:
-        print('No file found')
         return jsonify({'error': 'No file found'}), 400
     if public_key is None:
-        print('Invalid recipient')
         return jsonify({'error': 'Invalid recipient'}), 400
 
     # Read the file into bytes so we can encrypt

@@ -111,8 +111,8 @@ def upload_file(file_content,bucket,store_as=None):
         try:
             if store_as is None:
                 raise ValueError("store_as must be specified to upload a file")
-
-            file_stream = BytesIO(file_content)
+           
+            file_stream = BytesIO(file_content.encode("UTF-8"))
 
             s3_client.upload_fileobj(file_stream, bucket, store_as)
             return True
@@ -171,10 +171,10 @@ def get_object_content(bucket_name,obj_path):
         content = response['Body'].read().decode('utf-8')
         
         print(f'Content of {obj_path}:\n{content}')
-        return True
+        return content
     except Exception as e:
         print(f"Error retrieving content from {obj_path}: {e}")
-        return False
+        return None
 
 
 def get_metadata(bucket_name, obj_path):
@@ -328,8 +328,8 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recei
 
 
 if __name__ == "__main__":
-    list_buckets()
-    list_objs('team4-s3')
-    get_object_content('team4-s3',"/test/testFile.txt")
-    delete_file("team4-s3", '/test/testFile.txt')
-    delete_file("team4-s3", '/test/testFile2.txt')
+    #list_buckets()
+    #list_objs('team4-s3')
+    get_object_content('team4-s3',"/tests/9c9aba7b-34c7-4fb8-ab8e-d4d2f1bbf1fe")
+    #delete_file("team4-s3", '/test/testFile.txt')
+    #delete_file("team4-s3", '/test/testFile2.txt')

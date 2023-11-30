@@ -145,13 +145,18 @@ def download_files(bucket_name, path_to_download, save_as=None):
     Returns:
         bool: True if the download is successful, False otherwise.
     """
-    try:
-        obj_to_dl = path_to_download
-        s3_client.download_file(bucket_name,obj_to_dl, save_as)
-        return True
-    except Exception as e:
-        print(f"Failed to download {path_to_download}: {e}")
-        return False
+    if not LOCAL:
+        try:
+            obj_to_dl = path_to_download
+            s3_client.download_file(bucket_name,obj_to_dl, save_as)
+            return True
+        except Exception as e:
+            print(f"Failed to download {path_to_download}: {e}")
+            return False
+
+    else:
+        import shutil
+        shutil.copyfile(f'.{path_to_download}', save_as)
 
 
 def get_object_content(bucket_name,obj_path):

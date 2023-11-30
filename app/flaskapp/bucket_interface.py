@@ -4,14 +4,16 @@ import json
 from base64 import b64encode, b64decode
 import datetime
 import uuid
+import pathlib
+import io
 
-from flask import Blueprint, request, session, jsonify, current_app
+from flask import Blueprint, request, session, jsonify, current_app, send_file
 from rsa import generate_key
 from Crypto import Random
 from Crypto.Cipher import AES, PKCS1_v1_5
 from Crypto.PublicKey import RSA
 
-#import s3Bucket
+import s3Bucket
 import database
 
 bucket = Blueprint('bucket', __name__)
@@ -101,13 +103,29 @@ def upload_video():
 
 @bucket.route('/retrieve', methods=['POST'])
 def retrieve_video():
-    encrypted_aes_key = database.query_records(table_name='videos', fields='encrypt', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['encrypt']
+    video_name = request.form.get('video_name')
 
-    # DO THIS
-    encrypted_video = None
+    # Retrieve the encrypted AES key and decrypt it
+    encrypted_aes_key = database.query_records(table_name='videos', fields='encrpyt', condition=f'videoName = %s', condition_values=(video_name,), testcase=current_app.testing)[0]['encrpyt']
+    aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
 
-    aes_key_reconstructed = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
-    video_reconstructed = aes_decrypt_video(encrypted_video, aes_key_reconstructed)
+    # Download the encrypted video from S3
+    s3Bucket.download_files('team4-s3', video_name, './encrypted_video')
+
+    # Decrypt the file and write the data to an IO buffer
+    video_data = io.BytesIO()
+    with open('./encrypted_video', 'rb') as read_file:
+        decrypted_video = aes_decrypt_video(read_file.read(), aes_key)
+        video_data.write(decrypted_video)
+
+    # Delete the temporary file
+    pathlib.Path.unlink('./encrypted_video')
+
+    # Set buffer cursor to 0 again since it is by default at the last byte
+    video_data.seek(0)
+
+    # Send the data in the buffer as mp4
+    return send_file(video_data, mimetype='video/mp4'), 200
 
 
 if __name__ == '__main__':

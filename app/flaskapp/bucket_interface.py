@@ -2,6 +2,8 @@ import os
 import sys
 import json
 from base64 import b64encode, b64decode
+import datetime
+import uuid
 
 from flask import Blueprint, request, session, jsonify, current_app
 from rsa import generate_key
@@ -15,8 +17,11 @@ import database
 bucket = Blueprint('bucket', __name__)
 
 def get_public_key(email):
-    import_string = database.query_records(table_name='userprofile', fields='publickey', condition=f'email = %s', condition_values=(email,), testcase=current_app.testing)[0]['publickey']
-    return RSA.import_key(import_string)
+    try:
+        import_string = database.query_records(table_name='userprofile', fields='publickey', condition=f'email = %s', condition_values=(email,), testcase=current_app.testing)[0]['publickey']
+        return RSA.import_key(import_string)
+    except IndexError:
+        return None
 
 def get_private_key():
     return generate_key(session['pkey_seed'])
@@ -40,7 +45,7 @@ def aes_decrypt_video(data_json, aes256_key):
 
     cipher = AES.new(aes256_key, AES.MODE_GCM, nonce=nonce)
     plaintext = cipher.decrypt_and_verify(ciphertext, tag)
-    return plaintext.decode('utf-8')
+    return plaintext
 
 def rsa_encrypt_aes256_key(aes256_key, rsa_public_key):
     cipher = PKCS1_v1_5.new(rsa_public_key)
@@ -54,25 +59,55 @@ def rsa_decrypt_aes256_key(encrypted_aes256_key, rsa_private_key):
 
 @bucket.route('/upload', methods=['POST'])
 def upload_video():
-    print(f'Request files: {request.files.to_dict()}')
-    print(f'Request data: {request.data}')
-    print(request.files.get('file'))
-    print(request.files.get('video'))
-    return 'Sample request result'
-    # msg = request.form.get('msg')
-    # recipient_username = request.form.get('recipient')
+    # Read the file and email from post
+    file = request.files.get('file')
+    recipient_email = request.form.get('recipient')
 
-    # recipient_public_key = database.query_records(table_name='userprofile', fields='publickey', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)[0]['publickey']
-    # print(recipient_public_key)
+    # Get the public key corresponding to the recipient
+    public_key = get_public_key(recipient_email)
 
-    # msg_json, aes_key = aes_encrypt_video(msg)
+    # Should read retention date from post, but for now just set it to 7 days in future
+    dummy_retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
 
-    # rsa_private_key = generate_key(session['pkey_seed'])
-    # rsa_public_key = rsa_private_key.public_key()
+    # Video name is a uniquely generated uuid value
+    video_name = uuid.uuid4()
+
+    # Ensure that we actually got a file and that the recipient email is valid
+    if file is None:
+        print('No file found')
+        return jsonify({'error': 'No file found'}), 400
+    if public_key is None:
+        print('Invalid recipient')
+        return jsonify({'error': 'Invalid recipient'}), 400
+
+    # Read the file into bytes so we can encrypt
+    content = file.read()
+
+    # Encrypt the video using AES, then encrypt the AES key
+    encrypted_video, aes_key = aes_encrypt_video(content)
+    encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, public_key)
+
+    # If user is guest, sender_id is empty string - otherwise, sender_id is the userid
+    sender_id = ''
+    if 'username' in session:
+        sender_id = database.query_records(table_name='userprofile', fields='id', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['id']
+
+    insert_result = s3Bucket.encrypt_insert('team4-s3', encrypted_video, f'/tests/{video_name}', dummy_retention_date, sender_id, recipient_email, encrypted_aes_key)
+
+    if insert_result:
+        return jsonify({'video_id': video_name}), 200
+    else:
+        return jsonify({'error': 'Video insertion failed'}), 502
 
 @bucket.route('/retrieve', methods=['POST'])
 def retrieve_video():
-    pass
+    encrypted_aes_key = database.query_records(table_name='videos', fields='encrypt', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['encrypt']
+
+    # DO THIS
+    encrypted_video = None
+
+    aes_key_reconstructed = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
+    video_reconstructed = aes_decrypt_video(encrypted_video, aes_key_reconstructed)
 
 
 if __name__ == '__main__':

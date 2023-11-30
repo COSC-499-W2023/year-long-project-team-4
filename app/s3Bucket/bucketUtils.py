@@ -20,15 +20,18 @@ DBNAME = os.getenv("MYDB")
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
-TEST = os.getenv("TEST")
+TEST = os.getenv("TEST") == 'True'
+LOCAL = os.getenv('LOCAL') == 'True'
+
 
 # s3_client = boto3.client(
 # 's3',
 # aws_access_key_id=ACCESS_KEY,
 # aws_secret_access_key=SECRET_KEY,
 # aws_session_token=SESSION_TOKEN)
-boto3.setup_default_session(profile_name='team4-dev')
-s3_client = boto3.client('s3')
+if not LOCAL:
+    boto3.setup_default_session(profile_name='team4-dev')
+    s3_client = boto3.client('s3')
 
 if(TEST):
     DBNAME = 'Team4dbTest'
@@ -79,13 +82,17 @@ def already_existing_file(bucket_name, obj_path):
     Returns:
         bool: True if the object exists, False otherwise.
     """
-    try:
-        s3_client.head_object(Bucket=bucket_name, Key=obj_path)
-        print(f"Object {obj_path} already exists in {bucket_name}")
-        return True
-    except Exception as e:
-        print(f"Object {obj_path} does not exist in {bucket_name}")
-        return False
+    if not LOCAL:
+        try:
+            s3_client.head_object(Bucket=bucket_name, Key=obj_path)
+            print(f"Object {obj_path} already exists in {bucket_name}")
+            return True
+        except Exception as e:
+            print(f"Object {obj_path} does not exist in {bucket_name}")
+            return False
+
+    else:
+        return os.path.exists(f'.{obj_path}')
     
     
 def upload_file(file_content,bucket,store_as=None):
@@ -100,17 +107,30 @@ def upload_file(file_content,bucket,store_as=None):
     Returns:
         bool: True if the upload is successful, False otherwise.
     """
-    try:
-        if store_as is None:
-            raise ValueError("store_as must be specified to upload a file")
+    if not LOCAL:
+        try:
+            if store_as is None:
+                raise ValueError("store_as must be specified to upload a file")
 
-        file_stream = BytesIO(file_content)
-        
-        s3_client.upload_fileobj(file_stream, bucket, store_as)
-        return True
-    except Exception as e:
-        print(f"Failed to upload file content to {bucket}/{store_as}: {e}")
-        return False
+            file_stream = BytesIO(file_content)
+
+            s3_client.upload_fileobj(file_stream, bucket, store_as)
+            return True
+        except Exception as e:
+            print(f"Failed to upload file content to {bucket}/{store_as}: {e}")
+            return False
+
+    else:
+        try:
+            if store_as is None:
+                raise ValueError("store_as must be specified to upload a file")
+
+            with open(f'./{store_as}', 'w') as f:
+                f.write(file_content)
+            return True
+        except Exception as e:
+            print(f"Failed to upload file content to {bucket}/{store_as}: {e}")
+            return False
 
     
 def download_files(bucket_name, path_to_download, save_as=None):

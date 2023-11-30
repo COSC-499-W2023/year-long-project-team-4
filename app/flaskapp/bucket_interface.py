@@ -52,11 +52,11 @@ def aes_decrypt_video(data_json, aes256_key):
 def rsa_encrypt_aes256_key(aes256_key, rsa_public_key):
     cipher = PKCS1_v1_5.new(rsa_public_key)
     cipher_text = cipher.encrypt(aes256_key)
-    return cipher_text
+    return b64encode(cipher_text)
 
 def rsa_decrypt_aes256_key(encrypted_aes256_key, rsa_private_key):
     decipher = PKCS1_v1_5.new(rsa_private_key)
-    aes256_key = decipher.decrypt(encrypted_aes256_key, None)
+    aes256_key = decipher.decrypt(b64decode(encrypted_aes256_key), None)
     return aes256_key
 
 @bucket.route('/upload', methods=['POST'])
@@ -127,49 +127,8 @@ def retrieve_video():
     # Send the data in the buffer as mp4
     return send_file(video_data, mimetype='video/mp4'), 200
 
-
-if __name__ == '__main__':
-    key = get_public_key('test123@example.com')
-    print(key.export_key('PEM'))
-    exit()
-    # our RSA private and public keys
-    rsa_private_key = RSA.generate(2048)
-    rsa_public_key = rsa_private_key.public_key()
-
-    export = rsa_public_key.export_key('PEM')
-    print(export)
-    print(len(export))
-    decoded = export.decode('utf-8')
-    print(decoded)
-    print(len(decoded))
-    #print(rsa_public_key.size_in_bytes())
-    #encoded = b64encode(export)
-    # print(str(export))
-    # stuff = b'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuczR76U9NViOFQy4Fhvl\n1JOeKyWG0Ko3uL1omoWGqZ9fSEElho06c/NsE01Oaj6HZ6h91WrRYTvIttTiCSU/\n7G1pAn6x4IHmDOTFx2fJRgaDJPUXTLnNSEK0iRFJb559tdnjwoM9mdQs+fjvRK/F\nZrohGPe/MeF5LGsg99X81TZbi34Lm3v6k3M7CNYw1YmNMi3zQwZvQxd2XkcodLTt\n3l4V0TNfBsdxuqKAGmIufp+UQ9YgoMGCHSNfS+Bp6m9XXuLmLqU1oLh+R4pk9WnJ\nk1TFRn99TyV7tBQHWUfGwaQ1k4vjbqmRKMDP+dPzVPtDGfzaxOxO4B4tq85bWjEZ\nxQIDAQAB'
-    # print(stuff.hex())
-    # print()
-    # print(b64decode(stuff).hex())
-    exit()
-
-    # msg is our video
-    msg = b'this is my message'
-
-    # encrypt our video
-    msg_json, aes_key = aes_encrypt_video(msg)
-
-    print(aes_key.hex())
-    exit()
-
-    # encrypt the AES key used to encrypt the video using our RSA public key
-    encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, rsa_public_key)
-
-    # this is where we would stop after an upload operation. save the encrypted key with the video DB entry
-
-    # start of decryption / view video process
-
-    # decrypt the AES key using our RSA private key
-    decrypted_aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, rsa_private_key)
-    decrypted_msg = aes_decrypt_video(msg_json, decrypted_aes_key)
-
-    # note our decrypted message matches the message defined at the top
-    print(decrypted_msg)
+@bucket.route('/getvideos', methods=['GET'])
+def get_available_videos():
+    user_id = database.query_records(table_name='userprofile', fields='id', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['id']
+    available_videos = database.query_records(table_name='videos', fields='videoName, senderID', condition=f'recieverID = %s', condition_values=(user_id,), testcase=current_app.testing)
+    return json.dumps(available_videos), 200

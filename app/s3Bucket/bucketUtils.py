@@ -20,8 +20,8 @@ DBNAME = os.getenv("MYDB")
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
-TEST = os.getenv("TEST")
-bucket_name = os.getenv("BUCKETNAME")
+TEST = os.getenv("TEST") == 'True'
+BUCKETNAME = os.getenv("BUCKETNAME")
 
 # s3_client = boto3.client(
 # 's3',
@@ -58,7 +58,7 @@ def create_bucket(bucket):
     Creates a new S3 bucket with the specified name.
 
     Args:
-        bucket_name (str): The name of the new bucket.
+        BUCKET (str): The name of the new bucket.
 
     Returns:
         bool: True if the bucket creation is successful, False otherwise.
@@ -80,11 +80,11 @@ def already_existing_file(obj_path):
         bool: True if the object exists, False otherwise.
     """
     try:
-        s3_client.head_object(Bucket=bucket_name, Key=obj_path)
-        print(f"Object {obj_path} already exists in {bucket_name}")
+        s3_client.head_object(Bucket=BUCKETNAME, Key=obj_path)
+        print(f"Object {obj_path} already exists in {BUCKETNAME}")
         return True
     except Exception as e:
-        print(f"Object {obj_path} does not exist in {bucket_name}")
+        print(f"Object {obj_path} does not exist in {BUCKETNAME}")
         return False
     
     
@@ -103,12 +103,12 @@ def upload_file(file_content,store_as=None):
         if store_as is None:
             raise ValueError("store_as must be specified to upload a file")
 
-        file_stream = BytesIO(file_content)
+        file_stream = BytesIO(file_content.encode("UTF-8"))
         
-        s3_client.upload_fileobj(file_stream, bucket_name, store_as)
+        s3_client.upload_fileobj(file_stream, BUCKETNAME, store_as)
         return True
     except Exception as e:
-        print(f"Failed to upload file content to {bucket_name}/{store_as}: {e}")
+        print(f"Failed to upload file content to {BUCKETNAME}/{store_as}: {e}")
         return False
 
     
@@ -125,7 +125,7 @@ def download_files(path_to_download, save_as=None):
     """
     try:
         obj_to_dl = path_to_download
-        s3_client.download_file(bucket_name,obj_to_dl, save_as)
+        s3_client.download_file(BUCKETNAME,obj_to_dl, save_as)
         return True
     except Exception as e:
         print(f"Failed to download {path_to_download}: {e}")
@@ -134,15 +134,15 @@ def download_files(path_to_download, save_as=None):
 
 def get_object_content(obj_path):
     try:
-        response = s3_client.get_object(Bucket=bucket_name, Key=obj_path)
+        response = s3_client.get_object(Bucket=BUCKETNAME, Key=obj_path)
         
         content = response['Body'].read().decode('utf-8')
         
         print(f'Content of {obj_path}:\n{content}')
-        return True
+        return content
     except Exception as e:
         print(f"Error retrieving content from {obj_path}: {e}")
-        return False
+        return None
 
 
 def get_metadata(obj_path):
@@ -150,14 +150,14 @@ def get_metadata(obj_path):
     Retrieves metadata for a specified object in an S3 bucket.
 
     Args:
-        bucket_name (str): The name of the S3 bucket.
+        BUCKETNAME (str): The name of the S3 bucket.
         obj_path (str): The object key (path) for which to retrieve metadata.
 
     Returns:
         dict: Metadata of the specified object.
     """
     try:
-        response = s3_client.head_object(Bucket=bucket_name, Key=obj_path)
+        response = s3_client.head_object(Bucket=BUCKETNAME, Key=obj_path)
         return response.get('Metadata', {})
     except Exception as e:
         print(f'Error getting metadata for {obj_path}: {e}')
@@ -172,16 +172,16 @@ def list_objs():
         bool: True if listing is successful, False otherwise.
     """
     try:
-        response = s3_client.list_objects(Bucket=bucket_name)
+        response = s3_client.list_objects(Bucket=BUCKETNAME)
         
-        print(f"Objects in {bucket_name}")
+        print(f"Objects in {BUCKETNAME}")
         for obj in response.get('Contents',[]):
             print(obj['Key'])
 
         return True
     
     except Exception as e:
-        print(f"Failed to list objs in {bucket_name}: {e}")
+        print(f"Failed to list objs in {BUCKETNAME}: {e}")
         return False
     
     
@@ -190,14 +190,14 @@ def delete_file(obj_path):
     Deletes a file from an S3 bucket.
 
     Args:
-        bucket_name (str): The name of the S3 bucket.
+        BUCKETNAME (str): The name of the S3 bucket.
         obj_path (str): The object key (path) of the file to delete.
 
     Returns:
         bool: True if the deletion is successful, False otherwise.
     """
     try:
-        s3_client.delete_object(Bucket=bucket_name, Key=obj_path)
+        s3_client.delete_object(Bucket=BUCKETNAME, Key=obj_path)
         print("File deleted")
         return True
     except Exception as e:
@@ -210,7 +210,7 @@ def encrypt_insert(file_content, obj_path, retDate, senderEmail, receiverEmail, 
     This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
 
     Args:
-        bucket_name (str): The bucket to target for s3
+        BUCKETNAME (str): The bucket to target for s3
         file_content (bytes): The file after being encrypted 
         obj_path (str): the path for the obj to be saved under  
         retDate(dateTime): The date to delete

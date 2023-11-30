@@ -21,6 +21,7 @@ ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
 TEST = os.getenv("TEST")
+bucket_name = os.getenv("BUCKETNAME")
 
 # s3_client = boto3.client(
 # 's3',
@@ -52,7 +53,7 @@ def list_buckets():
 
  
 # Not sure if this one is needed    
-def create_bucket(bucket_name):
+def create_bucket(bucket):
     """
     Creates a new S3 bucket with the specified name.
 
@@ -63,17 +64,16 @@ def create_bucket(bucket_name):
         bool: True if the bucket creation is successful, False otherwise.
     """
     location = {'LocationConstraint':'ca-central-1'}
-    s3_client.create_bucket(Bucket=bucket_name,CreateBucketConfiguration=location)
+    s3_client.create_bucket(Bucket=bucket,CreateBucketConfiguration=location)
     print("New bucket created")
     return True
     
 
-def already_existing_file(bucket_name, obj_path):
+def already_existing_file(obj_path):
     """
     Checks if an object already exists in the specified S3 bucket.
 
     Args:
-        bucket_name (str): The name of the S3 bucket.
         obj_path (str): The object key (path) to check.
 
     Returns:
@@ -88,13 +88,12 @@ def already_existing_file(bucket_name, obj_path):
         return False
     
     
-def upload_file(file_content,bucket,store_as=None):
+def upload_file(file_content,store_as=None):
     """
     Uploads file content to an S3 bucket.
 
     Args:
         file_content (bytes): The content of the file to upload.
-        bucket (str): The name of the S3 bucket.
         store_as (str, optional): The object key (path) to store the file in S3.
 
     Returns:
@@ -106,19 +105,18 @@ def upload_file(file_content,bucket,store_as=None):
 
         file_stream = BytesIO(file_content)
         
-        s3_client.upload_fileobj(file_stream, bucket, store_as)
+        s3_client.upload_fileobj(file_stream, bucket_name, store_as)
         return True
     except Exception as e:
-        print(f"Failed to upload file content to {bucket}/{store_as}: {e}")
+        print(f"Failed to upload file content to {bucket_name}/{store_as}: {e}")
         return False
 
     
-def download_files(bucket_name, path_to_download, save_as=None):
+def download_files(path_to_download, save_as=None):
     """
     Downloads a file from an S3 bucket.
 
     Args:
-        bucket_name (str): The name of the S3 bucket.
         path_to_download (str): The object key (path) of the file to download.
         save_as (str, optional): The local path to save the downloaded file.
 
@@ -134,7 +132,7 @@ def download_files(bucket_name, path_to_download, save_as=None):
         return False
 
 
-def get_object_content(bucket_name,obj_path):
+def get_object_content(obj_path):
     try:
         response = s3_client.get_object(Bucket=bucket_name, Key=obj_path)
         
@@ -147,7 +145,7 @@ def get_object_content(bucket_name,obj_path):
         return False
 
 
-def get_metadata(bucket_name, obj_path):
+def get_metadata(obj_path):
     """
     Retrieves metadata for a specified object in an S3 bucket.
 
@@ -166,12 +164,9 @@ def get_metadata(bucket_name, obj_path):
         return {}
     
     
-def list_objs(bucket_name):
+def list_objs():
     """
     Lists all objects in a specified S3 bucket.
-
-    Args:
-        bucket_name (str): The name of the S3 bucket.
 
     Returns:
         bool: True if listing is successful, False otherwise.
@@ -190,7 +185,7 @@ def list_objs(bucket_name):
         return False
     
     
-def delete_file(bucket_name, obj_path):
+def delete_file(obj_path):
     """
     Deletes a file from an S3 bucket.
 
@@ -210,7 +205,7 @@ def delete_file(bucket_name, obj_path):
         return False
 
 
-def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, receiverEmail, encrpytKey):
+def encrypt_insert(file_content, obj_path, retDate, senderEmail, receiverEmail, encryptKey):
     """
     This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
 
@@ -251,23 +246,24 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recei
                         raise ValueError("That email was not found.")
                     
                     # Checks to see if guest or not
-                    if senderId:
-                        userQuery = "SELECT firstname, lastname from userprofile WHERE id = %s"
-                        cur.execute(userQuery,(senderId,))
+                    if senderEmail:
+                        userQuery = "SELECT id, firstname, lastname from userprofile WHERE email = %s"
+                        cur.execute(userQuery,(senderEmail,))
                         userInfo = cur.fetchall()
                         
                         if userInfo:
-                            userFname = userInfo[0][0]
-                            userLname = userInfo[0][1]
+                            senderId = userInfo [0][0]
+                            userFname = userInfo[0][1]
+                            userLname = userInfo[0][2]
                         else:
                             raise ValueError("Error retrieving current users information.")
                     
                         insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderID, senderFName, senderLName, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
-                        data = (obj_path,subDate, retDate, senderId, userFname, userLname, recID, encrpytKey)
+                        data = (obj_path,subDate, retDate, senderId, userFname, userLname, recID, encryptKey)
                         cur.execute(insertQuery, data)
-                        proceed = already_existing_file('team4-s3',obj_path)
+                        proceed = already_existing_file(obj_path)
                         if(not proceed):
-                            upload_file(file_content, bucket=bucket_name,store_as=obj_path)
+                            upload_file(file_content,store_as=obj_path)
                             db.commit()
                             cur.close()
                             result = True
@@ -277,11 +273,11 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recei
                     #If guest it does the same calls just without senderId
                     else:        
                         insertQuery = "INSERT INTO videos (videoName, subDate, retDate, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s)"
-                        data = (obj_path, subDate, retDate, recID, encrpytKey)
+                        data = (obj_path, subDate, retDate, recID, encryptKey)
                         cur.execute(insertQuery, data)
-                        proceed = already_existing_file('team4-s3',obj_path)
+                        proceed = already_existing_file(obj_path)
                         if(not proceed):
-                            upload_file(file_content, bucket=bucket_name,store_as=obj_path)
+                            upload_file(file_content,store_as=obj_path)
                             db.commit()
                             cur.close()
                             result = True
@@ -299,7 +295,7 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recei
 
 if __name__ == "__main__":
     list_buckets()
-    list_objs('team4-s3')
-    get_object_content('team4-s3',"/test/testFile.txt")
-    delete_file("team4-s3", '/test/testFile.txt')
-    delete_file("team4-s3", '/test/testFile2.txt')
+    list_objs()
+    get_object_content("/test/testFile.txt")
+    delete_file('/test/testFile.txt')
+    delete_file('/test/testFile2.txt')

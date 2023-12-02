@@ -20,7 +20,7 @@ DBNAME = os.getenv("MYDB")
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
-TEST = os.getenv("TEST")
+TEST = os.getenv('TEST') == 'True'
 
 s3_client = boto3.client(
 's3',

@@ -18,13 +18,16 @@ DBNAME = os.getenv("MYDB")
 
 ses_client = boto3.client(
     'ses', 
-    region_name=aws_region, 
+    region_name='ca-central-1', 
     aws_access_key_id=ACCESS_KEY,
     aws_secret_access_key=SECRET_KEY,
     aws_session_token=SESSION_TOKEN)
 
-
 def lambda_handler(event, context):
+    """
+    Lambda handler that Rruns when a video is entered into the s3 bucket.
+    It calls the other two functions in this file.
+    """
     # Get information about the uploaded file
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
@@ -40,6 +43,16 @@ def lambda_handler(event, context):
         send_email(user_email)
 
 def get_email(videoName):
+    """
+    Gets email from database by using the video's name that was uploaded
+
+    Args:
+        videoName str: video's name
+
+    Returns:
+        str: The reciever's email address
+        int: -1 if function fails
+    """
     try:
         with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
                 ssh_username=SSHUSER,
@@ -53,15 +66,11 @@ def get_email(videoName):
                 # Retrieve userID based on the videName
                 cur.execute("SELECT recieverID FROM videos WHERE videoName = %s", (videoName,))
                 recieverID = cur.fetchone()
-                if recieverID:
-                    recieverID = recieverID[0] 
-                    # Retrieve email based on the user's ID
-                    cur.execute("SELECT email FROM userprofile WHERE id = %s", (recieverID,))
-                    result = cur.fetchone()
-                    if result:
-                        result = result[0] 
-                    else:
-                        result = -1
+                recieverID = recieverID[0] 
+                # Retrieve email based on the user's ID
+                cur.execute("SELECT email FROM userprofile WHERE id = %s", (recieverID,))
+                result = cur.fetchone()
+                result = result[0]     
                 cur.close()      
     except Exception as e:
         print(e)
@@ -72,9 +81,18 @@ def get_email(videoName):
         return result
 
 def send_email(user_email):
+    """
+    Sends an email to user who just recieved a video
+
+    Args:
+        user_email str: The email address of the reciever
+
+    Returns:
+        int: 1 if email sent
+        int: -1 if function failed
+    """
     
-    aws_region = 'your-aws-region'
-    sender_email = 'savemovnow@gmail.com'
+    sender_email = 'safemovnow@gmail.com'
     
     # Compose the email message
     subject = "You've Recieved a Video"
@@ -103,11 +121,11 @@ def send_email(user_email):
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-
+        
         h1 {
             color: #007bff;
         }
-
+        
         p {
             margin-bottom: 20px;
         }
@@ -137,7 +155,9 @@ def send_email(user_email):
         )
 
         print(f"Email sent to {user_email}. Response: {email}")
+        return 1
         
     except Exception as e:
-        print(f"Error sending email: {e.email['Error']['Message']}")
+        print(e)
+        return -1
 

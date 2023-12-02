@@ -20,6 +20,7 @@ ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
 
+boto3.setup_default_session(profile_name = 'team4-dev')
 ses_client = boto3.client(
     'ses', 
     region_name='ca-central-1', 
@@ -158,10 +159,9 @@ def send_email(user_email):
             }
         )
 
-        print(f"Email sent to {user_email}. Response: {email}")
+        print(f"Email sent to {user_email}.")
         return 1
         
     except Exception as e:
         print(e)
         return -1
-

@@ -12,7 +12,7 @@ def test_get_email():
     assert result1 == "test123@gmail.com"
     
 def test_send_email():
-    assert notification.send_email("safemovnow@gmail.com") == 1 # Send to verified email
+    assert notification.send_email("fakeusertest987@gmail.com") == 1 
     
 if __name__ == "__main__":
     start_time = time.time()

@@ -1,6 +1,6 @@
 import boto3
 import sys,os
-from dotenv import load_dotenv, dotenv_values
+from dotenv import load_dotenv
 from io import BytesIO
 from sshtunnel import SSHTunnelForwarder
 import pymysql
@@ -219,8 +219,10 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
         encrpytKey: The public key of the sender 
         file_flag: sets the folder to be saved into 
     """
-    obj_path = f"{file_flag}/{senderEmail}/{obj_path}"
-    
+    if senderEmail:
+        obj_path = f"{file_flag}/{senderEmail}/{obj_path}"
+    else:
+        obj_path = f"{file_flag}/Guest/{obj_path}"
     db = None
     result = 0
     subDate = datetime.now(timezone.utc)
@@ -301,6 +303,6 @@ if __name__ == "__main__":
     list_buckets()
     list_objs()
     #encrypt_insert("tests",'test test file for encrpyt', 'testFile.txt', "2022-01-22 11:59:00", "Test@example.com", "Test@example.com", "as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
-    get_object_content("/tests/testFile.txt")
-    delete_file('/tests/testFile.txt')
-    delete_file('/tests/testFile2.txt')
+    get_object_content("tests/Guest/testFile2.txt")
+    delete_file('tests/Test@example.com/testFile.txt')
+    delete_file('tests/Guest/testFile2.txt')

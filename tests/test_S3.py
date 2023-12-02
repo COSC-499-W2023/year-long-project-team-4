@@ -44,7 +44,7 @@ def test_encrpyted_insert():
     assert result2 == True
 
 def test_get_object_content():
-    result = s3Bucket.get_object_content('tests/testFile.txt')
+    result = s3Bucket.get_object_content('tests/Guest/testFile2.txt')
     assert result is not None
 
 if __name__ == "__main__":

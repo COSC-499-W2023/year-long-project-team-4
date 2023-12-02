@@ -150,7 +150,7 @@ def retention() -> int:
         for items in data:
             retention_delete("videoName = %s", (data[items],), data[items])
             # Get how many files have been deleted
-            if (already_existing_file('team4-s3',data[items]) == False):
+            if (not already_existing_file('team4-s3',data[items])):
                 deleted_files += 1
         return deleted_files
     except Exception as e:

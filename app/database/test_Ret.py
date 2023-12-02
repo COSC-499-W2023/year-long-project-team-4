@@ -35,7 +35,7 @@ def test_ret():
     
     result1 = database.retention()
     
-    assert  result1 == True
+    assert  result1 > 0
     
     
 if __name__ == "__main__":

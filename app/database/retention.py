@@ -20,7 +20,7 @@ DBNAME = os.getenv("MYDB")
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
-TEST = os.getenv("TEST")
+TEST = os.getenv('TEST') == 'True'
 
 s3_client = boto3.client(
 's3',
@@ -145,13 +145,17 @@ def retention() -> int:
        bool: True if the deletion is successful, False otherwise.
     """
     try:
+        deleted_files = 0
         data = get_passed_retDates()
         for items in data:
             retention_delete("videoName = %s", (data[items],), data[items])
-        return True
+            # Get how many files have been deleted
+            if (already_existing_file('team4-s3',data[items]) == False):
+                deleted_files += 1
+        return deleted_files
     except Exception as e:
         print(e)
-        return False
+        return -1
         
         
 if __name__ == "__main__":

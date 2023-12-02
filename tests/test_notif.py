@@ -2,7 +2,6 @@ import pytest
 import time
 import sys
 import os
-from notification import get_email, send_email
 
 sys.path.append(os.path.abspath('../app'))
 

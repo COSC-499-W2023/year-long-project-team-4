@@ -16,6 +16,10 @@ DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
 
+ACCESS_KEY = os.getenv("ACCESSKEY")
+SECRET_KEY = os.getenv('SECRETKEY')
+SESSION_TOKEN = os.getenv('SESSTOKEN')
+
 ses_client = boto3.client(
     'ses', 
     region_name='ca-central-1', 

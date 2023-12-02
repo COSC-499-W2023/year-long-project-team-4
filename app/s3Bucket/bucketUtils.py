@@ -32,6 +32,9 @@ LOCAL = os.getenv('LOCAL') == 'True'
 if not LOCAL:
     boto3.setup_default_session(profile_name='team4-dev')
     s3_client = boto3.client('s3')
+else:
+    if not os.path.isdir('videos'):
+        os.mkdir('videos')
 
 if(TEST):
     DBNAME = 'Team4dbTest'
@@ -124,8 +127,7 @@ def upload_file(file_content,bucket,store_as=None):
         try:
             if store_as is None:
                 raise ValueError("store_as must be specified to upload a file")
-
-            with open(f'./{store_as}', 'w') as f:
+            with open(f'.{store_as}', 'w') as f:
                 f.write(file_content)
             return True
         except Exception as e:
@@ -165,16 +167,25 @@ def download_files(bucket_name, path_to_download, save_as=None):
 
 
 def get_object_content(bucket_name,obj_path):
-    try:
-        response = s3_client.get_object(Bucket=bucket_name, Key=obj_path)
-        
-        content = response['Body'].read().decode('utf-8')
-        
-        print(f'Content of {obj_path}:\n{content}')
-        return content
-    except Exception as e:
-        print(f"Error retrieving content from {obj_path}: {e}")
-        return None
+    if not LOCAL:
+        try:
+            response = s3_client.get_object(Bucket=bucket_name, Key=obj_path)
+
+            content = response['Body'].read().decode('utf-8')
+
+            print(f'Content of {obj_path}:\n{content}')
+            return content
+        except Exception as e:
+            print(f"Error retrieving content from {obj_path}: {e}")
+            return None
+
+    else:
+        try:
+            with open(f'.{obj_path}', 'rb') as read_file:
+                return read_file.read()
+        except Exception as e:
+            print(f"Error retrieving content from {obj_path}: {e}")
+            return None
 
 
 def get_metadata(bucket_name, obj_path):
@@ -240,7 +251,7 @@ def delete_file(bucket_name, obj_path):
         return False
 
 
-def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, receiverEmail, encrpytKey):
+def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, receiverEmail, encrpytKey, testcase=False):
     """
     This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
 
@@ -254,6 +265,7 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recei
         encrpytKey: The public key of the sender 
     """
     db = None
+    db_name = 'Team4dbTest' if testcase else DBNAME
     result = 0
     subDate = datetime.now(timezone.utc)
     try:
@@ -264,7 +276,7 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recei
         )as tunnel:
             print("SSH Tunnel Established")
             #Db connection string
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=db_name)
             if db:
                 if db:
                     cur = db.cursor()

@@ -92,10 +92,10 @@ def upload_video():
     if 'username' in session:
         sender_id = database.query_records(table_name='userprofile', fields='id', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['id']
 
-    insert_result = s3Bucket.encrypt_insert('team4-s3', encrypted_video, f'/tests/{video_name}', dummy_retention_date, sender_id, recipient_email, encrypted_aes_key)
+    insert_result = s3Bucket.encrypt_insert('team4-s3', encrypted_video, f'/videos/{video_name}', dummy_retention_date, sender_id, recipient_email, encrypted_aes_key, testcase=current_app.testing)
 
     if insert_result:
-        return jsonify({'video_id': video_name}), 200
+        return jsonify({'video_id': f'/videos/{video_name}'}), 200
     else:
         return jsonify({'error': 'Video insertion failed'}), 502
 
@@ -107,17 +107,11 @@ def retrieve_video():
     encrypted_aes_key = database.query_records(table_name='videos', fields='encrpyt', condition=f'videoName = %s', condition_values=(video_name,), testcase=current_app.testing)[0]['encrpyt']
     aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
 
-    # Download the encrypted video from S3
-    s3Bucket.download_files('team4-s3', video_name, './encrypted_video')
-
     # Decrypt the file and write the data to an IO buffer
     video_data = io.BytesIO()
-    with open('./encrypted_video', 'rb') as read_file:
-        decrypted_video = aes_decrypt_video(read_file.read(), aes_key)
-        video_data.write(decrypted_video)
-
-    # Delete the temporary file
-    pathlib.Path.unlink('./encrypted_video')
+    object_content = s3Bucket.get_object_content('team4-s3', video_name)
+    decrypted_video = aes_decrypt_video(object_content, aes_key)
+    video_data.write(decrypted_video)
 
     # Set buffer cursor to 0 again since it is by default at the last byte
     video_data.seek(0)

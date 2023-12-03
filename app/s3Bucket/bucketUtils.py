@@ -21,6 +21,7 @@ ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
 TEST = os.getenv("TEST") == 'True'
+LOCAL = os.getenv('LOCAL') == 'True'
 BUCKETNAME = os.getenv("BUCKETNAME")
 
 # s3_client = boto3.client(
@@ -28,8 +29,12 @@ BUCKETNAME = os.getenv("BUCKETNAME")
 # aws_access_key_id=ACCESS_KEY,
 # aws_secret_access_key=SECRET_KEY,
 # aws_session_token=SESSION_TOKEN)
-boto3.setup_default_session(profile_name='team4-dev')
-s3_client = boto3.client('s3')
+if not LOCAL:
+    boto3.setup_default_session(profile_name='team4-dev')
+    s3_client = boto3.client('s3')
+else:
+    if not os.path.isdir('videos'):
+        os.mkdir('videos')
 
 if(TEST):
     DBNAME = 'Team4dbTest'
@@ -79,15 +84,19 @@ def already_existing_file(obj_path):
     Returns:
         bool: True if the object exists, False otherwise.
     """
-    try:
-        s3_client.head_object(Bucket=BUCKETNAME, Key=obj_path)
-        print(f"Object {obj_path} already exists in {BUCKETNAME}")
-        return True
-    except Exception as e:
-        print(f"Object {obj_path} does not exist in {BUCKETNAME}")
-        return False
-    
-    
+    if not LOCAL:
+        try:
+            s3_client.head_object(Bucket=BUCKETNAME, Key=obj_path)
+            print(f"Object {obj_path} already exists in {BUCKETNAME}")
+            return True
+        except Exception as e:
+            print(f"Object {obj_path} does not exist in {BUCKETNAME}")
+            return False
+
+    else:
+        return os.path.exists(f'.{obj_path}')
+
+
 def upload_file(file_content,store_as=None):
     """
     Uploads file content to an S3 bucket.
@@ -99,17 +108,29 @@ def upload_file(file_content,store_as=None):
     Returns:
         bool: True if the upload is successful, False otherwise.
     """
-    try:
-        if store_as is None:
-            raise ValueError("store_as must be specified to upload a file")
+    if not LOCAL:
+        try:
+            if store_as is None:
+                raise ValueError("store_as must be specified to upload a file")
+           
+            file_stream = BytesIO(file_content.encode("UTF-8"))
 
-        file_stream = BytesIO(file_content.encode("UTF-8"))
-        
-        s3_client.upload_fileobj(file_stream, BUCKETNAME, store_as)
-        return True
-    except Exception as e:
-        print(f"Failed to upload file content to {BUCKETNAME}/{store_as}: {e}")
-        return False
+            s3_client.upload_fileobj(file_stream, BUCKETNAME, store_as)
+            return True
+        except Exception as e:
+            print(f"Failed to upload file content to {BUCKETNAME}/{store_as}: {e}")
+            return False
+
+    else:
+        try:
+            if store_as is None:
+                raise ValueError("store_as must be specified to upload a file")
+            with open(f'.{store_as}', 'w') as f:
+                f.write(file_content)
+            return True
+        except Exception as e:
+            print(f"Failed to upload file content to {BUCKETNAME}/{store_as}: {e}")
+            return False
 
     
 def download_files(path_to_download, save_as=None):
@@ -123,26 +144,45 @@ def download_files(path_to_download, save_as=None):
     Returns:
         bool: True if the download is successful, False otherwise.
     """
-    try:
-        obj_to_dl = path_to_download
-        s3_client.download_file(BUCKETNAME,obj_to_dl, save_as)
-        return True
-    except Exception as e:
-        print(f"Failed to download {path_to_download}: {e}")
-        return False
+    if not LOCAL:
+        try:
+            obj_to_dl = path_to_download
+            s3_client.download_file(BUCKETNAME,obj_to_dl, save_as)
+            return True
+        except Exception as e:
+            print(f"Failed to download {path_to_download}: {e}")
+            return False
+
+    else:
+        try:
+            import shutil
+            shutil.copyfile(f'.{path_to_download}', save_as)
+            return True
+        except Exception as e:
+            print(f'Failed to copy from {path_to_download} to {save_as}: {e}')
+            return False
 
 
 def get_object_content(obj_path):
-    try:
-        response = s3_client.get_object(Bucket=BUCKETNAME, Key=obj_path)
-        
-        content = response['Body'].read().decode('utf-8')
-        
-        print(f'Content of {obj_path}:\n{content}')
-        return content
-    except Exception as e:
-        print(f"Error retrieving content from {obj_path}: {e}")
-        return None
+    if not LOCAL:
+        try:
+            response = s3_client.get_object(Bucket=BUCKETNAME, Key=obj_path)
+
+            content = response['Body'].read().decode('utf-8')
+
+            print(f'Content of {obj_path}:\n{content}')
+            return content
+        except Exception as e:
+            print(f"Error retrieving content from {obj_path}: {e}")
+            return None
+
+    else:
+        try:
+            with open(f'.{obj_path}', 'rb') as read_file:
+                return read_file.read()
+        except Exception as e:
+            print(f"Error retrieving content from {obj_path}: {e}")
+            return None
 
 
 def get_metadata(obj_path):
@@ -220,6 +260,7 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
         file_flag: sets the folder to be saved into 
     """
     db = None
+    db_name = 'Team4dbTest' if testcase else DBNAME
     result = 0
     subDate = datetime.now(timezone.utc)
     try:
@@ -230,7 +271,7 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
         )as tunnel:
             print("SSH Tunnel Established")
             #Db connection string
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=db_name)
             if db:
                 if db:
                     cur = db.cursor()

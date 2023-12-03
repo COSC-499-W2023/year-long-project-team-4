@@ -50,7 +50,7 @@ def insert_user(username:str, email:str, password:str, firstname:str, lastname:s
                     cur = db.cursor()
                     #Insert String
                     query = "INSERT INTO userprofile(username, email, password_hash, firstname, lastname,salthash,publickey) values (%s,%s,%s,%s,%s,%s,%s)"
-                    #Creates list of the insertations 
+                    #Creates list of the insertations
                     data = (username,email,password,firstname,lastname, salthash, pubKey)
                     #Executes the query w/ the corrosponding data
                     cur.execute(query,data)
@@ -73,18 +73,18 @@ def insert_user(username:str, email:str, password:str, firstname:str, lastname:s
                 print("SSH Tunnel Established")
                 #Db connection string
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
-            if db:
-                cur = db.cursor()
-                #Insert String
-                query = "INSERT INTO userprofile (username, email, password_hash, firstname, lastname,salthash, publickey) values (%s,%s,%s,%s,%s,%s,%s)"
-                #Creates list of the insertations 
-                data = (username,email,password,firstname,lastname, salthash, pubKey)
-                #Executes the query w/ the corrosponding data
-                cur.execute(query,data)
-                print("Insertation Complete")
-                db.commit()
-                #Returns 1 if successful
-                result = 1
+                if db:
+                    cur = db.cursor()
+                    #Insert String
+                    query = "INSERT INTO userprofile (username, email, password_hash, firstname, lastname,salthash, publickey) values (%s,%s,%s,%s,%s,%s,%s)"
+                    #Creates list of the insertations
+                    data = (username,email,password,firstname,lastname, salthash, pubKey)
+                    #Executes the query w/ the corrosponding data
+                    cur.execute(query,data)
+                    print("Insertation Complete")
+                    db.commit()
+                    #Returns 1 if successful
+                    result = 1
     #except pymysql.Error as e:
     except Exception as e:
         print(e)
@@ -97,7 +97,7 @@ def insert_user(username:str, email:str, password:str, firstname:str, lastname:s
         return result
 
 
-def insert_video(subDate:str, retDate:str, senderID:str, recieverID:str, encrpyt, testcase:bool=False) -> int:
+def insert_video(videoName:str, subDate:str, retDate:str, senderID:str, recieverID:str, encrpyt, testcase:bool=False) -> int:
     '''
     Insert a new video into the database.
 
@@ -128,9 +128,9 @@ def insert_video(subDate:str, retDate:str, senderID:str, recieverID:str, encrpyt
                 if db:
                     cur = db.cursor()
                     #Insert String
-                    query = "INSERT INTO videos(subDate, retDate, senderID, recieverID, encrpyt) values (%s,%s,%s,%s,%s)"
+                    query = "INSERT INTO videos(videoName, subDate, retDate, senderID, recieverID, encrpyt) values (%s, %s, %s, %s, %s, %s)"
                     #Creates list of the insertations 
-                    data = (subDate, retDate, senderID, recieverID, encrpyt)
+                    data = (videoName, subDate, retDate, senderID, recieverID, encrpyt)
                     #Executes the query w/ the corrosponding data
                     cur.execute(query,data)
                     print("Insertation Complete")
@@ -156,9 +156,9 @@ def insert_video(subDate:str, retDate:str, senderID:str, recieverID:str, encrpyt
             if db:
                 cur = db.cursor()
                 #Insert String
-                query = "INSERT INTO videos (subDate, retDate, senderID, recieverID, encrpyt) values (%s,%s,%s,%s,%s)"
+                query = "INSERT INTO videos (videoName, subDate, retDate, senderID, recieverID, encrpyt) values (%s, %s,%s,%s,%s,%s)"
                 #Creates list of the insertations 
-                data = (subDate, retDate, senderID, recieverID, encrpyt)
+                data = (videoName, subDate, retDate, senderID, recieverID, encrpyt)
                 #Executes the query w/ the corrosponding data
                 cur.execute(query,data)
                 print("Insertation Complete")

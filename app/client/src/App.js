@@ -11,7 +11,9 @@ import {
   registerPath,
   viewVideoPath,
   uploadVideoPath,
+  accountPath,
 } from "./Path";
+import AccountPage from "./Pages/AccountPage";
 
 function App() {
   return (
@@ -23,6 +25,7 @@ function App() {
           <Route path={uploadVideoPath} element={<UploadVideoPage />} />
           <Route path={viewVideoPath} element={<ViewVideoPage />} />
           <Route path={registerPath} element={<RegisterPage />} />
+          <Route path={accountPath} element={<AccountPage />} />
         </Routes>
       </Router>
     </div>

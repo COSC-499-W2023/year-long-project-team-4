@@ -5,6 +5,7 @@ import {
   viewVideoPath,
   uploadVideoPath,
   loginPath,
+  accountPath,
 } from "../Path";
 import axios from 'axios'
 
@@ -62,7 +63,8 @@ const RecieveAndSendPage = () => {
       {currentUser && <h3>Welcome, {currentUser}!</h3>}
       {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
        <div className="d-grid gap-2">
-        <Button size="lg" href={uploadVideoPath}> Send Videos</Button> {" "}
+        <Button size="lg" href={accountPath}>Account Page</Button>
+        <Button size="lg" href={uploadVideoPath}> Send Videos</Button>
         <Button size="lg" href={viewVideoPath}> Receive Videos</Button>
         <Button size="lg" onClick={handleLogout}>Logout</Button> 
       </div>

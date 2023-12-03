@@ -245,7 +245,7 @@ def delete_file(obj_path):
         return False
 
 
-def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, receiverEmail, encryptKey):
+def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, receiverEmail, encryptKey, testcase=False):
     """
     This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
 
@@ -284,7 +284,10 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
                     
                     if recID:
                         recID = recID[0]
-                        obj_path = f"{file_flag}/{receiverEmail}/{obj_path}"
+                        obj_path = f"/{file_flag}/{receiverEmail}/{obj_path}"
+                        if LOCAL:
+                            if not os.path.isdir(f"{file_flag}/{receiverEmail}"):
+                                os.mkdir(f"{file_flag}/{receiverEmail}")
                     else:
                         raise ValueError("That email was not found.")
                     
@@ -300,7 +303,7 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
                             userLname = userInfo[0][2]
                         else:
                             raise ValueError("Error retrieving current users information.")
-                    
+
                         insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderID, senderFName, senderLName, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
                         data = (obj_path, subDate, retDate, senderId, userFname, userLname, recID, encryptKey)
                         cur.execute(insertQuery, data)

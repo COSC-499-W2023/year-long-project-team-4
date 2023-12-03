@@ -87,15 +87,15 @@ def upload_video():
     encrypted_video, aes_key = aes_encrypt_video(content)
     encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, public_key)
 
-    # If user is guest, sender_id is empty string - otherwise, sender_id is the userid
-    sender_id = ''
+    # If user is guest, sender_email is empty string - otherwise, sender_email is the sender's email
+    sender_email = ''
     if 'username' in session:
-        sender_id = database.query_records(table_name='userprofile', fields='id', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['id']
+        sender_email = database.query_records(table_name='userprofile', fields='email', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['email']
 
-    insert_result = s3Bucket.encrypt_insert('team4-s3', encrypted_video, f'/videos/{video_name}', dummy_retention_date, sender_id, recipient_email, encrypted_aes_key, testcase=current_app.testing)
+    insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, dummy_retention_date, sender_email, recipient_email, encrypted_aes_key, testcase=current_app.testing)
 
     if insert_result:
-        return jsonify({'video_id': f'/videos/{video_name}'}), 200
+        return jsonify({'video_id': f'/videos/{recipient_email}/{video_name}'}), 200
     else:
         return jsonify({'error': 'Video insertion failed'}), 502
 
@@ -109,7 +109,7 @@ def retrieve_video():
 
     # Decrypt the file and write the data to an IO buffer
     video_data = io.BytesIO()
-    object_content = s3Bucket.get_object_content('team4-s3', video_name)
+    object_content = s3Bucket.get_object_content(video_name)
     decrypted_video = aes_decrypt_video(object_content, aes_key)
     video_data.write(decrypted_video)
 

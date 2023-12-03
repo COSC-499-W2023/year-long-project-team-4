@@ -1,6 +1,6 @@
 import boto3
 import sys,os
-from dotenv import load_dotenv, dotenv_values
+from dotenv import load_dotenv
 from io import BytesIO
 from sshtunnel import SSHTunnelForwarder
 import pymysql
@@ -22,7 +22,7 @@ SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
 TEST = os.getenv("TEST") == 'True'
 LOCAL = os.getenv('LOCAL') == 'True'
-
+BUCKETNAME = os.getenv("BUCKETNAME")
 
 # s3_client = boto3.client(
 # 's3',
@@ -58,28 +58,27 @@ def list_buckets():
 
  
 # Not sure if this one is needed    
-def create_bucket(bucket_name):
+def create_bucket(bucket):
     """
     Creates a new S3 bucket with the specified name.
 
     Args:
-        bucket_name (str): The name of the new bucket.
+        BUCKET (str): The name of the new bucket.
 
     Returns:
         bool: True if the bucket creation is successful, False otherwise.
     """
     location = {'LocationConstraint':'ca-central-1'}
-    s3_client.create_bucket(Bucket=bucket_name,CreateBucketConfiguration=location)
+    s3_client.create_bucket(Bucket=bucket,CreateBucketConfiguration=location)
     print("New bucket created")
     return True
     
 
-def already_existing_file(bucket_name, obj_path):
+def already_existing_file(obj_path):
     """
     Checks if an object already exists in the specified S3 bucket.
 
     Args:
-        bucket_name (str): The name of the S3 bucket.
         obj_path (str): The object key (path) to check.
 
     Returns:
@@ -87,24 +86,23 @@ def already_existing_file(bucket_name, obj_path):
     """
     if not LOCAL:
         try:
-            s3_client.head_object(Bucket=bucket_name, Key=obj_path)
-            print(f"Object {obj_path} already exists in {bucket_name}")
+            s3_client.head_object(Bucket=BUCKETNAME, Key=obj_path)
+            print(f"Object {obj_path} already exists in {BUCKETNAME}")
             return True
         except Exception as e:
-            print(f"Object {obj_path} does not exist in {bucket_name}")
+            print(f"Object {obj_path} does not exist in {BUCKETNAME}")
             return False
 
     else:
         return os.path.exists(f'.{obj_path}')
-    
-    
-def upload_file(file_content,bucket,store_as=None):
+
+
+def upload_file(file_content,store_as=None):
     """
     Uploads file content to an S3 bucket.
 
     Args:
         file_content (bytes): The content of the file to upload.
-        bucket (str): The name of the S3 bucket.
         store_as (str, optional): The object key (path) to store the file in S3.
 
     Returns:
@@ -117,10 +115,10 @@ def upload_file(file_content,bucket,store_as=None):
            
             file_stream = BytesIO(file_content.encode("UTF-8"))
 
-            s3_client.upload_fileobj(file_stream, bucket, store_as)
+            s3_client.upload_fileobj(file_stream, BUCKETNAME, store_as)
             return True
         except Exception as e:
-            print(f"Failed to upload file content to {bucket}/{store_as}: {e}")
+            print(f"Failed to upload file content to {BUCKETNAME}/{store_as}: {e}")
             return False
 
     else:
@@ -131,16 +129,15 @@ def upload_file(file_content,bucket,store_as=None):
                 f.write(file_content)
             return True
         except Exception as e:
-            print(f"Failed to upload file content to {bucket}/{store_as}: {e}")
+            print(f"Failed to upload file content to {BUCKETNAME}/{store_as}: {e}")
             return False
 
     
-def download_files(bucket_name, path_to_download, save_as=None):
+def download_files(path_to_download, save_as=None):
     """
     Downloads a file from an S3 bucket.
 
     Args:
-        bucket_name (str): The name of the S3 bucket.
         path_to_download (str): The object key (path) of the file to download.
         save_as (str, optional): The local path to save the downloaded file.
 
@@ -150,7 +147,7 @@ def download_files(bucket_name, path_to_download, save_as=None):
     if not LOCAL:
         try:
             obj_to_dl = path_to_download
-            s3_client.download_file(bucket_name,obj_to_dl, save_as)
+            s3_client.download_file(BUCKETNAME,obj_to_dl, save_as)
             return True
         except Exception as e:
             print(f"Failed to download {path_to_download}: {e}")
@@ -166,10 +163,10 @@ def download_files(bucket_name, path_to_download, save_as=None):
             return False
 
 
-def get_object_content(bucket_name,obj_path):
+def get_object_content(obj_path):
     if not LOCAL:
         try:
-            response = s3_client.get_object(Bucket=bucket_name, Key=obj_path)
+            response = s3_client.get_object(Bucket=BUCKETNAME, Key=obj_path)
 
             content = response['Body'].read().decode('utf-8')
 
@@ -188,62 +185,59 @@ def get_object_content(bucket_name,obj_path):
             return None
 
 
-def get_metadata(bucket_name, obj_path):
+def get_metadata(obj_path):
     """
     Retrieves metadata for a specified object in an S3 bucket.
 
     Args:
-        bucket_name (str): The name of the S3 bucket.
+        BUCKETNAME (str): The name of the S3 bucket.
         obj_path (str): The object key (path) for which to retrieve metadata.
 
     Returns:
         dict: Metadata of the specified object.
     """
     try:
-        response = s3_client.head_object(Bucket=bucket_name, Key=obj_path)
+        response = s3_client.head_object(Bucket=BUCKETNAME, Key=obj_path)
         return response.get('Metadata', {})
     except Exception as e:
         print(f'Error getting metadata for {obj_path}: {e}')
         return {}
     
     
-def list_objs(bucket_name):
+def list_objs():
     """
     Lists all objects in a specified S3 bucket.
-
-    Args:
-        bucket_name (str): The name of the S3 bucket.
 
     Returns:
         bool: True if listing is successful, False otherwise.
     """
     try:
-        response = s3_client.list_objects(Bucket=bucket_name)
+        response = s3_client.list_objects(Bucket=BUCKETNAME)
         
-        print(f"Objects in {bucket_name}")
+        print(f"Objects in {BUCKETNAME}")
         for obj in response.get('Contents',[]):
             print(obj['Key'])
 
         return True
     
     except Exception as e:
-        print(f"Failed to list objs in {bucket_name}: {e}")
+        print(f"Failed to list objs in {BUCKETNAME}: {e}")
         return False
     
     
-def delete_file(bucket_name, obj_path):
+def delete_file(obj_path):
     """
     Deletes a file from an S3 bucket.
 
     Args:
-        bucket_name (str): The name of the S3 bucket.
+        BUCKETNAME (str): The name of the S3 bucket.
         obj_path (str): The object key (path) of the file to delete.
 
     Returns:
         bool: True if the deletion is successful, False otherwise.
     """
     try:
-        s3_client.delete_object(Bucket=bucket_name, Key=obj_path)
+        s3_client.delete_object(Bucket=BUCKETNAME, Key=obj_path)
         print("File deleted")
         return True
     except Exception as e:
@@ -251,18 +245,19 @@ def delete_file(bucket_name, obj_path):
         return False
 
 
-def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, receiverEmail, encrpytKey, testcase=False):
+def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, receiverEmail, encryptKey):
     """
     This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
 
     Args:
-        bucket_name (str): The bucket to target for s3
+        BUCKETNAME (str): The bucket to target for s3
         file_content (bytes): The file after being encrypted 
         obj_path (str): the path for the obj to be saved under  
         retDate(dateTime): The date to delete
         senderId(int): The id of the current user trying to submit the video
         recieverUserName: The user name of the target person to view the video
         encrpytKey: The public key of the sender 
+        file_flag: sets the folder to be saved into 
     """
     db = None
     db_name = 'Team4dbTest' if testcase else DBNAME
@@ -289,27 +284,29 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recei
                     
                     if recID:
                         recID = recID[0]
+                        obj_path = f"{file_flag}/{receiverEmail}/{obj_path}"
                     else:
                         raise ValueError("That email was not found.")
                     
                     # Checks to see if guest or not
-                    if senderId:
-                        userQuery = "SELECT firstname, lastname from userprofile WHERE id = %s"
-                        cur.execute(userQuery,(senderId,))
+                    if senderEmail:
+                        userQuery = "SELECT id, firstname, lastname from userprofile WHERE email = %s"
+                        cur.execute(userQuery,(senderEmail,))
                         userInfo = cur.fetchall()
                         
                         if userInfo:
-                            userFname = userInfo[0][0]
-                            userLname = userInfo[0][1]
+                            senderId = userInfo [0][0]
+                            userFname = userInfo[0][1]
+                            userLname = userInfo[0][2]
                         else:
                             raise ValueError("Error retrieving current users information.")
                     
                         insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderID, senderFName, senderLName, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
-                        data = (obj_path,subDate, retDate, senderId, userFname, userLname, recID, encrpytKey)
+                        data = (obj_path, subDate, retDate, senderId, userFname, userLname, recID, encryptKey)
                         cur.execute(insertQuery, data)
-                        proceed = already_existing_file('team4-s3',obj_path)
+                        proceed = already_existing_file(obj_path)
                         if(not proceed):
-                            upload_file(file_content, bucket=bucket_name,store_as=obj_path)
+                            upload_file(file_content,store_as=obj_path)
                             db.commit()
                             cur.close()
                             result = True
@@ -319,11 +316,11 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recei
                     #If guest it does the same calls just without senderId
                     else:        
                         insertQuery = "INSERT INTO videos (videoName, subDate, retDate, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s)"
-                        data = (obj_path, subDate, retDate, recID, encrpytKey)
+                        data = (obj_path, subDate, retDate, recID, encryptKey)
                         cur.execute(insertQuery, data)
-                        proceed = already_existing_file('team4-s3',obj_path)
+                        proceed = already_existing_file(obj_path)
                         if(not proceed):
-                            upload_file(file_content, bucket=bucket_name,store_as=obj_path)
+                            upload_file(file_content,store_as=obj_path)
                             db.commit()
                             cur.close()
                             result = True
@@ -332,6 +329,7 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recei
                             result = False      
     except Exception as e:
         print(e)
+        db.rollback()
         result = False
     finally:
         if db:
@@ -340,8 +338,9 @@ def encrypt_insert(bucket_name, file_content, obj_path, retDate, senderId, recei
 
 
 if __name__ == "__main__":
-    #list_buckets()
-    #list_objs('team4-s3')
-    get_object_content('team4-s3',"/tests/9c9aba7b-34c7-4fb8-ab8e-d4d2f1bbf1fe")
-    #delete_file("team4-s3", '/test/testFile.txt')
-    #delete_file("team4-s3", '/test/testFile2.txt')
+    list_buckets()
+    list_objs()
+    #encrypt_insert("tests",'test test file for encrpyt', 'testFile.txt', "2022-01-22 11:59:00", "Test@example.com", "Test@example.com", "as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
+    get_object_content("tests/Guest/testFile2.txt")
+    delete_file('tests/Test@example.com/testFile.txt')
+    delete_file('tests/Guest/testFile2.txt')

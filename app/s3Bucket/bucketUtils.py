@@ -219,10 +219,6 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
         encrpytKey: The public key of the sender 
         file_flag: sets the folder to be saved into 
     """
-    if senderEmail:
-        obj_path = f"{file_flag}/{senderEmail}/{obj_path}"
-    else:
-        obj_path = f"{file_flag}/Guest/{obj_path}"
     db = None
     result = 0
     subDate = datetime.now(timezone.utc)
@@ -247,6 +243,7 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
                     
                     if recID:
                         recID = recID[0]
+                        obj_path = f"{file_flag}/{receiverEmail}/{obj_path}"
                     else:
                         raise ValueError("That email was not found.")
                     
@@ -264,7 +261,7 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
                             raise ValueError("Error retrieving current users information.")
                     
                         insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderID, senderFName, senderLName, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
-                        data = (obj_path,subDate, retDate, senderId, userFname, userLname, recID, encryptKey)
+                        data = (obj_path, subDate, retDate, senderId, userFname, userLname, recID, encryptKey)
                         cur.execute(insertQuery, data)
                         proceed = already_existing_file(obj_path)
                         if(not proceed):

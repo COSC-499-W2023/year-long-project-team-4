@@ -56,21 +56,23 @@ const UploadVideoPage = () => {
 
     videoData.append('file', backend, 'videoFile.mp4');
     videoData.append('recipient', 'recipient_email@example.com');
-    // console.log(videoData.get('file'));
 
-      axios.post("http://localhost:8080/bucket/upload", videoData, {
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
-    })
-    .then(response => {
-      console.log('Video uploaded successfully', response.data);
-      navigate(viewVideoPath, { state: { file: file } });
-    })
-    .catch(error => {
-      console.error('Error uploading video', error);
-    });
+    console.log(videoData.get('file'));
+    console.log(videoData.get('recipient'));
+  
+    axios.post("http://localhost:8080/bucket/upload", videoData, {
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+  })
+  .then(response => {
+    console.log('Video uploaded successfully', response.data);
+    navigate(viewVideoPath, { state: { file: file } });
+  })
+  .catch(error => {
+    console.error('Error uploading video', error);
+  });
    };
 
    const handleChange = (event) => {

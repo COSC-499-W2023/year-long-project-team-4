@@ -16,6 +16,8 @@ const UploadVideoPage = () => {
   const mediaRecorderRef = React.useRef(null);
   const [capturing, setCapturing] = React.useState(false);
   const [recordedChunks, setRecordedChunks] = React.useState([]);
+  const [recipientEmail, setRecipientEmail] = useState('');
+  const [uploadSuccess, setUploadSuccess] = useState(false);
     
   const handleStartRecord = React.useCallback(() => {
     setCapturing(true);
@@ -54,22 +56,23 @@ const UploadVideoPage = () => {
     
     const videoData = new FormData();
 
+    // Appends the video file and recipient's email to the FormData object
     videoData.append('file', backend, 'videoFile.mp4');
-
-    // console.log(videoData.get('file'));
-
-    axios.post("http://localhost:8080/bucket/upload", 
-      videoData,
-      {
-        headers: {
-            'Authorization': `Bearer ${'token'}`, 
-            'Content-Type': 'multipart/form-data'
-        },
-      }
-    )
-    .then(res => console.log('data posted', res.data));
-    
-    navigate(viewVideoPath,{state:{file:file}});
+    videoData.append('recipient', recipientEmail);
+  
+    axios.post("http://localhost:8080/bucket/upload", videoData, {
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+  })
+  .then(response => {
+    console.log('Video uploaded successfully', response.data);
+    setUploadSuccess(true); // Updates the state to reflect a successful upload;
+  })
+  .catch(error => {
+    console.error('Error uploading video', error);
+  });
    };
 
    const handleChange = (event) => {
@@ -106,6 +109,8 @@ const UploadVideoPage = () => {
   }
 
   return (
+    <>
+      {uploadSuccess && <div className="alert alert-success" role="alert">Video sent successfully!</div>}
     <div className="position-absolute top-50 start-50 translate-middle text-center">
       <ToggleButtonGroup className="pb-5" type="radio" name="options" defaultValue={1}>
         <ToggleButton id="tbg-radio-1" value={1} onClick={()=>setType(1)}>
@@ -145,6 +150,16 @@ const UploadVideoPage = () => {
             )}
           </div>
         </Form.Group>
+        <Form.Group controlId="formRecipientEmail" className="mb-3">
+          <Form.Label>Recipient's Email</Form.Label>
+            <Form.Control 
+              type="email" 
+              required 
+              placeholder="Enter recipient's email" 
+              value={recipientEmail} 
+              onChange={(e) => setRecipientEmail(e.target.value)} 
+            />
+        </Form.Group>
         <Button type="submit">Upload file</Button>
       </Form>
       ):
@@ -179,6 +194,16 @@ const UploadVideoPage = () => {
           </video>  
          )}
         </>
+        <Form.Group controlId="formRecipientEmail" className="mb-3">
+          <Form.Label>Recipient's Email</Form.Label>
+            <Form.Control 
+              type="email" 
+              required 
+              placeholder="Enter recipient's email" 
+              value={recipientEmail} 
+              onChange={(e) => setRecipientEmail(e.target.value)} 
+            />
+        </Form.Group>
         <div className="mb-2">
           <Button onClick={()=>{handleRecord(recordedChunks)}}>Upload file</Button> {' '}
           <Button onClick={()=>{handleRetake()}} disabled={disable}>Retake recording</Button> {' '}
@@ -190,6 +215,7 @@ const UploadVideoPage = () => {
       }
       </>
     </div>
+    </>
   )
 }
 

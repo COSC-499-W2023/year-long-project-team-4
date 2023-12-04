@@ -167,3 +167,32 @@ Additional Context:
 - I'm waiting for encryption/decryption to be completed so that I can integrate the feature to our frontend
 - Will work on Error Handling front end nagvigation: 404 NOT FOUND
 - Started working on System Architecture Document.
+
+
+# Week 13: Nov 27 - Nov 3 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="806" alt="Screen Shot 2023-12-03 at 10 24 33 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/e5469cdd-bdb3-40d7-a7dd-f6fefc742df9">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- System Architecture design for the Design Milestone
+- Video Receiving
+- Encryption/Decryption of videos
+
+Tasks from the Project Board:
+- System Architecture Design
+- Video Retention
+- Encryption/Decryption
+- Design Submission
+- Project Presentation
+
+Completed:
+- System Architecture Design
+- Video Retention
+- Encryption/Decryption
+- Design Submission
+- Project Presentation
+
+Additional Context:
+- One of the teammembers unfortunately had technical issues so had to take up some extra tasks

@@ -124,3 +124,21 @@ Things I worked on:
 Tasks from the project board relevant to things I worked on:
 - Public / Private key generation (mostly done)
 - Encryption / decryption of videos (integration with public / private keys) (in progress, should be done by Tuesday class)
+
+
+# Week (13): Nov 26 - Dec 3
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/87899eeb-853e-4bc0-8d6e-ec7c05e01646)
+
+## Goal Recap:
+Things I worked on:
+- Code reviews
+- Entire encryption system is done, including key management, encryption, decryption
+- Built out video upload and retrieval functions for the backend integrated with encryption
+- Build automated testcases for entire encryption system, as well as video upload / retrieval
+- Generally helped out with issues others were having leading up to the milestone
+  
+Tasks from the project board relevant to things I worked on:
+- Public / Private key generation (done and testcases written)
+- Encryption / decryption of videos (integration with public / private keys) (done and testcases written)

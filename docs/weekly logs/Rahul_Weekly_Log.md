@@ -76,4 +76,14 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 
 ## In progress:
 
-- Creating an account page. 
+- Creating an account page.
+
+# Week 13: Nov 27th - Dec 6th:
+## Tasks Completed:
+![Capture3](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/5aff4cb8-2ae9-44cd-8360-494c0703ae11)
+- Finished account page
+- Updated and created docs for submission
+
+## In progress:
+
+- Building out the overall aestetics of the website to fill out the empty spaces in the website.

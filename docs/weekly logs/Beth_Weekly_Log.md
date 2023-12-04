@@ -131,3 +131,22 @@ Completed:
 - Finished video retention
 - Tested and recieved reviews on retention feature
 - Research for email notifications
+
+# Week 13: Nov 27 - Dec 3
+
+## Tasks Completed:
+
+![Week13act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/155f036a-06cf-4da1-9fa6-d69ce7c4f5da)
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Creating email notifications
+- Project Documents/Video
+
+Completed:
+- Finished email notification feature
+- Wrote automated tests for notification feature
+- Made slideshow for video
+- Wrote UI change for milestone document

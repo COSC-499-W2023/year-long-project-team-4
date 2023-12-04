@@ -179,3 +179,30 @@ Completed:
 
 Additional Context:
 - I'm waiting for others before I can continue work for this week. Need encryption to finish so I can further implement.
+
+  
+# Week 13: Nov 27 - Nov 3 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![PersonalTasks](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/0dd7373a-8ef9-467c-b5a7-444cb140a0fc)
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Database design for the Design Milestone
+- Provide support to retention/Notification/Encryption features 
+
+Tasks from the Project Board:
+- Data retention for video
+- Public/Private Key Generation
+- Encryption/Decryption
+- Design Submission
+- Project Presentation
+- Notifications
+
+Completed:
+- Design submission for milestone
+- Design Video
+
+Additional Context:
+- N/A

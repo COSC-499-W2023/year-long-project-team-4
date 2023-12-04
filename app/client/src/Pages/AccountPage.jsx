@@ -1,14 +1,37 @@
-import React from 'react';
-import {Row, Col, Button, ButtonGroup} from 'react-bootstrap';
+import React, {useState, useEffect} from 'react';
+import {Row, Col, Button, ButtonGroup, Modal} from 'react-bootstrap';
 import { recieveAndSendPath } from '../Path';
+import axios from 'axios';
+
 const AccountPage = () => {
- 
-const userName = "username123";
-const password = "password122";
+
+const [currentUser, setCurrentUser] = useState(null);
+
+const userName = currentUser;
 const firstName = "firstname123";
 const lastName = "lastname123";
 const email = "email123@email.com";
-const file = "";
+
+useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+              const response = await axios.get('http://localhost:8080/auth/currentuser', {
+                withCredentials: true
+              });
+        
+              if (response.data.username) {
+                setCurrentUser(response.data.username);
+              } else {
+                console.error('No user currently logged in');
+              }
+            } catch (error) {
+              console.error('There was an error fetching the current user', error);
+            }
+          };
+        
+          fetchCurrentUser();
+}, []);
+
 return (
    <div>
     <Row>
@@ -18,22 +41,11 @@ return (
             <div className="display-6 text-light"> First Name: {firstName}</div>
             <div className="display-6 text-light"> Last Name: {lastName}</div>
             <div className="display-6 text-light"> Email: {email}</div>
-            <div className="display-6 text-light"> Password: {password}</div>
         </Col>
-         <Col className="p-3">
-             <div className="display-6 text-light"> Videos Viewable</div>
-             <video 
-                src={file}
-                width="320" 
-                height="180" 
-                controls
-            /> 
-        </Col>   
     </Row>      
         <div className="text-center p-4">
             <Button href={recieveAndSendPath}> Return to Home</Button>
-        </div>
-   
+        </div>   
    </div>
   )
 }

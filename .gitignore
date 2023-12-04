@@ -1,3 +1,4 @@
-app/database/dbConfig.py
 *.pem
 *__pycache__
+.DS_Store
+*.env

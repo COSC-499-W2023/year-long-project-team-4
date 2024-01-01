@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Row, Col, Button, Modal} from 'react-bootstrap';
 import { recieveAndSendPath } from '../Path';
 import axios from 'axios';
+import {Fade} from 'react-reveal';
 
 const ViewVideoPage = () => {
   
@@ -48,7 +49,7 @@ const ViewVideoPage = () => {
   };
   
   return (
-     <div>
+     <Fade cascade>
       <Row>
           <div className="display-4 text-center text-light"> Receive Videos </div>
            <Col className="p-3">
@@ -75,7 +76,7 @@ const ViewVideoPage = () => {
                   </Modal.Body>
           </Modal>
      
-     </div>
+     </Fade>
     )
   }
   

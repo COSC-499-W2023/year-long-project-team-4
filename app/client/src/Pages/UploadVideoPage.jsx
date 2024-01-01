@@ -1,12 +1,12 @@
 import React, {useState} from 'react'
-import {Form,Button, ToggleButtonGroup, ToggleButton} from 'react-bootstrap'
-import {useNavigate} from 'react-router-dom'
+import {Form, Offcanvas, Button, ToggleButtonGroup, ToggleButton} from 'react-bootstrap'
 import Webcam from 'react-webcam';
-import {viewVideoPath} from "../Path"
 import record from "../Assets/record-btn.svg"
 import axios from "axios";
+import info from "../Assets/info-circle.svg"
+import { Fade } from 'react-reveal';
+
 const UploadVideoPage = () => {
-  const navigate = useNavigate();
   const [type, setType] = useState(1);
   const [file, setFile] = useState(null);
   const [backend, setBackend] = useState(null);
@@ -18,7 +18,12 @@ const UploadVideoPage = () => {
   const [recordedChunks, setRecordedChunks] = React.useState([]);
   const [recipientEmail, setRecipientEmail] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState(false);
-    
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  
+  const handleShow = () => setShow(true);  
+
   const handleStartRecord = React.useCallback(() => {
     setCapturing(true);
 
@@ -109,113 +114,180 @@ const UploadVideoPage = () => {
   }
 
   return (
-    <>
-      {uploadSuccess && <div className="alert alert-success" role="alert">Video sent successfully!</div>}
-    <div className="position-absolute top-50 start-50 translate-middle text-center">
-      <ToggleButtonGroup className="pb-5" type="radio" name="options" defaultValue={1}>
-        <ToggleButton id="tbg-radio-1" value={1} onClick={()=>setType(1)}>
-          Upload Video
-        </ToggleButton>
-        <ToggleButton id="tbg-radio-2" value={2} onClick={()=>setType(2)}>
-          Record Video
-        </ToggleButton>
-      </ToggleButtonGroup>
-      <>
-      {type===1? 
-      (
-      <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="formFileLg" className="d-grid gap-2">
-          <Form.Label className="display-4 text-white">Upload Video</Form.Label>
-          <Form.Control 
-            type="file" 
-            required 
-            class="p-2 bg-light border" 
-            accept="video/*" 
-            size="lg" 
-            onChange={handleChange}
-          />
-          <div>
-            {file===null ? 
-            (
-            <>
-            </>
-            ):(
-              <video 
-                className="record"
-                src={file}
-                width="640" 
-                height="360" 
-                controls
-              /> 
-            )}
-          </div>
-        </Form.Group>
-        <Form.Group controlId="formRecipientEmail" className="mb-3">
-          <Form.Label>Recipient's Email</Form.Label>
-            <Form.Control 
-              type="email" 
-              required 
-              placeholder="Enter recipient's email" 
-              value={recipientEmail} 
-              onChange={(e) => setRecipientEmail(e.target.value)} 
-            />
-        </Form.Group>
-        <Button type="submit">Upload file</Button>
-      </Form>
-      ):
-      (
-      <>
-      <Form onSubmit={handleSubmit}>
-        <div className="mb-2"> 
-        {capturing? 
-          ( <>
-              <Button variant= "danger" active>
-                <img width="16" height="22" src={record}/> 
-              </Button> {' '}
-              <Button onClick={handleStopRecord}>Stop Recording</Button>
-            </>
-          ):(
-            <> 
-              <Button variant= "secondary" active>
-                <img width="16" height="22" src={record}/> 
-              </Button> {' '}
-              <Button onClick={handleStartRecord} disabled={disableRecord}>Start Recording</Button>
-            </> 
-          )
-        }
-        </div> 
+  <>
+    <Fade>
+      <Button className="m-2 float-end" variant="light" onClick={handleShow}>
+        <img src={info}></img>
+      </Button>
+    </Fade>
+    <Offcanvas show={show} onHide={handleClose} backdrop="static">
+      <Offcanvas.Header closeButton>
+            <Offcanvas.Title>How Uploading Videos Works</Offcanvas.Title>
+      </Offcanvas.Header>
+      <Offcanvas.Body>
+        <p>
+          To send a video you have 2 options.
+          Option 1 is to upload a video, or 
+          Option 2, to record a video on the 
+          webapp.
+        </p> 
+        <p>
+          Note that if you are a guest, you will be required
+          to give an email in order to encypt the
+          video.
+        </p>
+        <p>  
+          Option 1 requires you to do the following:
+          <ul>
+            <li>
+              1. upload a video file, where 
+              a preview will show up. If 
+              satisfied, click send video to 
+              send the file.  
+            </li>
+            <li>
+              2. If not, simply click upload 
+              video to retry with another file,
+              following step 1 above.
+            </li>
+          </ul>    
+        </p>
+        <p>
+          Option 2 requires you to do the following:
+          <ul>
+            <li>
+              1. record a video using your camera. 
+              Simply click start record on the 
+              top and click stop record when done.  
+            </li>
+            <li>
+              2. To record a video using your camera. 
+              Simply click start record on the 
+              top and click stop record when done.
+            </li>
+            <li>
+              3. To preview the video, click preview
+              video. If satisfied, click send video.
+              If not, click retake video, and
+              repeat step 1 and 2. 
+            </li>
+          </ul> 
+        </p>
+      </Offcanvas.Body>
+    </Offcanvas>
+    {uploadSuccess && <div className="alert alert-success" role="alert">Video sent successfully!</div>}
+    <Fade>
+      <div className="position-absolute top-50 start-50 translate-middle text-center">
+        <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>
+          <ToggleButton id="tbg-radio-1" value={1} onClick={()=>setType(1)}>
+            Upload Video
+          </ToggleButton>
+          <ToggleButton id="tbg-radio-2" value={2} onClick={()=>setType(2)}>
+            Record Video
+          </ToggleButton>
+        </ToggleButtonGroup>
         <>
-         {file === null? 
-         (
-          <Webcam  width="640" height="360" audio={true} ref={webcamRef}/>
-         ):(
-          <video  width="640" height="360" controls>
-            <source src={file} type="video/mp4"/>
-          </video>  
-         )}
-        </>
-        <Form.Group controlId="formRecipientEmail" className="mb-3">
-          <Form.Label>Recipient's Email</Form.Label>
+        {type===1? 
+        (
+        <Form onSubmit={handleSubmit}>
+          <Form.Group controlId="formFileLg" className="d-grid gap-2">
+            <Form.Label className="display-4 text-white">Upload Video</Form.Label>
             <Form.Control 
-              type="email" 
+              type="file" 
               required 
-              placeholder="Enter recipient's email" 
-              value={recipientEmail} 
-              onChange={(e) => setRecipientEmail(e.target.value)} 
+              class="p-2 bg-light border" 
+              accept="video/*" 
+              size="lg" 
+              onChange={handleChange}
             />
-        </Form.Group>
-        <div className="mb-2">
-          <Button onClick={()=>{handleRecord(recordedChunks)}}>Upload file</Button> {' '}
-          <Button onClick={()=>{handleRetake()}} disabled={disable}>Retake recording</Button> {' '}
-          <Button type="submit" disabled={disable}>Send video</Button>
-        </div> 
-      </Form>   
-      </>
-      )
-      }
-      </>
-    </div>
-    </>
+            <div>
+              {file===null ? 
+              (
+              <>
+              </>
+              ):(
+                <Fade>
+                  <video 
+                    className="record"
+                    src={file}
+                    width="400" 
+                    height="225" 
+                    controls
+                  />
+                </Fade> 
+              )}
+            </div>
+          </Form.Group>
+          <Form.Group controlId="formRecipientEmail" className="mb-3">
+            <Form.Label>Recipient's Email</Form.Label>
+              <Form.Control 
+                type="email" 
+                required 
+                placeholder="Enter recipient's email" 
+                value={recipientEmail} 
+                onChange={(e) => setRecipientEmail(e.target.value)} 
+              />
+          </Form.Group>
+          <Button type="submit">Send video</Button>
+        </Form>
+        ):
+        (
+        <>
+        <Form onSubmit={handleSubmit}>
+          <div className="mb-2"> 
+          {capturing? 
+            ( <>
+                <Button variant= "danger" active>
+                  <img width="16" height="22" src={record}/> 
+                </Button> {' '}
+                <Button onClick={handleStopRecord}>Stop Recording</Button>
+              </>
+            ):(
+              <> 
+                <Button variant= "secondary" active>
+                  <img width="16" height="22" src={record}/> 
+                </Button> {' '}
+                <Button onClick={handleStartRecord} disabled={disableRecord}>Start Recording</Button>
+              </> 
+            )
+          }
+          </div> 
+          <>
+          {file === null? 
+          (<Fade>
+            <Webcam  width="400" height="225" audio={false} ref={webcamRef}/>
+           </Fade>
+            ):(
+            <Fade>  
+              <video  width="400" height="225" controls>
+                <source src={file} type="video/mp4"/>
+              </video>
+            </Fade>  
+          )}
+          </>
+          <Form.Group controlId="formRecipientEmail" className="mb-3">
+            <Form.Label>Recipient's Email</Form.Label>
+              <Form.Control 
+                type="email" 
+                required 
+                placeholder="Enter recipient's email" 
+                value={recipientEmail} 
+                onChange={(e) => setRecipientEmail(e.target.value)} 
+              />
+          </Form.Group>
+          <div className="mb-2">
+            <Button onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}
+            <Button onClick={()=>{handleRetake()}} disabled={disable}>Retake video</Button> {' '}
+            <Button type="submit" disabled={disable}>Send video</Button>
+          </div> 
+        </Form>   
+        </>
+        )
+        }
+        </>
+      </div>
+    </Fade>
+  </>
   )
 }
 

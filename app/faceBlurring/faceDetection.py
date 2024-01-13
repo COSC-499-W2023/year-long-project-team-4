@@ -1,12 +1,13 @@
 import boto3
 import cv2
-
+import time 
 
 boto3.setup_default_session(profile_name='team4-dev')
 rek_client = boto3.client('rekognition')
 
 
 def detect_faces(VideoFrame):
+    #start = time.time()
     #Load frame - Calls a tuple - ignore first varible using '_', only care about the second
     _, img_bytes = cv2.imencode(".jpg", VideoFrame)
     img_bytes = img_bytes.tobytes()
@@ -16,11 +17,15 @@ def detect_faces(VideoFrame):
     face_details = []
     for faces in response['FaceDetails']:
         face_details.append(faces['BoundingBox'])
+    
+    #end = time.time()
+    #print(f"AWS CALL TIME: {end - start}\n")
     return face_details
 
 
 def blur_faces_opencv(frame, face_details):
     #Copy frame into new variable
+    #start = time.time()
     image = frame.copy()
     h, w, _ = image.shape
 
@@ -38,11 +43,12 @@ def blur_faces_opencv(frame, face_details):
 
         # Replace the original face region with the blurred version
         image[y:y+height, x:x+width] = blurred_face
-
+    #end = time.time()
+    #print(f"BLUR CALL TIME: {end-start} seconds\n")
     return image
 
 if __name__ == '__main__':
-    
+    #start = time.time()
     # Temp variable for testing - load local files for it
     video_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/test_video.mp4"
     video_out_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/testBlur_video.mp4"
@@ -67,6 +73,9 @@ if __name__ == '__main__':
         cv2.imshow("Blurred Faces", output_frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+        
     cap.release()
     out.release()
     cv2.destroyAllWindows()
+    #end = time.time()
+    #print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n")

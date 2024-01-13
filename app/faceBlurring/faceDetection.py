@@ -7,21 +7,21 @@ rek_client = boto3.client('rekognition')
 
 
 def detect_faces(VideoFrame):
-    _, img_bytes = cv2.imencode(".jpeg", VideoFrame)
+    #Load frame - Calls a tuple - ignore first varible using '_', only care about the second
+    _, img_bytes = cv2.imencode(".jpg", VideoFrame)
     img_bytes = img_bytes.tobytes()
     
-    response = rek_client.detect_faces(Image={'Bytes': img_bytes})
-    print(response)
+    # Call rekognition api for each frame 
+    response = rek_client.detect_faces(Image={'Bytes': img_bytes}) 
     face_details = []
     for faces in response['FaceDetails']:
         face_details.append(faces['BoundingBox'])
-    print(face_details)
     return face_details
 
 
 def blur_faces_opencv(frame, face_details):
+    #Copy frame into new variable
     image = frame.copy()
-
     h, w, _ = image.shape
 
     for face_detail in face_details:
@@ -42,25 +42,31 @@ def blur_faces_opencv(frame, face_details):
     return image
 
 if __name__ == '__main__':
-    video_path = "../../tests/test_video.mp4"
-    video_out_path = "../../tests/testBlur_video.jpeg"
     
+    # Temp variable for testing - load local files for it
+    video_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/test_video.mp4"
+    video_out_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/testBlur_video.mp4"
+    
+    # Start handling video - Load, and save the output
     cap = cv2.VideoCapture(video_path)
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     out = cv2.VideoWriter(video_out_path, fourcc, 30,(int(cap.get(3)), int(cap.get(4))))
-    image_bytes = cv2.imread('C:/Users/Gauth/COSC499/year-long-project-team-4/tests/TestBlurFace.jpeg')
-    face_details = detect_faces(image_bytes)
-    out_image = blur_faces_opencv(image_bytes,face_details)
-    cv2.imwrite(video_out_path, out_image)
-    
-    cv2.imshow("Blurred Face", out_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    # while cap.isOpened():
-    #     ret, frame = cap.read()
-    #     if not ret:
-    #         break
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        # Send call to Rekon
+        face_details = detect_faces(frame)
         
-    #     face_details = detect_faces(frame)
-    #     print(face_details)
-    
+        # Take boundries from Reko and give to OpenCv to blur 
+        output_frame = blur_faces_opencv(frame,face_details)
+        out.write(output_frame)
+        
+        # Currently to display the blurring is working 
+        cv2.imshow("Blurred Faces", output_frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()

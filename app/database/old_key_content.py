@@ -61,7 +61,7 @@ def deleting_old_key_content(email):
         email (str): email of user who forgot password.
 
     Returns:
-        bool: True if the deletion is successful, False otherwise.
+        int: representing number of files deleted, -1 if function failed.
     """
     db = None
     result = 0
@@ -76,22 +76,37 @@ def deleting_old_key_content(email):
             db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=db_name)
             if db:
                 cur = db.cursor()
+                #Begin transaction that only commits to Database if files will successfully delete
                 query1 = f"START TRANSACTION"
                 cur.execute(query1)
+                #Get id of user through their email
                 query2 = f"SELECT id FROM userprofile WHERE email = {email}"
                 cur.execute(query2, email)
-                userID = cur.fetchall()
-                query3 = f"DELETE from videos WHERE recieverID = {userID}"
+                userID = cur.fetchone
+                #Get list of video names that need to be deleted
+                query3 = f"SELECT videoName from videos WHERE recieverID = {userID}"
                 cur.execute(query3, userID)
-                proceed = already_existing_file('team4-s3',obj_path)
-                if(proceed):
-                    s3_client.delete_object(Bucket='team4-s3',Key=obj_path)
-                    db.commit()
-                    cur.close()
-                    result = 1
-                else:
-                    db.rollback()
-                    result = -1
+                videoList = cur.fetchall()
+                #Loop through list, deleting files individually
+                for items in videoList:
+                    proceed = already_existing_file('team4-s3',videoList[items])
+                    #Only proceed to delete files if they exist in bucket
+                    if(proceed):
+                        #Delete from database
+                        query4 = f"DELETE FROM videos WHERE videoName = {(videoList[items],)}"
+                        cur.execute(query4, (videoList[items],))
+                        #Delete from S3 Bucket
+                        s3_client.delete_object(Bucket='team4-s3',Key=videoList[items])
+                        #Count deleted files
+                        deleted_files += 1
+                        #Commit transaction if files will delete
+                        db.commit()
+                        cur.close()
+                        result = deleted_files
+                    else:
+                        #Cancel transaction if file doesn't exist
+                        db.rollback()
+                        result = -1
     except Exception as e:
         print(e)
         result = -1

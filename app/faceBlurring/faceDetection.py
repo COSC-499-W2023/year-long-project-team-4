@@ -48,11 +48,15 @@ def blur_faces_opencv(frame, face_details):
     return image
 
 if __name__ == '__main__':
-    #start = time.time()
+    start = time.time()
     # Temp variable for testing - load local files for it
-    video_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/test_video.mp4"
-    video_out_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/testBlur_video.mp4"
+    video_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/testVideo.mp4"
+    video_out_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/testBlur_video1.mp4"
     
+    frame_skip = 15
+    frame_num = 0
+    sampled_frame = None
+    sampled_face_details =[]
     # Start handling video - Load, and save the output
     cap = cv2.VideoCapture(video_path)
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -63,19 +67,30 @@ if __name__ == '__main__':
         if not ret:
             break
         # Send call to Rekon
-        face_details = detect_faces(frame)
+        if frame_num % frame_skip == 0:
+            sampled_face_details = detect_faces(frame)
+            sampled_frame = frame.copy()
+        elif sampled_frame is not None:
+            processed_frame = blur_faces_opencv(frame,sampled_face_details)
+            out.write(processed_frame)
+            cv2.imshow("Blurred Faces", processed_frame)
+
+        frame_num += 1
+        
+        
+        #face_details = detect_faces(frame)
         
         # Take boundries from Reko and give to OpenCv to blur 
-        output_frame = blur_faces_opencv(frame,face_details)
-        out.write(output_frame)
+        #output_frame = blur_faces_opencv(frame,face_details)
+        #out.write(output_frame)
         
         # Currently to display the blurring is working 
-        cv2.imshow("Blurred Faces", output_frame)
+        #cv2.imshow("Blurred Faces", processed_frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
         
     cap.release()
     out.release()
     cv2.destroyAllWindows()
-    #end = time.time()
-    #print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n")
+    end = time.time()
+    print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n")

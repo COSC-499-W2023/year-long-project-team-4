@@ -161,12 +161,7 @@ const UploadVideoPage = () => {
               top and click stop record when done.  
             </li>
             <li>
-              2. To record a video using your camera. 
-              Simply click start record on the 
-              top and click stop record when done.
-            </li>
-            <li>
-              3. To preview the video, click preview
+              2. To preview the video, click preview
               video. If satisfied, click send video.
               If not, click retake video, and
               repeat step 1 and 2. 

@@ -10,6 +10,8 @@ const AlertGuestPage = () => {
             <Alert variant="danger">
                 Understand, as a guest you will only 
                 be able to send videos, not receive them.
+                You will also not be able to view the video
+                after it is sent.
                 If you understand please click continue,
                 otherwise click login to be able to access 
                 all features of this app.

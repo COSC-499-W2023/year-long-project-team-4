@@ -10,7 +10,7 @@ import {
 import axios from 'axios';
 import {Fade} from 'react-reveal';
 
-const RecieveAndSendPage = () => {
+const ReceiveAndSendPage = () => {
 
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
@@ -74,4 +74,4 @@ const RecieveAndSendPage = () => {
   )
 }
 
-export default RecieveAndSendPage
+export default ReceiveAndSendPage

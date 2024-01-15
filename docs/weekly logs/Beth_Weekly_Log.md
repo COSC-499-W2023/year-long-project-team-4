@@ -155,7 +155,7 @@ Completed:
 
 ## Tasks Completed:
 
-![2Week1act]("https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/94133fd6-8dc0-444e-b4c0-a937a8f9c7db")
+![2Week1act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/94133fd6-8dc0-444e-b4c0-a937a8f9c7db)
 
 
 ## Goal Recap:

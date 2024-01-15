@@ -151,7 +151,9 @@ Completed:
 - Made slideshow for video
 - Wrote UI change for milestone document
 
-# Term 2 Week 1: Jan 8 - Jan 14
+# Term 2
+
+# Week 1: Jan 8 - Jan 14
 
 ## Tasks Completed:
 

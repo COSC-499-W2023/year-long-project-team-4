@@ -1,11 +1,11 @@
 import React, {useState} from 'react'
-import {Card, Button, Form} from 'react-bootstrap';
+import { Button, Form} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom'
 import {
     loginPath,
   } from "../Path";
 import axios from 'axios'
-
+import {Fade} from 'react-reveal';
 const RegisterPage = () => {
 
   const [errorMessage, setErrorMessage] = useState(null);
@@ -58,44 +58,47 @@ const handleSubmit = (e) => {
 };
 
   return (
-  <div className="position-absolute top-50 start-50 translate-middle">          
-    <Card border="primary" style={{ width: "16rem" }}>  
-      <Card.Body className="text-center">
-        <Card.Title>Register</Card.Title>
-        {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+  <div className="position-absolute top-50 start-50 translate-middle text-white text-center">          
+    {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+      <Fade cascade>
         <Form onSubmit={handleSubmit}>
-          <Form.Group className="p-3">
+        <Form.Group className="p-3">
+        <div className="row">
+          <div className="col">
             <Form.Label>First Name</Form.Label>
-              <Form.Control
-                type="text"
-                required
-              />
-              <Form.Label>Last Name</Form.Label>
-              <Form.Control
-                type="text"
-                required
-              />
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                required
-              />
-              <Form.Label>Username</Form.Label>
-              <Form.Control
-                type="text"
-                required
-              />
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                type="password"
-                required
-              />
-          </Form.Group>   
-          <Button className="mb-2" variant="primary" type="submit"> Register </Button>
+            <Form.Control
+              type="text"
+              required
+            />
+            <Form.Label>Last Name</Form.Label>
+            <Form.Control
+              type="text"
+              required
+            />
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              required
+            />
+          </div>
+          <div className="col">
+            <Form.Label>Username</Form.Label>
+            <Form.Control
+              type="text"
+              required
+            />
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              required
+            />
+          </div>     
+          <Button className="m-2" variant="primary" type="submit"> Register </Button>
+          </div>
+        </Form.Group>  
         </Form>
-      </Card.Body>
-      <Card.Link className="text-center" href={loginPath}>Have an account?</Card.Link>
-    </Card>
+        <a href={loginPath}>Have an account?</a>
+      </Fade>
   </div>
   )
 }

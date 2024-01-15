@@ -86,4 +86,21 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 
 ## In progress:
 
-- Building out the overall aestetics of the website to fill out the empty spaces in the website.
+- Building out the overall aesthetics of the website to fill out the empty spaces in the website.
+
+# Term 2 Week 1: Jan8th - Jan 14th:
+## Tasks Completed:
+![t2 week1](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/ff7aeaac-3c22-4d05-9c9d-b80da86162a0)
+
+- Updated website aesthetics to make the website look better.
+- Mainly aesthetic and few logic changes.
+- Figured out what also needs to be done for the month.
+
+## In progress:
+- Ensure that buttons that should not exist do not exist when a user is not logged in
+- Bug fixes
+- Update the account page to remove certain fields
+- Add features such as UI for blurring a video.
+  
+
+  

@@ -196,3 +196,25 @@ Completed:
 
 Additional Context:
 - One of the teammembers unfortunately had technical issues so had to take up some extra tasks
+
+
+# Term 2 Week 1: Jan 7 - Jan 14 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="871" alt="Screen Shot 2024-01-14 at 9 32 17 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/c0b9b7f0-a8aa-4f66-9ea4-90a90565815b">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Error handling for 404 Page Not Found
+- Adding and completing tests for the frontend
+- Design Chat feature for client and admin interaction
+
+Tasks from the Project Board:
+- Error handling of frontend navigation 
+
+Completed:
+- Error handling for 404 Page Not Found
+- Adding and completing tests for the frontend
+
+Additional Context:
+- Still working on some frontend tests

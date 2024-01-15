@@ -150,3 +150,20 @@ Completed:
 - Wrote automated tests for notification feature
 - Made slideshow for video
 - Wrote UI change for milestone document
+
+# Term 2 Week 1: Jan 8 - Jan 14
+
+## Tasks Completed:
+
+![2Week1act]("https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/94133fd6-8dc0-444e-b4c0-a937a8f9c7db")
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Creating function that deletes videos when user changes password while logged out (forgot password)
+- Creating fuction to re-encrypt videos with new key when password changed while logged in
+
+Completed:
+- Almost finished delete function, working on testing still
+- Began conceptualizing/researching encrypt function becuase I've never handled encryption

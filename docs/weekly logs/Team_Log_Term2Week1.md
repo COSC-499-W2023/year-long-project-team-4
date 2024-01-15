@@ -7,7 +7,8 @@
 * rahulng7963 - Rahul Nagulapally
 
 ## Weekly Report Overview
-**Work performed (Monday - Sunday) Nov 27 - Dec 3:**
+**Work performed (Monday - Sunday) Jan 8 - Jan 14:**
+* Deleting old content tied to keys thst are no longer active
 * Public/Private Key generation
 * Encryption/Decryption
 * Integration

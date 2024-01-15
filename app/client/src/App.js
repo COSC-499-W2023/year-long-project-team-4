@@ -19,6 +19,7 @@ import {
   accountPath,
 } from "./Path";
 import AccountPage from "./Pages/AccountPage";
+import PageNotFound from "./Pages/PageNotFound";
 import AlertGuestPage from "./Pages/AlertGuestPage";
 
 function App() {
@@ -47,7 +48,8 @@ function App() {
         <Route path={uploadVideoPath} element={<UploadVideoPage />} />
         <Route path={viewVideoPath} element={<ViewVideoPage />} />
         <Route path={registerPath} element={<RegisterPage />} />
-        <Route path={accountPath} element={<AccountPage />} />
+        {/*Creating a Route element if no Route Path matches*/}
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Router>
   );

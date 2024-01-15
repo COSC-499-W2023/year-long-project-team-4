@@ -206,3 +206,22 @@ Completed:
 
 Additional Context:
 - N/A
+
+# Term 2 Week 1: Jan 7 - Jan 14 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![PersonalTask](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/c505f96a-cbce-4408-86c3-772cbb8cd924)
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Face Blurring 
+- Database Utility file hotfix
+
+Tasks from the Project Board:
+- Face blurring 
+
+Completed:
+- Fixed database Utility file and corresponding tests to new database changes. 
+
+Additional Context:
+- N/A

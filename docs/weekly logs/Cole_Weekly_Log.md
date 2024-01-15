@@ -142,3 +142,21 @@ Things I worked on:
 Tasks from the project board relevant to things I worked on:
 - Public / Private key generation (done and testcases written)
 - Encryption / decryption of videos (integration with public / private keys) (done and testcases written)
+
+
+# Term 2 Week (1): Jan 7 - Jan 14
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/4109a521-9730-4b4c-b736-e13a12fefe65)
+
+## Goal Recap:
+Things I worked on:
+- Code reviews
+- Added backend ability to create chats between 2 parties (backend support only for now)
+- Chats are encrypted with AES keys, which are encrypted by both party's RSA public keys so they can be accessed by either party (backend support only for now)
+- Both parties have the ability to decrypt, append new messages, and re-encrypt chats to act as a secure messaging platform to accompany videos (backend support only for now)
+- Research / attempts at automating testcases with github actions. Stuck here for now.
+  
+Tasks from the project board relevant to things I worked on:
+- Creating chats (almost done pending testcases being written)
+- Encryption / decryption of chats (almost done pending testcases being written)

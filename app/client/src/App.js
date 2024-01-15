@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginHomePage from "./Pages/LoginHomePage";
-import RecieveAndSendPage from "./Pages/RecieveAndSendPage";
+import ReceiveAndSendPage from "./Pages/ReceiveAndSendPage";
 import UploadVideoPage from "./Pages/UploadVideoPage";
 import ViewVideoPage from "./Pages/ViewVideoPage";
 import RegisterPage from "./Pages/RegisterPage";
@@ -12,7 +12,7 @@ import {
   homePath,
   loginPath,
   guestPath,
-  recieveAndSendPath,
+  receiveAndSendPath,
   registerPath,
   viewVideoPath,
   uploadVideoPath,
@@ -43,7 +43,7 @@ function App() {
         <Route path={homePath} element={<HomePage />} />
         <Route path={loginPath} element={<LoginHomePage />} />
         <Route path={guestPath} element={<AlertGuestPage />} />
-        <Route path={recieveAndSendPath} element={<RecieveAndSendPage />} />
+        <Route path={receiveAndSendPath} element={<ReceiveAndSendPage />} />
         <Route path={uploadVideoPath} element={<UploadVideoPage />} />
         <Route path={viewVideoPath} element={<ViewVideoPage />} />
         <Route path={registerPath} element={<RegisterPage />} />

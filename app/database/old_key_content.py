@@ -73,27 +73,28 @@ def deleting_old_key_content(email):
         )as tunnel:
             print("SSH Tunnel Established")
             #Db connection string
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=db_name)
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
             if db:
                 cur = db.cursor()
                 #Begin transaction that only commits to Database if files will successfully delete
-                query1 = f"START TRANSACTION"
+                query1 = "START TRANSACTION"
                 cur.execute(query1)
                 #Get id of user through their email
-                query2 = f"SELECT id FROM userprofile WHERE email = {email}"
-                cur.execute(query2, email)
-                userID = cur.fetchone
+                query2 = "SELECT id FROM userprofile WHERE email = %s"
+                cur.execute(query2, (email,))
+                userID = cur.fetchone()
                 #Get list of video names that need to be deleted
-                query3 = f"SELECT videoName from videos WHERE recieverID = {userID}"
-                cur.execute(query3, userID)
+                query3 = "SELECT videoName FROM videos WHERE receiverID = %s"
+                cur.execute(query3, (userID,))
                 videoList = cur.fetchall()
+                deleted_files = 0
                 #Loop through list, deleting files individually
                 for items in videoList:
                     proceed = already_existing_file('team4-s3',videoList[items])
                     #Only proceed to delete files if they exist in bucket
                     if(proceed):
                         #Delete from database
-                        query4 = f"DELETE FROM videos WHERE videoName = {(videoList[items],)}"
+                        query4 = "DELETE FROM videos WHERE videoName = %s"
                         cur.execute(query4, (videoList[items],))
                         #Delete from S3 Bucket
                         s3_client.delete_object(Bucket='team4-s3',Key=videoList[items])
@@ -101,12 +102,12 @@ def deleting_old_key_content(email):
                         deleted_files += 1
                         #Commit transaction if files will delete
                         db.commit()
-                        cur.close()
                         result = deleted_files
                     else:
                         #Cancel transaction if file doesn't exist
                         db.rollback()
                         result = -1
+                cur.close()
     except Exception as e:
         print(e)
         result = -1

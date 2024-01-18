@@ -1,7 +1,8 @@
 import boto3
 import cv2
 import time 
-
+from moviepy.editor import VideoFileClip
+import os
 boto3.setup_default_session(profile_name='team4-dev')
 rek_client = boto3.client('rekognition')
 
@@ -35,27 +36,42 @@ def blur_faces_opencv(frame, face_details):
         width = int(face_detail['Width'] * w)
         height = int(face_detail['Height'] * h)
 
-        # Extract the face region
+            # Extract the face region            
         face_region = image[y:y+height, x:x+width]
-
-        # Apply blur to the face region
-        blurred_face = cv2.GaussianBlur(face_region, (99, 99), 30)
-
+        if not face_region.size == 0:
+            # Apply blur to the face region
+            blurred_face = cv2.GaussianBlur(face_region, (99, 99), 30)
         # Replace the original face region with the blurred version
-        image[y:y+height, x:x+width] = blurred_face
+            image[y:y+height, x:x+width] = blurred_face
     #end = time.time()
     #print(f"BLUR CALL TIME: {end-start} seconds\n")
     return image
+
+
+def integrate_audio(original_video, original_fps, output_video, audio_path='C:/Users/Gauth/COSC499/year-long-project-team-4/tests/audio.mp4'):
+    # Extract audio
+    my_clip = VideoFileClip(original_video)
+    my_clip.audio.write_audiofile(audio_path,codec='libmp3lame')
+
+    temp_location = 'C:/Users/Gauth/COSC499/year-long-project-team-4/tests/output_video.mp4'
+    # Join output video with extracted audio
+    videoclip = VideoFileClip(output_video)
+    #videoclip = videoclip.set_audio(VideoFileClip(audio_path))
+    videoclip.write_videofile(temp_location, codec='libx264', audio=audio_path, audio_codec='libmp4lame')
+
+    os.rename(temp_location, 'C:/Users/Gauth/COSC499/year-long-project-team-4/tests/TestAudioBlurFinished.mp4')
+    # Delete audio
+    os.remove(audio_path)
 
 if __name__ == '__main__':
     start = time.time()
     
     # Temp variable for testing - load local files for it
-    video_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/testVideo.mp4"
-    video_out_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/testBlur_video1.mp4"
+    video_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/AudioTestUpdated.mp4"
+    video_out_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/TestAudioBlur.mp4"
     
     # Set up Vars for the frame skipping
-    frame_skip = 8
+    frame_skip = 5
     frame_num = 0
     sampled_frame = None
     sampled_face_details =[]
@@ -88,5 +104,6 @@ if __name__ == '__main__':
     # Free memory  
     cap.release()
     out.release()
+    integrate_audio(video_path,input_fps, video_out_path)
     end = time.time()
     print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n")

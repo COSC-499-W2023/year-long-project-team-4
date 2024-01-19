@@ -3,12 +3,14 @@ import cv2
 import time 
 from moviepy.editor import VideoFileClip
 import os
+import concurrent.futures
 boto3.setup_default_session(profile_name='team4-dev')
-rek_client = boto3.client('rekognition')
+
 
 
 def detect_faces(VideoFrame):
     #start = time.time()
+    rek_client = boto3.client('rekognition')
     #Load frame - Calls a tuple - ignore first varible using '_', only care about the second
     _, img_bytes = cv2.imencode(".jpg", VideoFrame)
     img_bytes = img_bytes.tobytes()
@@ -23,7 +25,6 @@ def detect_faces(VideoFrame):
     #print(f"AWS CALL TIME: {end - start}\n")
     return face_details
 
-
 def blur_faces_opencv(frame, face_details):
     #Copy frame into new variable
     #start = time.time()
@@ -33,7 +34,7 @@ def blur_faces_opencv(frame, face_details):
     for face_detail in face_details:
         x = int(face_detail['Left'] * w)
         y = int(face_detail['Top'] * h)
-        width = int(face_detail['Width'] * w)
+        width = int((face_detail['Width'] * w)*1.2)
         height = int(face_detail['Height'] * h)
 
             # Extract the face region            
@@ -47,63 +48,104 @@ def blur_faces_opencv(frame, face_details):
     #print(f"BLUR CALL TIME: {end-start} seconds\n")
     return image
 
-
-def integrate_audio(original_video, original_fps, output_video, audio_path='C:/Users/Gauth/COSC499/year-long-project-team-4/tests/audio.mp4'):
+def integrate_audio(original_video, output_video, audio_path=os.path.dirname(__file__)+'/temp/audio.mp4'):
     # Extract audio
     my_clip = VideoFileClip(original_video)
     my_clip.audio.write_audiofile(audio_path,codec='libmp3lame')
 
-    temp_location = 'C:/Users/Gauth/COSC499/year-long-project-team-4/tests/output_video.mp4'
+    temp_location = os.path.dirname(__file__)+'/temp/output_video.mp4'
     # Join output video with extracted audio
     videoclip = VideoFileClip(output_video)
     #videoclip = videoclip.set_audio(VideoFileClip(audio_path))
     videoclip.write_videofile(temp_location, codec='libx264', audio=audio_path, audio_codec='libmp4lame')
 
-    os.rename(temp_location, 'C:/Users/Gauth/COSC499/year-long-project-team-4/tests/TestAudioBlurFinished.mp4')
+    os.rename(temp_location, os.path.dirname(__file__)+'/temp/blurredVideo.mp4')
     # Delete audio
     os.remove(audio_path)
 
-if __name__ == '__main__':
-    start = time.time()
-    
-    # Temp variable for testing - load local files for it
-    video_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/AudioTestUpdated.mp4"
-    video_out_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/TestAudioBlur.mp4"
-    
-    # Set up Vars for the frame skipping
-    frame_skip = 5
-    frame_num = 0
-    sampled_frame = None
-    sampled_face_details =[]
-    
-    # Start handling video - Load, and save the output
+def parallel_detect_faces(video_path, frame_skip,video_out_path):
     cap = cv2.VideoCapture(video_path)
-    # Match FPS of input to output
     input_fps = cap.get(cv2.CAP_PROP_FPS)
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    out = cv2.VideoWriter(video_out_path, fourcc, input_fps,(int(cap.get(3)), int(cap.get(4))))
 
-    # Loop over frames of the video/Open the video & Loop over it
+    # Sample frames
+    sampled_frames = []
+    face_details_dict = {}
+    # Run aws rekognition calls in parallel
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = []
+
+        frame_num = 0
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            # Check for new frame to pull
+            if frame_num % frame_skip == 0:
+                sampled_frames.append(frame_num)
+                future = executor.submit(detect_faces, frame)
+                futures.append((frame_num, future))
+
+            frame_num += 1
+
+        # Collect face details
+        for frame_num, future in futures:
+            face_details_dict[frame_num] = future.result()
+
+    # Now process the video again, using the collected face details
+    cap.release()
+    cap = cv2.VideoCapture(video_path)
+
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    out = cv2.VideoWriter(video_out_path, fourcc, input_fps, (int(cap.get(3)), int(cap.get(4))))
+
+    frame_num = 0
     while cap.isOpened():
         ret, frame = cap.read()
-        # EOF Break
         if not ret:
             break
-        
-        # Check for new frame to pull
-        if frame_num % frame_skip == 0:
-            # Do the analysis on pulled frame
-            sampled_face_details = detect_faces(frame)
-            sampled_frame = frame.copy()
-        # Use previous frame boundries for frames inbetween pulls
-        if sampled_frame is not None:
-            processed_frame = blur_faces_opencv(frame,sampled_face_details)
-            out.write(processed_frame)
+
+        # Use previous frame boundaries for frames in between sampled frames
+        if frame_num in sampled_frames:
+            face_details = face_details_dict.get(frame_num, [])
+        processed_frame = blur_faces_opencv(frame, face_details)
+        out.write(processed_frame)
+
         frame_num += 1
-        
-    # Free memory  
+
     cap.release()
     out.release()
-    integrate_audio(video_path,input_fps, video_out_path)
-    end = time.time()
-    print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n")
+
+def process_video():
+    
+    start = time.time() #//for timing the entire video 
+    # Temp variable for testing - load local files for it
+    video_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/AudioTestUpdated.mp4"
+    video_out_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/TestAudioBlur.mp4" 
+    frame_skip = 3
+    
+    # This code below is for flask I believe? maybe not need confirmation
+        # if 'file' not in request.files:
+        #     return 'No file found'
+        # file = request.files['file']
+        # if file.filename == '':
+        #     return "no file selected"
+        # uploaded_path = 'temp/uploaded_video.mp4'
+        # file.save(uploaded_path)
+        # processed_path = 'temp/processed_video.mp4'
+        # parallel_detect_faces(uploaded_path,frame_skip, processed_path)
+        # integrate_audio(uploaded_path,processed_path)
+        # return send_file("../temp/blurredVideo.mp4", as_attachment=True)
+    
+    # number of frames between frame samples 
+   
+
+    
+    # Start handling video - Load, and save the output
+    parallel_detect_faces(video_path,frame_skip,video_out_path)
+    integrate_audio(video_path, video_out_path)
+    #end = time.time()
+    #print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n") #//printing the speed 
+    
+if __name__ == "__main__":
+    process_video()

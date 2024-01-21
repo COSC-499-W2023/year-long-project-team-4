@@ -72,7 +72,7 @@ def insert_user(username:str, email:str, password:str, firstname:str, lastname:s
         return result
 
 
-def insert_video(videoName:str, retDate:datetime, senderID:str, receiverID:str, encrpyt) -> int:
+def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail:str, senderEncryption, receiverEncryption) -> int:
     '''
     Insert a new video into the database.
 
@@ -105,9 +105,9 @@ def insert_video(videoName:str, retDate:datetime, senderID:str, receiverID:str, 
                 subDate = datetime.now(timezone.utc)
                 retDate = datetime.strptime(retDate,'%Y-%m-%d %H:%M:%S')
                 #Insert String
-                query = "INSERT INTO videos(videoName, subDate, retDate, senderID, receiverID, encrpyt) values (%s, %s, %s, %s, %s, %s)"
+                query = "INSERT INTO videos(videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) values (%s, %s, %s, %s, %s, %s, %s)"
                 #Creates list of the insertations 
-                data = (videoName, subDate, retDate, senderID, receiverID, encrpyt)
+                data = (videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption)
                 #Executes the query w/ the corrosponding data
                 cur.execute(query,data)
                 print("Insertation Complete")

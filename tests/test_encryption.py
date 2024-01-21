@@ -26,13 +26,13 @@ def client(app):
 # Test that you can reconsctruct the private key that generates a user's public key
 def test_reconstruct_private_key(client):
     # Reset database and signup
-    assert database.resetTable(tableName="userprofile", testcase=True)
+    assert database.resetTable(tableName="userprofile")
     post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
 
     # Get public key and salt hash
-    query_response = database.query_records(table_name='userprofile', fields='publickey, salthash', condition=f'email = %s', condition_values=(post_object['email'],), testcase=True)[0]
+    query_response = database.query_records(table_name='userprofile', fields='publickey, salthash', condition=f'email = %s', condition_values=(post_object['email'],))[0]
 
     # This is the public key stored in the database
     publickey_import_string = query_response['publickey']
@@ -50,13 +50,13 @@ def test_reconstruct_private_key(client):
 
 # Encrypt an AES key then decrypt it with correct private key
 def test_encrypt_decrypt_key_success(client):
-    assert database.resetTable(tableName="userprofile", testcase=True)
+    assert database.resetTable(tableName="userprofile")
     post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
 
     # Get public key and salt hash
-    query_response = database.query_records(table_name='userprofile', fields='publickey, salthash', condition=f'email = %s', condition_values=(post_object['email'],), testcase=True)[0]
+    query_response = database.query_records(table_name='userprofile', fields='publickey, salthash', condition=f'email = %s', condition_values=(post_object['email'],))[0]
 
     # This is the public key stored in the database
     publickey_import_string = query_response['publickey']
@@ -75,13 +75,13 @@ def test_encrypt_decrypt_key_success(client):
 
 # Encrypt an AES key then try to decrypt it with the wrong private key
 def test_encrypt_decrypt_key_fail(client):
-    assert database.resetTable(tableName="userprofile", testcase=True)
+    assert database.resetTable(tableName="userprofile")
     post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
 
     # Get public key and salt hash
-    query_response = database.query_records(table_name='userprofile', fields='publickey, salthash', condition=f'email = %s', condition_values=(post_object['email'],), testcase=True)[0]
+    query_response = database.query_records(table_name='userprofile', fields='publickey, salthash', condition=f'email = %s', condition_values=(post_object['email'],))[0]
 
     # This is the public key stored in the database
     publickey_import_string = query_response['publickey']
@@ -124,13 +124,13 @@ def test_encrypt_decrypt_message_fail(client):
 def test_end_to_end(client):
     test_message = Random.get_random_bytes(512)
 
-    assert database.resetTable(tableName="userprofile", testcase=True)
+    assert database.resetTable(tableName="userprofile")
     post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
 
     # Get public key and salt hash
-    query_response = database.query_records(table_name='userprofile', fields='publickey, salthash', condition=f'email = %s', condition_values=(post_object['email'],), testcase=True)[0]
+    query_response = database.query_records(table_name='userprofile', fields='publickey, salthash', condition=f'email = %s', condition_values=(post_object['email'],))[0]
 
     # This is the public key stored in the database
     publickey_import_string = query_response['publickey']
@@ -165,8 +165,8 @@ def test_video_upload_download(client):
     }
 
     # Reset tables and signup
-    assert database.resetTable(tableName="userprofile", testcase=True)
-    assert database.resetTable(tableName="videos", testcase=True)
+    assert database.resetTable(tableName="userprofile")
+    assert database.resetTable(tableName="videos")
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
 

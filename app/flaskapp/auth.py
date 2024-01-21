@@ -29,7 +29,7 @@ def signup():
         return jsonify({'error': 'Missing last name'}), 400
 
     # Ensure user doesn't already exist
-    existing_user = database.query_records(table_name='userprofile', fields='username', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)
+    existing_user = database.query_records(table_name='userprofile', fields='username', condition=f'username = %s', condition_values=(username,))
     if existing_user:
         return jsonify({'error': 'User already exists'}), 409
 
@@ -39,7 +39,7 @@ def signup():
     public_key = private_key.publickey().export_key('PEM')
 
     hashed_password = bcrypt.generate_password_hash(password).decode()
-    result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash, pubKey=public_key, testcase=current_app.testing)
+    result = database.insert_user(username=username, email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash, pubKey=public_key)
     
     if result == 1:
         session['username'] = username
@@ -62,7 +62,7 @@ def login():
         return jsonify({'error': 'Missing password'}), 400
 
     # Check username exists
-    existing_user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)
+    existing_user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=(username,))
     if not existing_user_password:
         return jsonify({'error': 'User not found under specified username'}), 404
 
@@ -71,7 +71,7 @@ def login():
     if not bcrypt.check_password_hash(stored_hashed_password, password):
         return jsonify({'error': 'Incorrect password'}), 401
 
-    query_results = database.query_records(table_name='userprofile', fields='salthash, email', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)[0]
+    query_results = database.query_records(table_name='userprofile', fields='salthash, email', condition=f'username = %s', condition_values=(username,))[0]
     salt_hash = query_results['salthash']
     email = query_results['email']
 

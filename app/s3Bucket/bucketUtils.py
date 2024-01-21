@@ -245,7 +245,7 @@ def delete_file(obj_path):
         return False
 
 
-def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, receiverEmail, encryptKey, testcase=False):
+def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, receiverEmail, encryptKey):
     """
     This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
 
@@ -255,12 +255,11 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
         obj_path (str): the path for the obj to be saved under  
         retDate(dateTime): The date to delete
         senderId(int): The id of the current user trying to submit the video
-        recieverUserName: The user name of the target person to view the video
+        receiverUserName: The user name of the target person to view the video
         encrpytKey: The public key of the sender 
         file_flag: sets the folder to be saved into 
     """
     db = None
-    db_name = 'Team4dbTest' if testcase else DBNAME
     result = 0
     subDate = datetime.now(timezone.utc)
     try:
@@ -271,7 +270,7 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
         )as tunnel:
             print("SSH Tunnel Established")
             #Db connection string
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=db_name)
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
             if db:
                 if db:
                     cur = db.cursor()
@@ -304,7 +303,7 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
                         else:
                             raise ValueError("Error retrieving current users information.")
 
-                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderID, senderFName, senderLName, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
+                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderID, senderFName, senderLName, receiverID, encrpyt) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
                         data = (obj_path, subDate, retDate, senderId, userFname, userLname, recID, encryptKey)
                         cur.execute(insertQuery, data)
                         proceed = already_existing_file(obj_path)
@@ -318,7 +317,7 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
                             result = False
                     #If guest it does the same calls just without senderId
                     else:        
-                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s)"
+                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, receiverID, encrpyt) VALUES ( %s, %s, %s, %s, %s)"
                         data = (obj_path, subDate, retDate, recID, encryptKey)
                         cur.execute(insertQuery, data)
                         proceed = already_existing_file(obj_path)

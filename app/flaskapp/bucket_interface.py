@@ -20,7 +20,7 @@ bucket = Blueprint('bucket', __name__)
 
 def get_public_key(email):
     try:
-        import_string = database.query_records(table_name='userprofile', fields='publickey', condition=f'email = %s', condition_values=(email,), testcase=current_app.testing)[0]['publickey']
+        import_string = database.query_records(table_name='userprofile', fields='publickey', condition=f'email = %s', condition_values=(email,), )[0]['publickey']
         return RSA.import_key(import_string)
     except IndexError:
         return None
@@ -90,9 +90,9 @@ def upload_video():
     # If user is guest, sender_email is empty string - otherwise, sender_email is the sender's email
     sender_email = ''
     if 'username' in session:
-        sender_email = database.query_records(table_name='userprofile', fields='email', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['email']
+        sender_email = database.query_records(table_name='userprofile', fields='email', condition=f'username = %s', condition_values=(session['username'],), )[0]['email']
 
-    insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, dummy_retention_date, sender_email, recipient_email, encrypted_aes_key, testcase=current_app.testing)
+    insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, dummy_retention_date, sender_email, recipient_email, encrypted_aes_key, )
 
     if insert_result:
         return jsonify({'video_id': f'/videos/{recipient_email}/{video_name}'}), 200
@@ -104,7 +104,7 @@ def retrieve_video():
     video_name = request.form.get('video_name')
 
     # Retrieve the encrypted AES key and decrypt it
-    encrypted_aes_key = database.query_records(table_name='videos', fields='encrpyt', condition=f'videoName = %s', condition_values=(video_name,), testcase=current_app.testing)[0]['encrpyt']
+    encrypted_aes_key = database.query_records(table_name='videos', fields='encrpyt', condition=f'videoName = %s', condition_values=(video_name,), )[0]['encrpyt']
     aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
 
     # Decrypt the file and write the data to an IO buffer
@@ -121,6 +121,6 @@ def retrieve_video():
 
 @bucket.route('/getvideos', methods=['GET'])
 def get_available_videos():
-    user_id = database.query_records(table_name='userprofile', fields='id', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['id']
-    available_videos = database.query_records(table_name='videos', fields='videoName, senderID', condition=f'recieverID = %s', condition_values=(user_id,), testcase=current_app.testing)
+    user_id = database.query_records(table_name='userprofile', fields='id', condition=f'username = %s', condition_values=(session['username'],), )[0]['id']
+    available_videos = database.query_records(table_name='videos', fields='videoName, senderID', condition=f'receiverID = %s', condition_values=(user_id,), )
     return json.dumps(available_videos), 200

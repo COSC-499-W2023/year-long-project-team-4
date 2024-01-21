@@ -13,9 +13,10 @@ def test_list_buckets():
   
 def test_upload_file():
     result1 = s3Bucket.upload_file('This is test content', 'testFile.txt')
-    
+    result2 = s3Bucket.upload_file('This is test content', 'tests/Guest/testFile2.txt')
     assert result1 == True
-      
+    assert result2 == True
+    
 def test_existing_file():
     result1 = s3Bucket.already_existing_file('testFile.txt')
     result2 = s3Bucket.already_existing_file('notInBucket.txt')

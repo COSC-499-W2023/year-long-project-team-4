@@ -43,6 +43,7 @@ def signup():
     
     if result == 1:
         session['username'] = username
+        session['email'] = email
         session['pkey_seed'] = password + salt_hash.hex()
         return jsonify({'username': username}), 200
     else:
@@ -70,9 +71,12 @@ def login():
     if not bcrypt.check_password_hash(stored_hashed_password, password):
         return jsonify({'error': 'Incorrect password'}), 401
 
-    salt_hash = database.query_records(table_name='userprofile', fields='salthash', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)[0]['salthash']
+    query_results = database.query_records(table_name='userprofile', fields='salthash, email', condition=f'username = %s', condition_values=(username,), testcase=current_app.testing)[0]
+    salt_hash = query_results['salthash']
+    email = query_results['email']
 
     session['username'] = username
+    session['email'] = email
     session['pkey_seed'] = password + salt_hash.hex()
 
     return jsonify({'username': username}), 200
@@ -82,6 +86,7 @@ def login():
 def logout():
     session.pop('username', None)
     session.pop('pkey_seed', None)
+    session.pop('email', None)
     return jsonify({'success': 'Successful logout'}), 200
 
 

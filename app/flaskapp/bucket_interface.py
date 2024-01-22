@@ -109,9 +109,18 @@ def retrieve_video():
     video_name = request.form.get('video_name')
 
     # Retrieve the encrypted AES key and decrypt it
-    query_results = database.query_records(table_name='videos', fields='receiverEmail, receiverEncryption', condition=f'videoName = %s', condition_values=(video_name,))[0]
-    encrypted_aes_key = query_results['receiverEncryption']
+    query_results = database.query_records(table_name='videos', fields='senderEmail, receiverEmail, senderEncryption, receiverEncryption', condition=f'videoName = %s', condition_values=(video_name,))[0]
+    encrypted_aes_key = None
     receiver_email = query_results['receiverEmail']
+    sender_email = query_results['senderEmail']
+
+    if session['email'] == receiver_email:
+        encrypted_aes_key = query_results['receiverEncryption']
+    elif session['email'] == sender_email:
+        encrypted_aes_key = query_results['senderEncryption']
+
+    if encrypted_aes_key is None:
+        return jsonify({'error': 'Currently logged in user is neither sender or receiver of requested video'}), 409
 
     aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
     video_path = f'/videos/{receiver_email}/{video_name}'

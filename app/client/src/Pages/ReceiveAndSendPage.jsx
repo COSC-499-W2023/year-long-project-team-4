@@ -7,9 +7,10 @@ import {
   loginPath,
   accountPath,
 } from "../Path";
-import axios from 'axios'
+import axios from 'axios';
+import {Fade} from 'react-reveal';
 
-const RecieveAndSendPage = () => {
+const ReceiveAndSendPage = () => {
 
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
@@ -62,14 +63,15 @@ const RecieveAndSendPage = () => {
     <div className="position-absolute top-50 start-50 translate-middle">
       {currentUser && <h3>Welcome, {currentUser}!</h3>}
       {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-       <div className="d-grid gap-2">
-        <Button size="lg" href={accountPath}>Account Page</Button>
-        <Button size="lg" href={uploadVideoPath}> Send Videos</Button>
-        <Button size="lg" href={viewVideoPath}> Receive Videos</Button>
-        <Button size="lg" onClick={handleLogout}>Logout</Button> 
-      </div>
+      <Fade>
+        <div className="d-grid gap-2">
+          <Button size="lg" href={uploadVideoPath}> Send Videos</Button>
+          <Button size="lg" href={viewVideoPath}> Receive Videos</Button>
+          <Button size="lg" onClick={handleLogout}>Logout</Button> 
+        </div>
+      </Fade>
     </div>
   )
 }
 
-export default RecieveAndSendPage
+export default ReceiveAndSendPage

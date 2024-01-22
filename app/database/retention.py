@@ -20,15 +20,16 @@ DBNAME = os.getenv("MYDB")
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
-TEST = os.getenv('TEST') == 'True'
+TEST = os.getenv('TEST')
 
-s3_client = boto3.client(
-'s3',
-aws_access_key_id=ACCESS_KEY,
-aws_secret_access_key=SECRET_KEY,
-aws_session_token=SESSION_TOKEN)
+# s3_client = boto3.client(
+# 's3',
+# aws_access_key_id=ACCESS_KEY,
+# aws_secret_access_key=SECRET_KEY,
+# aws_session_token=SESSION_TOKEN)
+s3_client = boto3.client('s3')
 
-if(TEST):
+if(TEST.lower() == "true"):
     DBNAME = "Team4dbTest"
 
 def get_passed_retDates() -> list:
@@ -148,9 +149,9 @@ def retention() -> int:
         deleted_files = 0
         data = get_passed_retDates()
         for items in data:
-            retention_delete("videoName = %s", (data[items],), data[items])
+            retention_delete("videoName = %s", (items,), items)
             # Get how many files have been deleted
-            if (not already_existing_file('team4-s3',data[items])):
+            if (not already_existing_file('team4-s3',items)):
                 deleted_files += 1
         return deleted_files
     except Exception as e:

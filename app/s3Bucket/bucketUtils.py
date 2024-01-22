@@ -35,6 +35,8 @@ if not LOCAL:
 else:
     if not os.path.isdir('videos'):
         os.mkdir('videos')
+    if not os.path.isdir('chats'):
+        os.mkdir('chats')
 
 if(TEST):
     DBNAME = 'Team4dbTest'
@@ -245,7 +247,7 @@ def delete_file(obj_path):
         return False
 
 
-def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, receiverEmail, encryptKey, testcase=False):
+def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption):
     """
     This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
 
@@ -255,12 +257,11 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
         obj_path (str): the path for the obj to be saved under  
         retDate(dateTime): The date to delete
         senderId(int): The id of the current user trying to submit the video
-        recieverUserName: The user name of the target person to view the video
+        receiverUserName: The user name of the target person to view the video
         encrpytKey: The public key of the sender 
         file_flag: sets the folder to be saved into 
     """
     db = None
-    db_name = 'Team4dbTest' if testcase else DBNAME
     result = 0
     subDate = datetime.now(timezone.utc)
     try:
@@ -271,20 +272,22 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
         )as tunnel:
             print("SSH Tunnel Established")
             #Db connection string
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=db_name)
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
             if db:
                 if db:
                     cur = db.cursor()
                     query1 = f"START TRANSACTION"
                     cur.execute(query1)
                     
-                    recQuery = "SELECT id FROM userprofile WHERE email LIKE %s"
+                    recQuery = "SELECT id, firstname, lastname FROM userprofile WHERE email LIKE %s"
                     cur.execute(recQuery,(receiverEmail,))
-                    recID = cur.fetchone()
+                    recInfo = cur.fetchall()
                     
-                    if recID:
-                        recID = recID[0]
-                        obj_path = f"/{file_flag}/{receiverEmail}/{obj_path}"
+                    if recInfo:
+                        recID = recInfo[0][0]
+                        recFname = recInfo[0][1]
+                        recLname = recInfo[0][2]
+                        obj_path = f"/{file_flag}/{receiverEmail}/{file_name}"
                         if LOCAL:
                             if not os.path.isdir(f"{file_flag}/{receiverEmail}"):
                                 os.mkdir(f"{file_flag}/{receiverEmail}")
@@ -303,10 +306,17 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
                             userLname = userInfo[0][2]
                         else:
                             raise ValueError("Error retrieving current users information.")
-
-                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderID, senderFName, senderLName, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
-                        data = (obj_path, subDate, retDate, senderId, userFname, userLname, recID, encryptKey)
-                        cur.execute(insertQuery, data)
+                        
+                        if file_flag == "videos":
+                            insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                            data = (file_name, subDate, retDate, senderEmail, userFname, userLname, receiverEmail, senderEncryption, receiverEncryption)
+                            cur.execute(insertQuery, data)
+                            
+                        elif file_flag == "chats":  
+                            insertQuery = "INSERT INTO chats (chatName, timestamp, senderEmail, senderFName, senderLName, receiverEmail, receiverFirstName, receiverLastName, senderEncryption, receiverEncryption, retDate) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s,%s,%s)"
+                            data = (file_name, subDate, senderEmail, userFname, userLname, receiverEmail, recFname, recLname, senderEncryption, receiverEncryption, retDate)
+                            cur.execute(insertQuery, data)
+                            
                         proceed = already_existing_file(obj_path)
                         if(not proceed):
                             upload_file(file_content,store_as=obj_path)
@@ -317,10 +327,17 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
                             db.rollback()
                             result = False
                     #If guest it does the same calls just without senderId
-                    else:        
-                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s)"
-                        data = (obj_path, subDate, retDate, recID, encryptKey)
-                        cur.execute(insertQuery, data)
+                    else: 
+                        if file_flag == 'videos':       
+                            insertQuery = "INSERT INTO videos (videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s)"
+                            data = (file_name, subDate, retDate, receiverEmail, receiverEncryption)
+                            cur.execute(insertQuery, data)
+                            
+                        elif file_flag == 'chats':       
+                            insertQuery = "INSERT INTO chats (chatName, timestamp, retDate, receiverEmail, receiverFirstName, receiverLastName, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s)"
+                            data = (file_name, subDate, retDate, receiverEmail, recFname, recLname, receiverEncryption)
+                            cur.execute(insertQuery, data)
+                            
                         proceed = already_existing_file(obj_path)
                         if(not proceed):
                             upload_file(file_content,store_as=obj_path)
@@ -343,7 +360,7 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
 if __name__ == "__main__":
     list_buckets()
     list_objs()
-    #encrypt_insert("tests",'test test file for encrpyt', 'testFile.txt', "2022-01-22 11:59:00", "Test@example.com", "Test@example.com", "as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
+    encrypt_insert("videos",'test test file for encrpyt', 'testFile34.txt', "2022-01-22 11:59:00", "Test@example.com", "Test@example.com","234234234asd" ,"as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
     get_object_content("tests/Guest/testFile2.txt")
     delete_file('tests/Test@example.com/testFile.txt')
     delete_file('tests/Guest/testFile2.txt')

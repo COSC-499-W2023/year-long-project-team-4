@@ -225,3 +225,23 @@ Completed:
 
 Additional Context:
 - N/A
+
+# Term 2 Week 2: Jan 14 - Jan 21 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![Weekly_todo](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/5914e38c-9a43-4a65-b1db-83ae19b93116)
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Face Blurring 
+- Database Utility file hotfix
+
+Tasks from the Project Board:
+- Face blurring 
+
+Completed:
+- Finished face blurring with multi-processing for faster video handling, audio added back to the video. I am just awaiting integration with the front end for it.
+- Database changes/bug fixing. I had to add new columns to the database so that required lots of changes to existing code.   
+
+Additional Context:
+- N/A

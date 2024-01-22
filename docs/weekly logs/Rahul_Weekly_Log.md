@@ -101,6 +101,19 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 - Bug fixes
 - Update the account page to remove certain fields
 - Add features such as UI for blurring a video.
-  
+
+# Term 2 Week 2: Jan 15th -21st
+
+## Tasks Completed: 
+![term2_week2](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/99c760ab-f4ff-426e-bda2-7780ffa3c0f9)
+
+- fixed bugs
+- Partially created CRUD features for the account page
+- Added view video page to account page
+- Removed certain fields from the account and register page
+
+# In progress: 
+- Add features such as UI for blurring a video.
+
 
   

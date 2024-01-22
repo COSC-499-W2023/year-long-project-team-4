@@ -69,13 +69,13 @@ def get_email(videoName):
             if db:
                 cur = db.cursor()
                 # Retrieve userID based on the videName
-                cur.execute("SELECT receiverID FROM videos WHERE videoName = %s", (videoName,))
+                cur.execute("SELECT receiverEmail FROM videos WHERE videoName = %s", (videoName,))
                 receiverID = cur.fetchone()
-                receiverID = receiverID[0] 
-                # Retrieve email based on the user's ID
-                cur.execute("SELECT email FROM userprofile WHERE id = %s", (receiverID,))
-                result = cur.fetchone()
-                result = result[0]     
+                result = receiverID[0] 
+                # # Retrieve email based on the user's ID
+                # cur.execute("SELECT email FROM userprofile WHERE id = %s", (receiverID,))
+                # result = cur.fetchone()
+                # result = result[0]     
                 cur.close()      
     except Exception as e:
         print(e)

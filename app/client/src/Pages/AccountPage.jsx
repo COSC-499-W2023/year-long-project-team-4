@@ -174,7 +174,7 @@ return (
           <Tab eventKey="delete" title="Delete profile">
             <div className="text-center">
               <div className="display-6"> Are you sure you want to delete your account? </div>
-              <p className="m-3"> You will no longer be able to access any of the videos you sent or recieved.</p>
+              <p className="m-3"> You will no longer be able to access any of the videos you sent or received.</p>
               <Button className="m-3" href={homePath} onClick={()=>{handleDelete()}}> Delete Account</Button>
             </div>
           </Tab>

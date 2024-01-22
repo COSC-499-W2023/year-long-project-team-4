@@ -160,3 +160,19 @@ Things I worked on:
 Tasks from the project board relevant to things I worked on:
 - Creating chats (almost done pending testcases being written)
 - Encryption / decryption of chats (almost done pending testcases being written)
+
+
+# Term 2 Week (2): Jan 14 - Jan 21
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/b2532270-724e-4dfe-b252-225c6f90b325)
+
+## Goal Recap:
+Things I worked on:
+- Finished entire backend for messaging aside from testcases (these will be there next week)
+- Changed video encryption to encrypt the keys from both parties (sender/receiver) that way senders can still access their sent videos at a later time
+- Cleanup on old tech debt to prepare for peer evaluations
+  
+Tasks from the project board relevant to things I worked on:
+- Creating chats
+- Encryption / decryption of chats

@@ -136,8 +136,8 @@ def change_password_reencrypt(new_password):
     #Make sure user is logged in
     if 'username' in session:
         #Get videos to reencrypt
-        user_id = database.query_records(table_name='userprofile', fields='id', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['id']
-        videos_to_decrypt = database.query_records(table_name='videos', fields='videoName', condition=f'recieverID = %s', condition_values=(user_id,), testcase=current_app.testing)[0]['videoName'].append(database.query_records(table_name='videos', fields='videoName', condition=f'senderID = %s', condition_values=(user_id,), testcase=current_app.testing))[0]['videoName']
+        user_email = database.query_records(table_name='userprofile', fields='email', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['email']
+        videos_to_decrypt = database.query_records(table_name='videos', fields='videoName', condition=f'recieverEmail = %s', condition_values=(user_email,), testcase=current_app.testing)[0]['videoName'].append(database.query_records(table_name='videos', fields='videoName', condition=f'senderEmail = %s', condition_values=(user_email,), testcase=current_app.testing))[0]['videoName']
         #Loop through list, decrypting videos
         videos_to_reencrypt= []
         for items1 in videos_to_decrypt:
@@ -160,7 +160,7 @@ def change_password_reencrypt(new_password):
             public_key = get_public_key(email)
             encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, public_key)
             #Insert into s3Bucket (sent videos first)
-            video_details = database.query_records(table_name='videos', fields='videoName, retDate, recieverID', condition=f'senderID = %s', condition_values=(user_id,), testcase=current_app.testing)
+            video_details = database.query_records(table_name='videos', fields='videoName, retDate, recieverID', condition=f'senderID = %s', condition_values=(user_email,), testcase=current_app.testing)
             for items3 in video_details:
                 video_name = video_details[items3].get("videoName")
                 retention_date = video_details[items3].get("retDate")
@@ -170,7 +170,7 @@ def change_password_reencrypt(new_password):
                 if not insert_video:
                     return jsonify({'error': 'Video insertion failed'}), 502
             #Repeat but for recieved videos
-            video_details = database.query_records(table_name='videos', fields='videoName, retDate, senderID', condition=f'recieverID = %s', condition_values=(user_id,), testcase=current_app.testing)
+            video_details = database.query_records(table_name='videos', fields='videoName, retDate, senderID', condition=f'recieverID = %s', condition_values=(user_email,), testcase=current_app.testing)
             for items4 in video_details:
                 video_name = video_details[items4].get("videoName")
                 retention_date = video_details[items4].get("retDate")
@@ -219,22 +219,20 @@ def change_password_forgot(email,new_password,input_code):
     #Verify user input correct code
     if input_code == created_code:
         #Change password
-        user_password = database.query_records(table_name='userprofile', fields='password', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['password']
+        user_password = database.query_records(table_name='userprofile', fields='password', condition=f'email = %s', condition_values=(email,), testcase=current_app.testing)[0]['password']
         database.update_data = {user_password: new_password}
-        #Get videos to delete
-        user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(email,), testcase=current_app.testing)[0]['id']
-        videos_to_delete = database.query_records(table_name='videos', fields='videoName', condition=f'recieverID = %s', condition_values=(user_id,), testcase=current_app.testing)[0]['videoName'].append(database.query_records(table_name='videos', fields='videoName', condition=f'senderID = %s', condition_values=(user_id,), testcase=current_app.testing))[0]['videoName']
+        #Get recieved videos that need key deleted
+        videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'recieverID = %s', condition_values=(email,), testcase=current_app.testing)[0]['videoName']
         #Loop through list, deleting files individually
-        for items in videos_to_delete:
-            proceed = s3Bucket.already_existing_file('team4-s3',videos_to_delete[items])
-            #Only proceed to delete files if they exist in bucket
-            if(proceed):
-                #Delete from database
-                database.delete_record("videos", "videoName = %s", (videos_to_delete[items],))
-                #Delete from S3 Bucket
-                s3Bucket.delete_object(Bucket='team4-s3',Key=videos_to_delete[items])
-            else:
-                return (jsonify({"status": "failed", "message": "error deleting videos"}), 500)
+        for items1 in videos_to_delete_key:
+            #Delete key from database for recieved videos
+            database.delete_key(videos_to_delete_key[items1],False,True)
+        #Get recieved videos that need key deleted
+        videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'senderID = %s', condition_values=(email,), testcase=current_app.testing)[0]['videoName']
+        #Loop through list, deleting files individually
+        for items2 in videos_to_delete_key:
+            #Delete key from database for recieved videos
+            database.delete_key(videos_to_delete_key[items2],True,False)
         return (jsonify({"status": "success", "message": "codes match, password changed"}),200,)
     elif input_code != created_code:
         return (jsonify({"status": "rejected", "message": "codes do not match",}),404,)

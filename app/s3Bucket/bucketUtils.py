@@ -35,6 +35,8 @@ if not LOCAL:
 else:
     if not os.path.isdir('videos'):
         os.mkdir('videos')
+    if not os.path.isdir('chats'):
+        os.mkdir('chats')
 
 if(TEST):
     DBNAME = 'Team4dbTest'

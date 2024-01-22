@@ -29,8 +29,9 @@ def get_public_key(email):
 def get_private_key():
     return generate_key(session['pkey_seed'])
 
-def aes_encrypt_video(data):
-    aes256_key = Random.get_random_bytes(32)
+def aes_encrypt_video(data, aes256_key=None):
+    if aes256_key is None:
+        aes256_key = Random.get_random_bytes(32)
     cipher = AES.new(aes256_key, AES.MODE_GCM)
     ciphertext, tag = cipher.encrypt_and_digest(data)
     result_json = {
@@ -134,6 +135,7 @@ def get_available_videos():
 
 @bucket.route('/create_chat', methods=['POST'])
 def create_chat():
+    dummy_retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
     chat_json = {
         'messages': []
     }
@@ -142,6 +144,10 @@ def create_chat():
     chat_name = request.form.get('video_name')
     if not database.query_records(table_name='videos', fields='videoName', condition=f'videoName = %s', condition_values=(chat_name,)):
         return jsonify({'error': 'Associated video does not exist'}), 409
+
+    # Ensure chat not already created
+    if database.query_records(table_name='chats', fields='chatName', condition=f'chatName = %s', condition_values=(chat_name,)):
+        return jsonify({'error': 'Associated chat already exists'}), 409
 
     participant1 = session['email']
     participant2 = request.form.get('chat_receiver_email')
@@ -161,20 +167,7 @@ def create_chat():
     encrypted_aes_key_p1 = rsa_encrypt_aes256_key(aes_key, participant1_key)
     encrypted_aes_key_p2 = rsa_encrypt_aes256_key(aes_key, participant2_key)
 
-
-    # #### TEST PLAYGROUND
-    # decrypted_aes_key = rsa_decrypt_aes256_key(encrypted_aes_key_p1, get_private_key())
-
-    # chat_data = io.BytesIO()
-    # decrypted_chat = aes_decrypt_video(encrypted_chat, decrypted_aes_key)
-    # chat_data.write(decrypted_chat)
-    # chat_data.seek(0)
-
-    # return send_file(chat_data, mimetype='application/json'), 200
-
-    # #### PLAYGROUND END
-
-    # NOTE: Needs to support second AES key
+    # Insert the new chat into the DB and S3 bucket
     insert_result = s3Bucket.encrypt_insert('chats', encrypted_chat, chat_name, dummy_retention_date, participant1, participant2, encrypted_aes_key_p1, encrypted_aes_key_p2)
 
     if insert_result:
@@ -203,7 +196,7 @@ def send_chat():
 
     # Decrypt the file and write the data to an IO buffer
     chat_data = io.BytesIO()
-    object_content = s3Bucket.get_object_content(chat_name)
+    object_content = s3Bucket.get_object_content(f"/chats/{chat_info['receiverEmail']}/{chat_name}")
     decrypted_chat = aes_decrypt_video(object_content, aes_key)
     chat_data.write(decrypted_chat)
     chat_data.seek(0)
@@ -223,39 +216,32 @@ def send_chat():
     # Add our message to the chat log
     chat_json['messages'].append(msg_bundle)
 
-    # Get the public key corresponding to the recipient
-    participant1_key = get_public_key(chat_info['participant1'])
-    participant2_key = get_public_key(chat_info['participant2'])
+    # Encrypt the chat log using same AES key as before - this avoid having to update the keys in the database every time the chat is appended to
+    encrypted_chat, _ = aes_encrypt_video(json.dumps(chat_json).encode('utf-8'), aes_key)
 
-    # Encrypt the chat log
-    encrypted_chat, aes_key = aes_encrypt_video(json.dumps(chat_json).encode('utf-8'))
+    # Directly upload to S3 since no DB changes are made
+    path = f'/chats/{chat_info["receiverEmail"]}/{chat_name}'
+    upload_result = s3Bucket.upload_file(encrypted_chat, path)
 
-    # Encrypt the AES key for both parties so it can be accessed by either
-    encrypted_aes_key_p1 = rsa_encrypt_aes256_key(aes_key, participant1_key)
-    encrypted_aes_key_p2 = rsa_encrypt_aes256_key(aes_key, participant2_key)
-
-    # NOTE: Needs to support second AES key
-    insert_result = s3Bucket.encrypt_insert('chats', encrypted_chat, chat_name, dummy_retention_date, chat_info['participant1'], chat_info['participant2'], encrypted_aes_key_p1, encrypted_aes_key_p2)
-
-    if insert_result:
-        return jsonify({'chat_id': f'/chats/{chat_info["participant1"]}/{chat_name}'}), 200
+    if upload_result:
+        return jsonify({'chat_id': path}), 200
     else:
         return jsonify({'error': 'Chat insertion failed'}), 502
 
 
 @bucket.route('/retrieve_chat', methods=['POST'])
 def retrieve_chat():
-    chat_name = request.form.get('chat_name')
+    chat_name = request.form.get('video_name')
 
     # Retrieve info for requested chat
-    chat_info = database.query_records(table_name='chats', fields='senderID, sendEncryption, receiverID, receiverEncrpyt', condition=f'chatName = %s', condition_values=(chat_name,))[0]
+    chat_info = database.query_records(table_name='chats', fields='senderEmail, senderEncryption, receiverEmail, receiverEncryption', condition=f'chatName = %s', condition_values=(chat_name,))[0]
     
     # Figure out which participant the current user is and load the correct encrypted key
     encrypted_aes_key = None
-    if session['username'] == chat_info['participant1']:
-        encrypted_aes_key = chat_info['participant1EncryptedKey']
-    elif session['username'] == chat_info['participant2']:
-        encrypted_aes_key = chat_info['participant2EncryptedKey']
+    if session['email'] == chat_info['senderEmail']:
+        encrypted_aes_key = chat_info['senderEncryption']
+    elif session['email'] == chat_info['receiverEmail']:
+        encrypted_aes_key = chat_info['receiverEncryption']
 
     if encrypted_aes_key is None:
         return jsonify({'error': 'Current user not participant in requested chat'}), 400
@@ -265,7 +251,7 @@ def retrieve_chat():
 
     # Decrypt the file and write the data to an IO buffer
     chat_data = io.BytesIO()
-    object_content = s3Bucket.get_object_content(chat_name)
+    object_content = s3Bucket.get_object_content(f"/chats/{chat_info['receiverEmail']}/{chat_name}")
     decrypted_chat = aes_decrypt_video(object_content, aes_key)
     chat_data.write(decrypted_chat)
     chat_data.seek(0)

@@ -133,6 +133,11 @@ def get_available_videos():
     available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
     return json.dumps(available_videos), 200
 
+@bucket.route('/get_sent_videos', methods=['GET'])
+def get_sent_videos():
+    available_videos = database.query_records(table_name='videos', fields='videoName, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
+    return json.dumps(available_videos), 200
+
 @bucket.route('/create_chat', methods=['POST'])
 def create_chat():
     dummy_retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
@@ -150,39 +155,30 @@ def create_chat():
     video_sender_email = query_results['senderEmail']
     video_receiver_email = query_results['receiverEmail']
 
-    participant1 = None
-    participant2 = None
-    if session['email'] == query_results['senderEmail']:
-        participant1 = query_results['senderEmail']
-        participant2 = query_results['receiverEmail']
-    elif session['email'] == query_results['receiverEmail']:
-        participant1 = query_results['receiverEmail']
-        participant2 = query_results['senderEmail']
-
-    if participant1 is None or participant2 is None:
+    if video_sender_email is None or video_receiver_email is None:
         return jsonify({'error': 'Invalid users associated with video, perhaps one account is guest?'}), 409
 
     # Ensure chat not already created
     if database.query_records(table_name='chats', fields='chatName', condition=f'chatName = %s', condition_values=(chat_name,)):
         return jsonify({'error': 'Associated chat already exists'}), 409
 
-    participant1_key = get_public_key(participant1)
-    if participant1_key is None:
-        return jsonify({'error': 'Could not get currently logged in user public key'}), 409
+    sender_key = get_public_key(video_sender_email)
+    if sender_key is None:
+        return jsonify({'error': 'Could not get video sender public key'}), 409
 
-    participant2_key = get_public_key(participant2)
-    if participant2_key is None:
-        return jsonify({'error': 'Could not get provided recipient user public key'}), 409
+    receiver_key = get_public_key(video_receiver_email)
+    if receiver_key is None:
+        return jsonify({'error': 'Could not get video recipient public key'}), 409
 
     # Encrypt the chat log
     encrypted_chat, aes_key = aes_encrypt_video(json.dumps(chat_json).encode('utf-8'))
 
     # Encrypt the AES key for both parties so it can be accessed by either
-    encrypted_aes_key_p1 = rsa_encrypt_aes256_key(aes_key, participant1_key)
-    encrypted_aes_key_p2 = rsa_encrypt_aes256_key(aes_key, participant2_key)
+    encrypted_aes_key_sender = rsa_encrypt_aes256_key(aes_key, sender_key)
+    encrypted_aes_key_receiver = rsa_encrypt_aes256_key(aes_key, receiver_key)
 
     # Insert the new chat into the DB and S3 bucket
-    insert_result = s3Bucket.encrypt_insert('chats', encrypted_chat, chat_name, dummy_retention_date, participant1, participant2, encrypted_aes_key_p1, encrypted_aes_key_p2)
+    insert_result = s3Bucket.encrypt_insert('chats', encrypted_chat, chat_name, dummy_retention_date, video_sender_email, video_receiver_email, encrypted_aes_key_sender, encrypted_aes_key_receiver)
 
     if insert_result:
         return jsonify({'chat_id': f'{chat_name}'}), 200

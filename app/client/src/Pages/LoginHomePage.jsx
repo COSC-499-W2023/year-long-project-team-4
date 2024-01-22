@@ -1,16 +1,18 @@
-import React, {useEffect, useState} from 'react'
-import {Card, Button, Form} from 'react-bootstrap';
+import React, {useState} from 'react'
+import {Button, InputGroup, Form} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom'
 import {Fade} from "react-reveal";
 import {
   guestPath,
-  recieveAndSendPath,
+  receiveAndSendPath,
   registerPath,
 } from "../Path";
 import axios from 'axios'
+import see from '../Assets/eye.svg';
+import unSee from '../Assets/eye-slash.svg';
 
 const LoginHomePage = () => {
-
+  const [type, setType] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
@@ -29,7 +31,7 @@ const LoginHomePage = () => {
   
       if (response.data.username) {
         setCurrentUser(response.data.username);
-        navigate(recieveAndSendPath);
+        navigate(receiveAndSendPath);
       } else {
         setErrorMessage(response.data.error);
       }
@@ -66,11 +68,19 @@ const LoginHomePage = () => {
                       required
             />
             <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
-              required
-            />
-          </Form.Group>   
+              <InputGroup>
+                <Form.Control
+                  type={type ? "text" : "password"}
+                  required
+                />
+                <Button 
+                  variant="primary" 
+                  onClick={()=> setType(!type)}
+                >
+                  {!type? <img src={see}/> :<img src={unSee}/>}
+                </Button>
+              </InputGroup>
+            </Form.Group>   
           <Button type="submit" className="mb-2" variant="primary"> Login </Button>
         </Form>
       </Fade>

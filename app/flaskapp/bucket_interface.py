@@ -142,15 +142,29 @@ def create_chat():
 
     # Read video name associated with the new chat, and ensure that said video exists
     chat_name = request.form.get('video_name')
-    if not database.query_records(table_name='videos', fields='videoName', condition=f'videoName = %s', condition_values=(chat_name,)):
+    query_results = database.query_records(table_name='videos', fields='senderEmail, receiverEmail', condition=f'videoName = %s', condition_values=(chat_name,))
+    if not query_results:
         return jsonify({'error': 'Associated video does not exist'}), 409
+
+    query_results = query_results[0]
+    video_sender_email = query_results['senderEmail']
+    video_receiver_email = query_results['receiverEmail']
+
+    participant1 = None
+    participant2 = None
+    if session['email'] == query_results['senderEmail']:
+        participant1 = query_results['senderEmail']
+        participant2 = query_results['receiverEmail']
+    elif session['email'] == query_results['receiverEmail']:
+        participant1 = query_results['receiverEmail']
+        participant2 = query_results['senderEmail']
+
+    if participant1 is None or participant2 is None:
+        return jsonify({'error': 'Invalid users associated with video, perhaps one account is guest?'}), 409
 
     # Ensure chat not already created
     if database.query_records(table_name='chats', fields='chatName', condition=f'chatName = %s', condition_values=(chat_name,)):
         return jsonify({'error': 'Associated chat already exists'}), 409
-
-    participant1 = session['email']
-    participant2 = request.form.get('chat_receiver_email')
 
     participant1_key = get_public_key(participant1)
     if participant1_key is None:
@@ -182,7 +196,11 @@ def send_chat():
     chat_text = request.form.get('chat_text')
     dummy_retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
 
-    chat_info = database.query_records(table_name='chats', fields='senderEmail, senderEncryption, receiverEmail, receiverEncryption', condition=f'chatName = %s', condition_values=(chat_name,))[0]
+    try:
+        chat_info = database.query_records(table_name='chats', fields='senderEmail, senderEncryption, receiverEmail, receiverEncryption', condition=f'chatName = %s', condition_values=(chat_name,))[0]
+    except IndexError:
+        return jsonify({'error': 'Chat does not exist'}), 400
+
 
     # Figure out which participant the current user is and load the correct encrypted key
     encrypted_aes_key = None
@@ -233,9 +251,12 @@ def send_chat():
 def retrieve_chat():
     chat_name = request.form.get('video_name')
 
-    # Retrieve info for requested chat
-    chat_info = database.query_records(table_name='chats', fields='senderEmail, senderEncryption, receiverEmail, receiverEncryption', condition=f'chatName = %s', condition_values=(chat_name,))[0]
-    
+    try:
+        # Retrieve info for requested chat
+        chat_info = database.query_records(table_name='chats', fields='senderEmail, senderEncryption, receiverEmail, receiverEncryption', condition=f'chatName = %s', condition_values=(chat_name,))[0]
+    except IndexError:
+        return jsonify({'error': 'Chat does not exist'}), 400
+
     # Figure out which participant the current user is and load the correct encrypted key
     encrypted_aes_key = None
     if session['email'] == chat_info['senderEmail']:

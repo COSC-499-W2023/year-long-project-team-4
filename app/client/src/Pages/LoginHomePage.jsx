@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom'
 import {Fade} from "react-reveal";
 import {
   guestPath,
-  recieveAndSendPath,
+  receiveAndSendPath,
   registerPath,
 } from "../Path";
 import axios from 'axios'
@@ -29,7 +29,7 @@ const LoginHomePage = () => {
   
       if (response.data.username) {
         setCurrentUser(response.data.username);
-        navigate(recieveAndSendPath);
+        navigate(receiveAndSendPath);
       } else {
         setErrorMessage(response.data.error);
       }
@@ -60,13 +60,15 @@ const LoginHomePage = () => {
       <Fade big cascade>
         <Form onSubmit={handleSubmit}>
           <Form.Group className="p-3">
-            <Form.Label>Username</Form.Label>
+            <Form.Label htmlFor='username'>Username</Form.Label>
             <Form.Control
+              id='username'
               type="text"
                       required
             />
-            <Form.Label>Password</Form.Label>
+            <Form.Label htmlFor='password'>Password</Form.Label>
             <Form.Control
+              id='password'
               type="password"
               required
             />

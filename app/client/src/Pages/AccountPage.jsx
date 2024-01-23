@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Card, Col, Button, Row, ListGroup, Tab, Form, Tabs} from 'react-bootstrap';
-import { recieveAndSendPath } from '../Path';
+import { receiveAndSendPath } from '../Path';
 import {Fade} from 'react-reveal';
 import axios from 'axios';
 
@@ -99,7 +99,7 @@ return (
         </Tabs>
       </Card>
       <div className="text-center">
-        <Button className="m-2" href={recieveAndSendPath}> Return to Home </Button>
+        <Button className="m-2" href={receiveAndSendPath}> Return to Home </Button>
       </div>
     </Fade>   
    </div>

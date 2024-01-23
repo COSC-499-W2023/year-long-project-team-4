@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Row, Col, Button, Modal} from 'react-bootstrap';
-import { recieveAndSendPath } from '../Path';
+import { receiveAndSendPath } from '../Path';
 import axios from 'axios';
 import {Fade} from 'react-reveal';
 
@@ -64,7 +64,7 @@ const ViewVideoPage = () => {
           </Col>   
       </Row>      
           <div className="text-center p-4">
-              <Button href={recieveAndSendPath}> Return to Home</Button>
+              <Button href={receiveAndSendPath}> Return to Home</Button>
           </div>
   
           <Modal show={showVideoModal} onHide={handleCloseVideoModal}>

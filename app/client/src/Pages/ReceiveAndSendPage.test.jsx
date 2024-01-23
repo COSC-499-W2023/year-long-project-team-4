@@ -1,15 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import RecieveAndSendPage from './RecieveAndSendPage';
+import ReceiveAndSendPage from './ReceiveAndSendPage';
 import {
   viewVideoPath,
   uploadVideoPath,
 } from '../Path';
 
-describe('RecieveAndSendPage Component', () => {
-  test('renders RecieveAndSendPage with buttons', () => {
-    render(<RecieveAndSendPage />);
+describe('ReceiwveAndSendPage Component', () => {
+  test('renders ReceiveAndSendPage with buttons', () => {
+    render(<ReceiveAndSendPage />);
 
     // Test for Send video button
     const sendVideosButton = screen.getByRole('button', { name: /send videos/i });

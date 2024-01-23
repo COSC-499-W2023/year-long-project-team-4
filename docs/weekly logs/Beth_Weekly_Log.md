@@ -169,3 +169,22 @@ Tasks from project board:
 Completed:
 - Almost finished delete function, working on testing still
 - Began conceptualizing/researching encrypt function becuase I've never handled encryption
+
+# Week 2: Jan 15 - Jan 21
+
+## Tasks Completed:
+
+![2Week2act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/6beb9f66-9193-461f-8842-54536f461bd9)
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Creating function that removes user's access to their videos when user changes password while logged out (forgot password)
+- Creating fuction to re-encrypt videos with new key when password changed while logged in
+
+Completed:
+- Completed both functions
+- Started testing
+- Had to make a lot of changes to update them with more current code, first function no longer deletes videos and just removes user's access
+- Made databaseUtil function to zero out keys

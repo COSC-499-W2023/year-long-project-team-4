@@ -218,3 +218,25 @@ Completed:
 
 Additional Context:
 - Still working on some frontend tests
+
+# Term 2 Week 2: Jan 14 - Jan 21 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="800" alt="Screen Shot 2024-01-21 at 8 56 39 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/cc02caaa-c5d1-4aef-8efe-943ee631ddd8">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Add frontend tests
+- Make changes to chat feature design according to backend implementation
+- Integration of Face blurring
+
+Tasks from the Project Board:
+- Face Blurring
+- Frontend testing
+
+Completed:
+- Face Blurring integration
+- Frontend testing
+
+Additional Context:
+- N/A

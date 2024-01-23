@@ -1,22 +1,23 @@
 import React, {useState} from 'react'
-import { Button, Form} from 'react-bootstrap';
+import { Button, Form, InputGroup} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom'
 import {
     loginPath,
   } from "../Path";
 import axios from 'axios'
 import {Fade} from 'react-reveal';
+import see from '../Assets/eye.svg';
+import unSee from '../Assets/eye-slash.svg';
 const RegisterPage = () => {
-
+  const [type, setType] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
 
-const handleSignup = async (firstname, lastname, email, username, password) => {
+const handleSignup = async (firstname, lastname, email, password) => {
   const formData = new FormData();
   formData.append('firstname', firstname);
   formData.append('lastname', lastname);
   formData.append('email', email);
-  formData.append('username', username);
   formData.append('password', password); // Add other form details as needed.
 
 try {
@@ -52,9 +53,8 @@ const handleSubmit = (e) => {
     const firstname = e.target.elements[0].value;  // Assuming the first input is the username
     const lastname = e.target.elements[1].value;
     const email = e.target.elements[2].value;
-    const username = e.target.elements[3].value;
     const password = e.target.elements[4].value;  // Assuming the second input is the password
-    handleSignup(firstname,lastname, email, username, password);
+    handleSignup(firstname,lastname, email, password);
 };
 
   return (
@@ -70,11 +70,6 @@ const handleSubmit = (e) => {
               type="text"
               required
             />
-            <Form.Label>Last Name</Form.Label>
-            <Form.Control
-              type="text"
-              required
-            />
             <Form.Label>Email</Form.Label>
             <Form.Control
               type="email"
@@ -82,16 +77,24 @@ const handleSubmit = (e) => {
             />
           </div>
           <div className="col">
-            <Form.Label>Username</Form.Label>
+          <Form.Label>Last Name</Form.Label>
             <Form.Control
               type="text"
               required
             />
             <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
-              required
-            />
+              <InputGroup>
+                <Form.Control
+                  type={type ? "text" : "password"}
+                  required
+                />
+                <Button 
+                  variant="primary" 
+                  onClick={()=> setType(!type)}
+                >
+                  {!type? <img src={see}/> :<img src={unSee}/>}
+                </Button>
+              </InputGroup>
           </div>     
           <Button className="m-2" variant="primary" type="submit"> Register </Button>
           </div>

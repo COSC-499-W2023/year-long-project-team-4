@@ -30,7 +30,7 @@ ses_client = boto3.client(
 
 def lambda_handler(event, context):
     """
-    Lambda handler that Rruns when a video is entered into the s3 bucket.
+    Lambda handler that runs when a video is entered into the s3 bucket.
     It calls the other two functions in this file.
     """
     # Get information about the uploaded file
@@ -55,7 +55,7 @@ def get_email(videoName):
         videoName str: video's name
 
     Returns:
-        str: The reciever's email address
+        str: The receiver's email address
         int: -1 if function fails
     """
     try:
@@ -69,13 +69,13 @@ def get_email(videoName):
             if db:
                 cur = db.cursor()
                 # Retrieve userID based on the videName
-                cur.execute("SELECT recieverID FROM videos WHERE videoName = %s", (videoName,))
-                recieverID = cur.fetchone()
-                recieverID = recieverID[0] 
-                # Retrieve email based on the user's ID
-                cur.execute("SELECT email FROM userprofile WHERE id = %s", (recieverID,))
-                result = cur.fetchone()
-                result = result[0]     
+                cur.execute("SELECT receiverEmail FROM videos WHERE videoName = %s", (videoName,))
+                receiverID = cur.fetchone()
+                result = receiverID[0] 
+                # # Retrieve email based on the user's ID
+                # cur.execute("SELECT email FROM userprofile WHERE id = %s", (receiverID,))
+                # result = cur.fetchone()
+                # result = result[0]     
                 cur.close()      
     except Exception as e:
         print(e)
@@ -87,10 +87,10 @@ def get_email(videoName):
 
 def send_email(user_email):
     """
-    Sends an email to user who just recieved a video
+    Sends an email to user who just received a video
 
     Args:
-        user_email str: The email address of the reciever
+        user_email str: The email address of the receiver
 
     Returns:
         int: 1 if email sent
@@ -100,7 +100,7 @@ def send_email(user_email):
     sender_email = 'safemovnow@gmail.com'
     
     # Compose the email message
-    subject = "You've Recieved a Video"
+    subject = "You've Received a Video"
     html_body = """
     <!DOCTYPE html>
     <html lang="en">

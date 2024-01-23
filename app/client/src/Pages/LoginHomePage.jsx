@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react'
 import {Card, Button, Form} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom'
+import {Fade} from "react-reveal";
 import {
+  guestPath,
   recieveAndSendPath,
   registerPath,
 } from "../Path";
@@ -50,30 +52,38 @@ const LoginHomePage = () => {
   
   
    return (
-    <div className="position-absolute top-50 start-50 translate-middle">          
-      <Card border="primary" style={{ width: "16rem" }}>  
-        <Card.Body className="text-center">
-          <Card.Title>Login</Card.Title>
-          {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-            <Form onSubmit={handleSubmit}>
-              <Form.Group className="p-3">
-                <Form.Label>Username</Form.Label>
-                  <Form.Control
-                    type="text"
-                    required
-                  />
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    required
-                  />
-              </Form.Group>   
-              <Button type="submit" className="mb-2" variant="primary"> Login </Button>
-            </Form>
-        </Card.Body>
-        <Card.Link className="text-center"  href={recieveAndSendPath}>Use as guest</Card.Link>
-        <Card.Link className="text-center" href={registerPath}>No account?</Card.Link>
-      </Card>
+    <div className="position-absolute top-50 start-50 translate-middle text-white text-center">          
+      <Fade big cascade>
+        <div className="display-3">Login</div>
+      </Fade>
+      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+      <Fade big cascade>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="p-3">
+            <Form.Label>Username</Form.Label>
+            <Form.Control
+              type="text"
+                      required
+            />
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              required
+            />
+          </Form.Group>   
+          <Button type="submit" className="mb-2" variant="primary"> Login </Button>
+        </Form>
+      </Fade>
+      <Fade big cascade>
+        <div className="row">
+          <div className="col"> 
+            <a href={guestPath}>Use as guest</a>
+          </div>    
+          <div className="col"> 
+            <a href={registerPath}>No account?</a>
+          </div>
+        </div>
+      </Fade>
     </div>
   )
 }

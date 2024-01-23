@@ -39,6 +39,11 @@ def test_delete():
     result2 = database.delete_record("videos", "videoName = %s", ('Test.mp4',)) # Assuming user_id 1 exists
     assert result1 == 1  # Assuming the deletion was successful
     assert result2 == 1  # Assuming the deletion was successful
+    
+def test_delete_key():
+    database.insert_video("TestDeleteKey.mp4", "2024-01-24 11:59:00", "updated@example.com", "Test@example.com","1","2")
+    result = database.delete_key("TestDeleteKey.mp4",True,False)
+    assert result == 1  # Assuming the delete was successful
        
        
 if __name__ == "__main__":
@@ -50,5 +55,6 @@ if __name__ == "__main__":
     test_update()
     test_authenticate()
     test_delete()   
+    test_delete_key()
     end_time = time.time()
     print("Time taken: ",end_time - start_time,"seconds")

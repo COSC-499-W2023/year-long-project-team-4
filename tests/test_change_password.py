@@ -24,31 +24,31 @@ def test_change_password_reencrypt():
     post_object = {'username': 'testDeleteUser','email': 'testDelete@example.com', 'password': 'test_password', 'firstname': 'John', 'lastname': 'Doe'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
-    #Create user
-    database.insert_user('testDeleteUser','testDelete@example.com','test_password', "John", "Doe","","")
-    #Send and recieve video from the user
-    database.insert_video("TestDelete1.mp4","2022-01-22 11:59:00", "testDelete@example.com", "", "", "")
-    s3Bucket.upload_file('This is test content', 'TestDelete1.mp4')
-    database.insert_video("TestDelete2.mp4","2022-01-22 11:59:00", "", "testDelete@example.com", "", "")
-    s3Bucket.upload_file('This is test content', 'TestDelete2.mp4')
-    #Run function
-    flaskapp.change_password_reencrypt("new_password")
+
+    response = client.post('/change_password_reencrypt/new_password', data=post_object)
     assert response.status_code == 200
+    
+    current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=('testDeleteUser',))
+    assert current_password == 'new_password'
 
 def test_set_verificationcode():
-    flaskapp.set_verification('testDelete@example.com')
+    post_object = {'username': 'fakeusertest987','email': 'fakeusertest987@gmail.com', 'password': 'test_password', 'firstname': 'John', 'lastname': 'Doe'}
+    response = client.post('/set_verificationcode/fakeusertest987@gmail.com', data=post_object)
+    assert response.status_code == 200 
     
 def test_change_password_forgot():
     assert database.resetTable(tableName="userprofile", testcase=True)
-    #Create user
-    database.insert_user('testDeleteUser2','testDelete2@example.com','test_password', "Fake", "Doe","","")
-    #Send and recieve video from the user
-    database.insert_video("TestDelete3.mp4","2022-01-22 11:59:00", "testDelete2@example.com", "", "", "")
-    s3Bucket.upload_file('This is test content', 'TestDelete3.mp4')
-    database.insert_video("TestDelete4.mp4","2022-01-22 11:59:00", "", "testDelete2@example.com", "", "")
-    s3Bucket.upload_file('This is test content', 'TestDelete4.mp4')
-    #Run function
-    flaskapp.change_password_forgot("testDelete@example.com", "new_password",)
+    post_object = {'username': 'testDeleteUser','email': 'fakeusertest987@gmail.com', 'password': 'test_password', 'firstname': 'John', 'lastname': 'Doe'}
+    response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+
+    input_code = flaskapp.set_verificationcode('fakeusertest987@gmail.com')
+    response = client.post('/change_password_forgot/fakeusertest987@gmail.com/new_password/'+ str(input_code))
+    assert response.status_code == 200
+    
+    current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=('fakeusertest987',))
+    assert current_password == 'new_password'
+    
     
 if __name__ == "__main__":
     start_time = time.time()

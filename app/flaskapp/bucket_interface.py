@@ -21,6 +21,7 @@ import s3Bucket
 import database
 
 bucket = Blueprint('bucket', __name__)
+
 app = Flask(__name__)
 app.config['REDIS_URL'] = "redis://localhost:6379/0"
 redis = FlaskRedis(app)
@@ -307,8 +308,10 @@ def change_password_reencrypt(new_password):
             object_content = s3Bucket.get_object_content(videos_to_decrypt[items1])
             videos_to_reencrypt[items1] = aes_decrypt_video(object_content, aes_key)
         #Change password
-        user_password = database.query_records(table_name='userprofile', fields='password', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['password']
-        database.update_data = {user_password: new_password}
+        user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['password_hash']
+        user_id = database.query_records(table_name='userprofile', fields='id', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['id']
+        update_data = {user_password: new_password}
+        database.update_user(user_id,update_data)
         #Loop through videos to reencrypt and insert back to database and s3Bucket
         for items2 in videos_to_reencrypt:
             #Reencrypt
@@ -378,8 +381,10 @@ def change_password_forgot(email,new_password,input_code):
     #Verify user input correct code
     if input_code == created_code:
         #Change password
-        user_password = database.query_records(table_name='userprofile', fields='password', condition=f'email = %s', condition_values=(email,), testcase=current_app.testing)[0]['password']
-        database.update_data = {user_password: new_password}
+        user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,), testcase=current_app.testing)[0]['password_hash']
+        user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(email,), testcase=current_app.testing)[0]['id']
+        update_data = {user_password: new_password}
+        database.update_user(user_id,update_data)
         #Get recieved videos that need key deleted
         videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'recieverID = %s', condition_values=(email,), testcase=current_app.testing)[0]['videoName']
         #Loop through list, deleting files individually

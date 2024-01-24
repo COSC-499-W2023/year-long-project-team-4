@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Row, Col, Button, Modal} from 'react-bootstrap';
-import { recieveAndSendPath } from '../Path';
+import { receiveAndSendPath } from '../Path';
 import axios from 'axios';
 import {Fade} from 'react-reveal';
 
@@ -51,31 +51,29 @@ const ViewVideoPage = () => {
   return (
      <Fade cascade>
       <Row>
-          <div className="display-4 text-center text-light"> Receive Videos </div>
-           <Col className="p-3">
-               <div className="display-6 text-light"> Videos Viewable</div>
-               {videos.map((video, index) => (
-                          <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                              <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                              <p>Video{index + 1}</p>
-                              </Button>
-                          </div>
-                      ))}
-          </Col>   
+        <div className="display-4 text-center text-light"> Receive Videos </div>
+        <Col className="p-3">
+            <div className="display-6 text-light"> Videos Viewable</div>
+            {videos.map((video, index) => (
+                <div key={index} onClick={() => handleVideoClick(video.videoName)}>
+                <Button className='text-center mb-2' style={{minWidth: '150px'}}>
+                <p>Video{index + 1}</p>
+                </Button>
+                </div>
+            ))}
+        </Col>   
       </Row>      
-          <div className="text-center p-4">
-              <Button href={recieveAndSendPath}> Return to Home</Button>
-          </div>
-  
-          <Modal show={showVideoModal} onHide={handleCloseVideoModal}>
-                  <Modal.Header closeButton>
-                      <Modal.Title>Video Playback</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                      {selectedVideo && <video src={selectedVideo} width="100%" controls autoPlay />}
-                  </Modal.Body>
-          </Modal>
-     
+      <div className="text-center p-4">
+        <Button href={receiveAndSendPath}> Return to Home</Button>
+      </div>
+      <Modal show={showVideoModal} onHide={handleCloseVideoModal}>
+        <Modal.Header closeButton>
+            <Modal.Title>Video Playback</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            {selectedVideo && <video src={selectedVideo} width="100%" controls autoPlay />}
+        </Modal.Body>
+       </Modal>
      </Fade>
     )
   }

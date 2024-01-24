@@ -24,6 +24,11 @@ const UploadVideoPage = () => {
   
   const handleShow = () => setShow(true);  
 
+  const handleType = (typeNumber) => {
+    setType(typeNumber);
+    setFile(null);
+  }
+
   const handleStartRecord = React.useCallback(() => {
     setCapturing(true);
 
@@ -174,10 +179,10 @@ const UploadVideoPage = () => {
     <Fade>
       <div className="position-absolute top-50 start-50 translate-middle text-center">
         <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>
-          <ToggleButton id="tbg-radio-1" value={1} onClick={()=>setType(1)}>
+          <ToggleButton id="tbg-radio-1" value={1} onClick={()=>{handleType(1)}}>
             Upload Video
           </ToggleButton>
-          <ToggleButton id="tbg-radio-2" value={2} onClick={()=>setType(2)}>
+          <ToggleButton id="tbg-radio-2" value={2} onClick={()=>{handleType(2)}}>
             Record Video
           </ToggleButton>
         </ToggleButtonGroup>

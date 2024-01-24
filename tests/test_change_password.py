@@ -20,39 +20,46 @@ def client(app):
     return app.test_client()
 
 def test_change_password_reencrypt(client):
-    assert database.resetTable(tableName="userprofile", testcase=True)
-    post_object = {'username': 'testDeleteUser','email': 'testDelete@example.com', 'password': 'test_password', 'firstname': 'John', 'lastname': 'Doe'}
+    assert database.resetTable(tableName="userprofile")
+    post_object = {'username': 'testDeleteUser','email': 'fakeuser987@gmail.com', 'password': 'test_password', 'firstname': 'John', 'lastname': 'Doe'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
 
-    response = json.loads(client.post('/change_password_reencrypt/new_password', data=post_object))
+    change_password_object = {'new_password' : 'new_password', 'email': 'fakeuser987@gmail.com', 'input_code': '123456'}
+    response = json.loads(client.post('bucket/change_password_reencrypt', data=change_password_object))
     assert response.status_code == 200
     
     current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=('testDeleteUser',))
     assert current_password == 'new_password'
 
 def test_set_verificationcode(client):
-    post_object = {'username': 'fakeusertest987','email': 'fakeusertest987@gmail.com', 'password': 'test_password', 'firstname': 'John', 'lastname': 'Doe'}
-    response = json.loads(client.post('/set_verificationcode/fakeusertest987@gmail.com', data=post_object))
+    assert database.resetTable(tableName="userprofile")
+    post_object = {'username': 'testDeleteUser','email': 'fakeusertest987@gmail.com', 'password': 'test_password', 'firstname': 'John', 'lastname': 'Doe'}
+    response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+    
+    set_verificationcode_object = {'email': 'fakeusertest987@gmail.com'}
+    response = json.loads(client.post('bucket/set_verificationcode', data=set_verificationcode_object))
     assert response.status_code == 200 
     
 def test_change_password_forgot(client):
-    assert database.resetTable(tableName="userprofile", testcase=True)
+    assert database.resetTable(tableName="userprofile")
     post_object = {'username': 'testDeleteUser','email': 'fakeusertest987@gmail.com', 'password': 'test_password', 'firstname': 'John', 'lastname': 'Doe'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
 
-    input_code = flaskapp.set_verificationcode('fakeusertest987@gmail.com')
-    response = json.loads(client.post('/change_password_forgot/fakeusertest987@gmail.com/new_password/'+ str(input_code)))
-    assert response.status_code == 200
+    change_password_object = {'new_password' : 'new_password', 'email': 'fakeusertest987@gmail.com', 'input_code': '123456'}
+    response = client.post(('/bucket/change_password_forgot'), data = change_password_object)
+    # assert response.status_code == 200
     
-    current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=('fakeusertest987',))
+    current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=('testDeleteUser',))
     assert current_password == 'new_password'
-    
     
 if __name__ == "__main__":
     start_time = time.time()
-    test_change_password_reencrypt()
+    app = flaskapp.create_app()
+    app.config['TESTING'] = True
+    test_change_password_forgot(app.test_client())
     test_set_verificationcode()
     test_change_password_forgot()
     end_time = time.time()

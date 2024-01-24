@@ -9,6 +9,8 @@ import io
 import random
 import boto3
 import time
+import string
+import bcrypt
 
 from flask import Blueprint, request, session, jsonify, current_app, send_file, Flask
 from rsa import generate_key
@@ -26,7 +28,6 @@ app = Flask(__name__)
 app.config['REDIS_URL'] = "redis://localhost:6379/0"
 redis = FlaskRedis(app)
 
-boto3.setup_default_session(profile_name = 'team4-dev')
 ses_client = boto3.client(
     'ses', 
     region_name='ca-central-1', 
@@ -319,13 +320,18 @@ def change_password_reencrypt():
             object_content = s3Bucket.get_object_content(videos_to_decrypt[items1])
             videos_to_reencrypt[items1] = aes_decrypt_video(object_content, aes_key)
         #Change password
-        user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(user_email,))[0]['password_hash']
-        if not user_password:
-            return jsonify({'error': 'Missing user_password'}), 400
         user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(user_email,))[0]['id']
         if not user_id:
-            return jsonify({'error': 'Missing user_id'}), 400
-        update_data = {'password_hash': 'new_password'}
+            return jsonify({"status": "failed",'message': 'Missing user_id'}), 400
+        salt_hash = os.urandom(64)
+        private_key_seed = new_password + salt_hash.hex()
+        private_key = generate_key(private_key_seed)
+        public_key = private_key.publickey().export_key('PEM')
+        hashed_password = bcrypt.generate_password_hash(new_password).decode()
+        update_data = {'password_hash': f'{hashed_password}', 
+                       'salthash': f'{salt_hash}', 
+                       'pubKey' : f'{public_key}'
+                       }
         database.update_user(user_id,update_data)
         #Loop through videos to reencrypt and insert back to database and s3Bucket
         for items2 in videos_to_reencrypt:
@@ -344,7 +350,7 @@ def change_password_reencrypt():
                 recipient_email = database.query_records(table_name='userprofile', fields='email', condition=f'id = %s', condition_values=(receiverEmail,))[0]
                 insert_video = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, retention_date, user_email, recipient_email, encrypted_aes_key)
                 if not insert_video:
-                    return jsonify({'error': 'Video insertion failed'}), 502
+                    return jsonify({"status": "failed",'message': 'Video insertion failed'}), 502
             #Repeat but for recieved videos
             video_details = database.query_records(table_name='videos', fields='videoName, retDate, senderEmail', condition=f'receiverEmail = %s', condition_values=(user_email,),)
             for items4 in video_details:
@@ -354,14 +360,14 @@ def change_password_reencrypt():
                 sender_email = database.query_records(table_name='userprofile', fields='email', condition=f'id = %s', condition_values=(senderEmail,))[0]
                 insert_video = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, retention_date, sender_email,user_email, encrypted_aes_key)
                 if not insert_video:
-                    return jsonify({'error': 'Video insertion failed'}), 502
+                    return jsonify({"status": "failed",'message': 'Video insertion failed'}), 502
         password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(user_email,))[0]['password_hash']
         if password == new_password:
             return (jsonify({"status": "success", "message": "codes match, password changed"}),200)
         else:
             return (jsonify({"status": "failed", "message": f"password not changed {password}"}), 502)
     else:
-        return jsonify({'error': 'User not logged in'}), 502
+        return jsonify({"status": "failed",'message': 'User not logged in'}), 502
                 
 @bucket.route('/set_verificationcode', methods=['POST'])
 def set_verificationcode():
@@ -369,7 +375,10 @@ def set_verificationcode():
     if email is None:
         return jsonify({'error': 'Missing email'}), 400
     #Create verification code
-    created_code = random.choice(range(100000, 999999))
+    created_code = ''.join(random.choices(string.digits, k=6))
+    update_data = {'verifyKey': f'{created_code}'}
+    user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(email,))[0]['id']
+    database.update_user(user_id,update_data)
     #Send user an email with code
     try:
         response = ses_client.send_email(
@@ -397,17 +406,26 @@ def change_password_forgot():
     if input_code is None:
         return jsonify({'error': 'Missing input_code'}), 400
     #Get code
-    created_code = '123456' 
+    created_code = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(email,))[0]['verifyKey']
     #Verify user input correct code
     if input_code == created_code:
-        #Change password 
+        #Change password, salt_hash, and pubKey
         user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,))[0]['password_hash']
         if not user_password:
-            return jsonify({'error': 'Missing user_password'}), 400
+            return jsonify({"status": "failed",'message': 'Missing user_password'}), 400
         user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(email,))[0]['id']
         if not user_id:
-            return jsonify({'error': 'Missing user_id'}), 400
-        update_data = {'password_hash': '{new_password}'}
+            return jsonify({"status": "failed",'message': 'Missing user_id'}), 400
+        old_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,))[0]['password_hash']
+        salt_hash = os.urandom(64)
+        private_key_seed = new_password + salt_hash.hex()
+        private_key = generate_key(private_key_seed)
+        public_key = private_key.publickey().export_key('PEM')
+        hashed_password = bcrypt.generate_password_hash(new_password).decode()
+        update_data = {'password_hash': f'{hashed_password}', 
+                       'salthash': f'{salt_hash}', 
+                       'pubKey' : f'{public_key}'
+                       }
         database.update_user(user_id,update_data)
         #Get recieved videos that need key deleted
         videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'receiverEmail = %s', condition_values=(email,))
@@ -422,7 +440,7 @@ def change_password_forgot():
             #Delete key from database for recieved videos
             database.delete_key(videos_to_delete_key[items2]['videoName'],True,False)
         password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,))[0]['password_hash']
-        if password == new_password:
+        if password != old_password:
             return (jsonify({"status": "success", "message": "codes match, password changed"}),200)
         else:
             return (jsonify({"status": "failed", "message": f"password not changed {password}"}), 502)

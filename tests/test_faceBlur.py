@@ -5,6 +5,7 @@ import cv2
 
 sys.path.append(os.path.abspath('../app'))
 import faceBlurring
+import flaskapp
 
 @pytest.fixture
 def sample_video_path():
@@ -14,6 +15,15 @@ def sample_video_path():
 def sample_output_path():
     return os.path.dirname(__file__)+"/TestBlurred.mp4"
 
+@pytest.fixture
+def app():
+    app = flaskapp.create_app()
+    app.config['TESTING'] = True
+    yield app
+
+@pytest.fixture
+def client(app):
+    return app.test_client()
 
 def test_detect_faces():
     image = os.path.join(os.path.dirname(__file__), "TestBlurFace.jpeg")
@@ -37,7 +47,26 @@ def test_parallel_detect_faces(sample_video_path, sample_output_path):
 
 def test_process_video():
     # This runs off the assumption blurredVideo is in the temp folder
-    os.remove('../app/faceBlurring/temp/blurredVideo.mp4')
-    faceBlurring.process_video()  # If this function works, you should expect to see a file in your /app/faceDection/temp/ named blurredVideo.mp4
+    video_path = '../app/faceBlurring/temp/blurred_AudioTest.mp4'
+    if os.path.exists(video_path):
+        os.remove(video_path)
+        print(f"File {video_path} removed successfully.")
+    else:
+        print(f"File {video_path} does not exist.")
+    file_path = os.path.join(os.path.dirname(__file__), 'AudioTest.mp4')
+    faceBlurring.process_video(file_path)  # If this function works, you should expect to see a file in your /app/faceDection/temp/ named blurred_{videoName}.mp4
+    assert os.path.exists(video_path)
+    
+def test_file_upload(client):
+    if os.path.exists('../app/faceBlurring/temp/blurred_AudioTest.mp4'):
+        os.remove('../app/faceBlurring/temp/blurred_AudioTest.mp4')
+    
+    file_path = 'AudioTest.mp4'
+    data = {
+        'file' : (open(file_path,'rb'), file_path)
+    }
+    response = client.post('bucket/blurRequest', data=data)
 
-
+    assert response.status_code == 200
+    assert os.path.exists('../app/faceBlurring/temp/blurred_AudioTest.mp4')
+    

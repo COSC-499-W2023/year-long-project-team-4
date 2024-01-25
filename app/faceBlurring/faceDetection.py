@@ -48,19 +48,24 @@ def blur_faces_opencv(frame, face_details):
     #print(f"BLUR CALL TIME: {end-start} seconds\n")
     return image
 
-def integrate_audio(original_video, output_video, videoLoc, audio_path=os.path.dirname(__file__)+'/temp/audio.mp4'):
+def integrate_audio(original_video, output_video, audio_path=os.path.dirname(__file__)+'/temp/audio.mp4'):
     # Extract audio
+    print(original_video)
     my_clip = VideoFileClip(original_video)
+    print(my_clip)
     my_clip.audio.write_audiofile(audio_path,codec='libmp3lame')
 
-    temp_location = os.path.dirname(__file__)+'/temp/output_video.mp4'
+    temp_location = os.path.join(os.path.dirname(__file__), 'temp', 'output_video.mp4')
+    
     # Join output video with extracted audio
     videoclip = VideoFileClip(output_video)
     #videoclip = videoclip.set_audio(VideoFileClip(audio_path))
     videoclip.write_videofile(temp_location, codec='libx264', audio=audio_path, audio_codec='libmp4lame')
-    os.rename(temp_location, os.path.dirname(__file__)+'/temp/'+videoLoc)
+    videoLoc = os.path.basename(original_video)
+    os.rename(temp_location, os.path.dirname(__file__)+'/temp/blurred_'+videoLoc)
     # Delete audio
     os.remove(audio_path)
+    os.remove(output_video)
 
 def parallel_detect_faces(video_path, frame_skip,video_out_path):
     cap = cv2.VideoCapture(video_path)
@@ -115,37 +120,21 @@ def parallel_detect_faces(video_path, frame_skip,video_out_path):
     cap.release()
     out.release()
 
-def process_video():
+def process_video(upload_path):
     
     start = time.time() #//for timing the entire video 
-    # Temp variable for testing - load local files for it
-    video_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/AudioTestUpdated.mp4"
-    video_out_path = "C:/Users/Gauth/COSC499/year-long-project-team-4/tests/TestAudioBlur.mp4" 
     frame_skip = 5
-    video_name = "testBlur.mp4"
-    # This code below is for flask I believe? maybe not need confirmation
-        # if 'file' not in request.files:
-        #     return 'No file found'
-        # file = request.files['file']
-        # if file.filename == '':
-        #     return "no file selected"
-        # uploaded_path = 'temp/uploaded_video.mp4'
-        # video_name = file.filename
-        # file.save(uploaded_path)
-        # processed_path = 'temp/processed_video.mp4'
-        # parallel_detect_faces(uploaded_path,frame_skip, processed_path)
-        # integrate_audio(uploaded_path,processed_path,video_name)
-        # return send_file("../temp/blurredVideo.mp4", as_attachment=True)
     
-    # number of frames between frame samples 
-   
-
+    # Generate the video_out_path using the video name
+    base = os.path.basename(upload_path)
+    video_out_path = os.path.join(os.path.dirname(__file__), 'temp', 'processed_' + base)
+    print(video_out_path)
     
     # Start handling video - Load, and save the output
-    parallel_detect_faces(video_path,frame_skip,video_out_path)
-    integrate_audio(video_path, video_out_path,video_name)
-    #end = time.time()
-    #print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n") #//printing the speed 
+    parallel_detect_faces(upload_path,frame_skip,video_out_path)
+    integrate_audio(upload_path, video_out_path)
+    end = time.time()
+    print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n") #//printing the speed 
     
 if __name__ == "__main__":
-    process_video()
+    process_video(upload_path = r"C:\Users\Gauth\COSC499\year-long-project-team-4\tests\AudioTest.mp4")

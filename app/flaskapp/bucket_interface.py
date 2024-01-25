@@ -15,6 +15,7 @@ from Crypto.PublicKey import RSA
 
 import s3Bucket
 import database
+import faceBlurring
 
 bucket = Blueprint('bucket', __name__)
 
@@ -124,3 +125,16 @@ def get_available_videos():
     user_id = database.query_records(table_name='userprofile', fields='id', condition=f'username = %s', condition_values=(session['username'],), testcase=current_app.testing)[0]['id']
     available_videos = database.query_records(table_name='videos', fields='videoName, senderID', condition=f'recieverID = %s', condition_values=(user_id,), testcase=current_app.testing)
     return json.dumps(available_videos), 200
+
+@bucket.route('/blurRequest', methods=['POST'])
+def processVideo():
+    file = request.files.get('file')
+    
+    if file is None:
+        return 'No file found'
+    upload_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'faceBlurring', 'temp'))    
+    upload_path = os.path.join(upload_directory,file.filename)
+    file.save(upload_path)
+    
+    faceBlurring.process_video(upload_path)
+    return send_file(upload_path, as_attachment=True)

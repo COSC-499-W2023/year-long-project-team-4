@@ -53,6 +53,7 @@ const ReceiveAndSendPage = () => {
         }
       } catch (error) {
         console.error('There was an error fetching the current user', error);
+        setErrorMessage('There was an error fetching the current user');
       }
     };
   

@@ -10,31 +10,27 @@ import random
 import boto3
 import time
 import string
-import bcrypt
 
 from flask import Blueprint, request, session, jsonify, current_app, send_file, Flask
 from rsa import generate_key
 from Crypto import Random
 from Crypto.Cipher import AES, PKCS1_v1_5
 from Crypto.PublicKey import RSA
-from flask_redis import FlaskRedis
 
 import s3Bucket
 import database
 
-bucket = Blueprint('bucket', __name__)
+from . import bcrypt
 
-app = Flask(__name__)
-app.config['REDIS_URL'] = "redis://localhost:6379/0"
-redis = FlaskRedis(app)
+bucket = Blueprint('bucket', __name__)
 
 ses_client = boto3.client(
     'ses', 
     region_name='ca-central-1', 
     aws_access_key_id=ACCESS_KEY,
     aws_secret_access_key=SECRET_KEY,
-    aws_session_token=SESSION_TOKEN)
-
+    aws_session_token=SESSION_TOKEN
+    )
 def get_public_key(email):
     try:
         import_string = database.query_records(table_name='userprofile', fields='publickey', condition=f'email = %s', condition_values=(email,))[0]['publickey']
@@ -399,24 +395,23 @@ def change_password_forgot():
     email = request.form.get('email')
     new_password = request.form.get('new_password')
     input_code = request.form.get('input_code')
+    old_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,))[0]['password_hash']
+    user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(email,))[0]['id']
+    if not user_id:
+        return jsonify({"status": "failed",'message': 'Missing user_id'}), 400
     if email is None:
         return jsonify({'error': 'Missing email'}), 400
     if new_password is None:
         return jsonify({'error': 'Missing password'}), 400
     if input_code is None:
         return jsonify({'error': 'Missing input_code'}), 400
+    if not old_password:
+        return jsonify({"status": "failed",'message': 'Missing user_password'}), 400
     #Get code
     created_code = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(email,))[0]['verifyKey']
     #Verify user input correct code
     if input_code == created_code:
         #Change password, salt_hash, and pubKey
-        user_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,))[0]['password_hash']
-        if not user_password:
-            return jsonify({"status": "failed",'message': 'Missing user_password'}), 400
-        user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(email,))[0]['id']
-        if not user_id:
-            return jsonify({"status": "failed",'message': 'Missing user_id'}), 400
-        old_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,))[0]['password_hash']
         salt_hash = os.urandom(64)
         private_key_seed = new_password + salt_hash.hex()
         private_key = generate_key(private_key_seed)
@@ -439,11 +434,11 @@ def change_password_forgot():
         for items2 in videos_to_delete_key:
             #Delete key from database for recieved videos
             database.delete_key(videos_to_delete_key[items2]['videoName'],True,False)
-        password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,))[0]['password_hash']
-        if password != old_password:
+        current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,))[0]['password_hash']
+        if current_password != old_password:
             return (jsonify({"status": "success", "message": "codes match, password changed"}),200)
         else:
-            return (jsonify({"status": "failed", "message": f"password not changed {password}"}), 502)
+            return (jsonify({"status": "failed", "message": f"password not changed {current_password}"}), 502)
     elif input_code != created_code:
         return (jsonify({"status": "rejected", "message": "codes do not match"}),502)
     else:

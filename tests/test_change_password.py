@@ -29,8 +29,9 @@ def test_change_password_reencrypt(client):
     response = json.loads(client.post('bucket/change_password_reencrypt', data=change_password_object).data.decode('utf-8'))
     assert not 'error' in response
     
-    current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=('testDeleteUser',))[0]['password_hash']
-    assert not 'test_password' in current_password 
+    post_object = {'username': 'testDeleteUser','email': 'fakeusertest987@gmail.com', 'password': 'new_password', 'firstname': 'John', 'lastname': 'Doe'}
+    response = json.loads(client.post('/auth/login', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
 
 def test_set_verificationcode(client):
     assert database.resetTable(tableName="userprofile")
@@ -39,7 +40,7 @@ def test_set_verificationcode(client):
     assert not 'error' in response
     
     set_verificationcode_object = {'email': 'fakeusertest987@gmail.com'}
-    response = json.loads(client.post('bucket/set_verificationcode', data=set_verificationcode_object))
+    response = json.loads(client.post('bucket/set_verificationcode', data=set_verificationcode_object).data.decode('utf-8'))
     assert not 'error' in response
     
 def test_change_password_forgot(client):
@@ -49,12 +50,9 @@ def test_change_password_forgot(client):
     assert not 'error' in response
 
     input_code = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=('fakeusertest987@gmail.com',))[0]['verifyKey']
-    change_password_object = {'new_password' : 'new_password', 'email': 'fakeusertest987@gmail.com', 'input_code': '{input_code}'}
+    change_password_object = {'new_password' : 'new_password', 'email': 'fakeusertest987@gmail.com', 'input_code': f'{input_code}'}
     response = json.loads(client.post('/bucket/change_password_forgot', data = change_password_object).data.decode('utf-8'))
     assert not 'error' in response
-    
-    current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'username = %s', condition_values=('testDeleteUser',))[0]['password_hash']
-    assert not 'test_password' in current_password 
     
     post_object = {'username': 'testDeleteUser','email': 'fakeusertest987@gmail.com', 'password': 'new_password', 'firstname': 'John', 'lastname': 'Doe'}
     response = json.loads(client.post('/auth/login', data=post_object).data.decode('utf-8'))

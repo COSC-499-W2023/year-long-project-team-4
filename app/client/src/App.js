@@ -36,8 +36,8 @@ function App() {
           }
         );
 
-        if (response.data.username) {
-          setCurrentUser(response.data.username);
+        if (response.data.email) {
+          setCurrentUser(response.data.email);
         } else {
           console.error("No user currently logged in");
         }
@@ -51,7 +51,7 @@ function App() {
   return (
     <Router>
       <Navbar bg="primary">
-        <Navbar.Brand href={homePath}>
+        <Navbar.Brand href={currentUser ? receiveAndSendPath : homePath}>
           <div className=" m-2 display-6">SafeMov</div>
         </Navbar.Brand>
         <>

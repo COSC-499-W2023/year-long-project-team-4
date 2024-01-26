@@ -17,10 +17,10 @@ const LoginHomePage = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
-  const handleLogin = async (username, password) => {
+  const handleLogin = async (email, password) => {
     try {
       const response = await axios.post('http://localhost:8080/auth/login', {
-        username: username,
+        email: email,
         password: password
       }, {
         headers: {
@@ -29,8 +29,8 @@ const LoginHomePage = () => {
         withCredentials: true
       });
   
-      if (response.data.username) {
-        setCurrentUser(response.data.username);
+      if (response.data.email) {
+        setCurrentUser(response.data.email);
         navigate(receiveAndSendPath);
       } else {
         setErrorMessage(response.data.error);
@@ -47,9 +47,9 @@ const LoginHomePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const username = e.target.elements[0].value;  // Assuming the first input is the username
-    const password = e.target.elements[1].value;  // Assuming the second input is the password
-    handleLogin(username, password);
+    const email = e.target.elements[0].value;  
+    const password = e.target.elements[1].value; 
+    handleLogin(email, password);
   };
   
   
@@ -62,10 +62,10 @@ const LoginHomePage = () => {
       <Fade big cascade>
         <Form onSubmit={handleSubmit}>
           <Form.Group className="p-3">
-            <Form.Label>Username</Form.Label>
+            <Form.Label>Email</Form.Label>
             <Form.Control
               type="text"
-                      required
+              required
             />
             <Form.Label>Password</Form.Label>
               <InputGroup>

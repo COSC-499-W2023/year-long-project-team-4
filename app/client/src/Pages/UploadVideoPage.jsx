@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Form, Offcanvas, Button, ToggleButtonGroup, ToggleButton} from 'react-bootstrap'
+import {Form, Offcanvas, Button, ToggleButtonGroup, Spinner, ToggleButton} from 'react-bootstrap'
 import Webcam from 'react-webcam';
 import record from "../Assets/record-btn.svg"
 import axios from "axios";
@@ -19,6 +19,7 @@ const UploadVideoPage = () => {
   const [recipientEmail, setRecipientEmail] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [show, setShow] = useState(false);
+  const [load, setLoad] = useState(false);
 
   const handleClose = () => setShow(false);
   
@@ -115,8 +116,23 @@ const UploadVideoPage = () => {
       setFile(null);
       setDisable(true);
     }
-
   }
+  const handleBlur = () => {
+    const videoData = new FormData();
+    setLoad(true);
+    videoData.append('file', backend, 'videoFile.mp4');
+    axios.post("/blurRequest", videoData, {
+     withCredentials: true,
+     headers: {
+       'Content-Type': 'multipart/form-data'
+     },
+    }).then((response) => {
+      const mediablob = new Blob(response,{type: "video/mp4"});
+      setBackend(mediablob);
+      setFile(URL.createObjectURL(mediablob));
+      setLoad(false);
+    })
+    } 
 
   return (
   <>
@@ -136,24 +152,22 @@ const UploadVideoPage = () => {
           Option 2, to record a video on the 
           webapp.
         </p> 
-        <p>
-          Note that if you are a guest, you will be required
-          to give an email in order to encypt the
-          video.
-        </p>
         <p>  
           Option 1 requires you to do the following:
           <ul>
             <li>
               1. upload a video file, where 
               a preview will show up. If 
-              satisfied, click send video to 
+              satisfied, enter the email
+              of the user you wish to send
+              to then click send video to 
               send the file.  
             </li>
             <li>
-              2. If not, simply click upload 
-              video to retry with another file,
-              following step 1 above.
+              2. If not happy with the video, 
+              simply click upload video to 
+              retry with another file, following 
+              step 1 above.
             </li>
           </ul>    
         </p>
@@ -166,9 +180,11 @@ const UploadVideoPage = () => {
               top and click stop record when done.  
             </li>
             <li>
-              2. To preview the video, click preview
-              video. If satisfied, click send video.
-              If not, click retake video, and
+              2. To preview the video, click 
+              preview video. If satisfied, 
+              enter the recipient's email, 
+              and click send video. If not, 
+              click retake video, and 
               repeat step 1 and 2. 
             </li>
           </ul> 
@@ -218,8 +234,7 @@ const UploadVideoPage = () => {
               )}
             </div>
           </Form.Group>
-          <Form.Group controlId="formRecipientEmail" className="mb-3">
-            <Form.Label>Recipient's Email</Form.Label>
+          <Form.Group controlId="formRecipientEmail" className="mb-3 mt-3">
               <Form.Control 
                 type="email" 
                 required 
@@ -258,15 +273,20 @@ const UploadVideoPage = () => {
             <Webcam  width="400" height="225" audio={false} ref={webcamRef}/>
            </Fade>
             ):(
-            <Fade>  
+            <Fade>
+              {load? (
+              <>
+                <Spinner variant="primary" animation="grow" />
+              </>
+              ):(
               <video  width="400" height="225" controls>
                 <source src={file} type="video/mp4"/>
               </video>
+              )}
             </Fade>  
           )}
           </>
-          <Form.Group controlId="formRecipientEmail" className="mb-3">
-            <Form.Label>Recipient's Email</Form.Label>
+          <Form.Group controlId="formRecipientEmail" className="mb-3 mt-3">
               <Form.Control 
                 type="email" 
                 required 
@@ -276,9 +296,10 @@ const UploadVideoPage = () => {
               />
           </Form.Group>
           <div className="mb-2">
-            <Button onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}
-            <Button onClick={()=>{handleRetake()}} disabled={disable}>Retake video</Button> {' '}
-            <Button type="submit" disabled={disable}>Send video</Button>
+            <Button className="mt-2" onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}
+            <Button className="mt-2" onClick={()=>{handleRetake()}} disabled={disable}>Retake video</Button> {' '}
+            <Button className="mt-2" onClick={()=>{handleBlur(recordedChunks)}} disabled={disable}>Blur video</Button> {' '}
+            <Button className="mt-2"type="submit" disabled={disable}>Send video</Button>
           </div> 
         </Form>   
         </>

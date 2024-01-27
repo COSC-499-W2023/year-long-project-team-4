@@ -123,11 +123,14 @@ const UploadVideoPage = () => {
     videoData.append('file', backend, 'videoFile.mp4');
     axios.post("http://localhost:8080/bucket/blurRequest", videoData)
       .then((response) => {
-      const mediablob = new Blob(response,{type: "video/mp4"});
+      const mediablob = new Blob(response.data,{type: "video/mp4"});
       setBackend(mediablob);
       setFile(URL.createObjectURL(mediablob));
       setLoad(false);
     })
+    .catch(error => {
+      console.error('Error blurring video', error);
+    });
     } 
 
   return (

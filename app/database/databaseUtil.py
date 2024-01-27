@@ -341,7 +341,7 @@ def resetTable(tableName:str)-> bool:
 
 def delete_key(videoName:str,sender:bool,reciever:bool) -> int:
     '''
-    Zeros out a user's key so they can no longer access a video. If both reciever annd sender keys are zero'd out, delete the video
+    Zeros out a user's key so they can no longer access a video
 
     Args:
         videoName(str): The video's name where the key will be deleted
@@ -368,6 +368,50 @@ def delete_key(videoName:str,sender:bool,reciever:bool) -> int:
                     set_clause = "senderEncryption = 0"
                 elif (reciever):
                     set_clause = "recieverEncryption = 0"
+                else:
+                    result = -1
+                query = f"UPDATE videos SET {set_clause} WHERE videoName = %s"
+                cur.execute(query, videoName)   
+                cur.close()
+                result = 1  # Set result to 1 to indicate success
+    except Exception as e:
+        print(e)
+        result = -1  # Set result to -1 to indicate an error
+    finally:
+        if db:
+            db.close()
+    return result  # Return the result
+
+def change_key(videoName:str,encrypted_aes_key:str,sender:bool,reciever:bool) -> int:
+    '''
+    Change a user's encryption key on a video after they changed their password
+
+    Args:
+        videoName(str): The video's name where the key will be deleted
+        encrypted_aes_key(str): Key
+        sender(bool): true if the user is the sender
+        reciever(bool): true if the user is the reciever
+
+    Returns:
+        int: An integer result code indicating the outcome of the delete operation.
+             - 1: Delete was successful.
+             - -1: An error occurred during the delete.
+    '''
+    db = None
+    result = 0  # Initialize the result to 0
+    
+    try:
+        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database='Team4dbTest')
+            if db:
+                cur = db.cursor()
+                #Create set clause depending on whether user is sender or reciever
+                if (sender):
+                    set_clause = f"senderEncryption = {encrypted_aes_key}"
+                elif (reciever):
+                    set_clause = f"recieverEncryption = {encrypted_aes_key}"
                 else:
                     result = -1
                 query = f"UPDATE videos SET {set_clause} WHERE videoName = %s"

@@ -24,11 +24,13 @@ TEST = os.getenv("TEST") == 'True'
 LOCAL = os.getenv('LOCAL') == 'True'
 BUCKETNAME = os.getenv("BUCKETNAME")
 
-# s3_client = boto3.client(
-# 's3',
-# aws_access_key_id=ACCESS_KEY,
-# aws_secret_access_key=SECRET_KEY,
-# aws_session_token=SESSION_TOKEN)
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id='ASIARH6FIJVEWDHFXX4V',
+    aws_secret_access_key='mnVQQK13iCc9lcYaHID6HecBapIelZf0acjUbkKz',
+    aws_session_token='IQoJb3JpZ2luX2VjEPP//////////wEaDGNhLWNlbnRyYWwtMSJIMEYCIQCvZUSKpO2IZgw8zabFQ3UbcQ0aa4Pv4VI0cgw1Tm7JPAIhAPnRmGgcFCElRX36YMUgsl05mDh/XW0we0N3KNMYfCxyKpoDCKz//////////wEQABoMMDg1Nzc2MTU4MDI1IgzxqHml6Jqet4uokuQq7gKNmL4CmvsTUCm0hzBzSbWNuChZ+8dWewxuozsBZMeUBOYK2YDx3fKCR0dPeDNLtgVOAFjCwLt2oVyUnV9DrTjBn44ZsGP0V5zrwzY3YRDchkKdcmBjc/OJIcTeEhoNQEtb6iI3LXFe3Qz4pOnKxXB5D8ajvRgAhXzhhoLcsWuyFydtv8iUmKynuzkey3kKyUMNmhmERU5jtJfUmjQLTwfl1a6uZUuCVM80zGBDByDmBF6+PYpmrvFY5X4bsn3r3Ko9pXPmvoKPEnDeHvfYOGTCzPsSx53MQr78EfcZEhcwHpfrSOJ3RziSFYfubbjYrdrUFq6j+DEaDHb4UbcOX1O2QvLHF2c7426kgU5qLiREnVRAFfnshXEVNKoqch8T9MEt2mB8d5kKQDWrdw2xlERAb/Sr/Oc3hdp5haR7XBR2KpDeeJ70VrrrDGN+VmXhnUlTOIG6zRUxx4CPZsSvMktF7g/2K5AmfdNp62B5c9Yw2oHQrQY6pQGVCbZ3szlpxuRN0sXw6JPyHYGLtn8OcPaVantuVYxZ7QFAaYGnXVpbtKK/37K1NvFazxmDDxMDZ2c5Y+eIBb9a2xOqbJtvWisx6Qtmtppbv+Y+UHEHIs22csGni6fc6yZigVn0fWZnaf8W4ALU5mC+Pkg29JLArdKuFMnZBlPqbM7lbyitD7KmgHnsz02Q1cKs8wlo+4C7QWnPaPc5y8W+NcAQruU='
+    )
+
 if not LOCAL:
     boto3.setup_default_session(profile_name='team4-dev')
     s3_client = boto3.client('s3')
@@ -227,7 +229,7 @@ def list_objs():
         return False
     
     
-def delete_file(obj_path):
+def delete_file(BUCKETNAME, obj_path):
     """
     Deletes a file from an S3 bucket.
 

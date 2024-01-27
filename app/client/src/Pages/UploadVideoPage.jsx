@@ -121,9 +121,9 @@ const UploadVideoPage = () => {
     const videoData = new FormData();
     setLoad(true);
     videoData.append('file', backend, 'videoFile.mp4');
-    axios.post("http://localhost:8080/bucket/blurRequest", videoData)
-      .then((response) => {
-      const mediablob = new Blob(response.data,{type: "video/mp4"});
+    axios.post("http://localhost:8080/bucket/blurRequest", videoData, { responseType: 'arraybuffer' })
+    .then((response) => {
+      const mediablob = new Blob([response.data], { type: "video/mp4" });
       setBackend(mediablob);
       setFile(URL.createObjectURL(mediablob));
       setLoad(false);

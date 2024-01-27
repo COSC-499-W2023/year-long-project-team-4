@@ -122,7 +122,7 @@ def parallel_detect_faces(video_path, frame_skip,video_out_path):
 
 def process_video(upload_path):
     
-    start = time.time() #//for timing the entire video 
+    start = time.time() # for timing the entire video 
     frame_skip = 5
     
     # Generate the video_out_path using the video name
@@ -134,7 +134,7 @@ def process_video(upload_path):
     parallel_detect_faces(upload_path,frame_skip,video_out_path)
     integrate_audio(upload_path, video_out_path)
     end = time.time()
-    print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n") #//printing the speed 
+    print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n") # printing the speed 
     
 if __name__ == "__main__":
     process_video(upload_path = r"C:\Users\Gauth\COSC499\year-long-project-team-4\tests\AudioTest.mp4")

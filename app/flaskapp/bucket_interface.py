@@ -166,4 +166,4 @@ def processVideo():
     
     blurred_upload_path = os.path.join(upload_directory, 'blurred_' + file.filename)  
     print(f'blurred_upload_path: {blurred_upload_path}')
-    return send_file(blurred_upload_path, as_attachment=True, mimetype='/video/mp4')
+    return send_file(blurred_upload_path, as_attachment=True, mimetype='video/mp4')

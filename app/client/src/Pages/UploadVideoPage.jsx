@@ -121,12 +121,8 @@ const UploadVideoPage = () => {
     const videoData = new FormData();
     setLoad(true);
     videoData.append('file', backend, 'videoFile.mp4');
-    axios.post("/blurRequest", videoData, {
-     withCredentials: true,
-     headers: {
-       'Content-Type': 'multipart/form-data'
-     },
-    }).then((response) => {
+    axios.post("http://localhost:8080/bucket/blurRequest", videoData)
+      .then((response) => {
       const mediablob = new Blob(response,{type: "video/mp4"});
       setBackend(mediablob);
       setFile(URL.createObjectURL(mediablob));
@@ -223,13 +219,15 @@ const UploadVideoPage = () => {
               </>
               ):(
                 <Fade>
-                  <video 
-                    className="record"
-                    src={file}
-                    width="400" 
-                    height="225" 
-                    controls
-                  />
+                  {load? (
+                  <>
+                    <Spinner variant="primary" animation="grow" />
+                  </>
+                  ):(
+                  <video  width="400" height="225" controls>
+                    <source src={file} type="video/mp4"/>
+                  </video>
+                  )}
                 </Fade> 
               )}
             </div>
@@ -243,6 +241,7 @@ const UploadVideoPage = () => {
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
           </Form.Group>
+          <Button onClick={()=>{handleBlur()}} disabled={file? false : true}>Blur video</Button> {' '}
           <Button type="submit">Send video</Button>
         </Form>
         ):
@@ -270,7 +269,7 @@ const UploadVideoPage = () => {
           <>
           {file === null? 
           (<Fade>
-            <Webcam  width="400" height="225" audio={false} ref={webcamRef}/>
+            <Webcam  width="400" height="225" audio={true} ref={webcamRef}/>
            </Fade>
             ):(
             <Fade>
@@ -298,7 +297,7 @@ const UploadVideoPage = () => {
           <div className="mb-2">
             <Button className="mt-2" onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}
             <Button className="mt-2" onClick={()=>{handleRetake()}} disabled={disable}>Retake video</Button> {' '}
-            <Button className="mt-2" onClick={()=>{handleBlur(recordedChunks)}} disabled={disable}>Blur video</Button> {' '}
+            <Button className="mt-2" onClick={()=>{handleBlur()}} disabled={disable}>Blur video</Button> {' '}
             <Button className="mt-2"type="submit" disabled={disable}>Send video</Button>
           </div> 
         </Form>   

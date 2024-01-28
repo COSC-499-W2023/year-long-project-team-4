@@ -81,3 +81,14 @@ def test_logout(client):
 
     current_user = json.loads(client.get('/auth/currentuser').data.decode('utf-8'))
     assert 'error' in current_user # Ensure we are not currently logged in
+
+def test_get_user_details(client):
+    assert database.resetTable(tableName="userprofile")
+    post_object = {'email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+
+    client.post('/auth/signup', data=post_object)
+    response = json.loads(client.get('/auth/userdetails').data.decode('utf-8'))
+
+    assert response['email'] == post_object['email']
+    assert response['firstname'] == post_object['firstname']
+    assert response['lastname'] == post_object['lastname']

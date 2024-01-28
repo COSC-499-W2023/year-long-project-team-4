@@ -92,3 +92,14 @@ def get_current_user():
     if 'email' in session:
         return jsonify({'email': session['email']}), 200
     return jsonify({'error': 'No user currently logged in'}), 401
+
+
+@auth.route('/userdetails')
+def get_user_details():
+    if 'email' in session:
+        email = session['email']
+        query_results = database.query_records(table_name='userprofile', fields='firstname, lastname', condition=f'email = %s', condition_values=(email,))[0]
+        firstname = query_results['firstname']
+        lastname = query_results['lastname']
+        return jsonify({'firstname': firstname, 'lastname': lastname, 'email': email}), 200
+    return jsonify({'error': 'No user currently logged in'}), 401

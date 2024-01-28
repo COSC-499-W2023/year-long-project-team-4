@@ -20,6 +20,8 @@ def signup():
         return jsonify({'error': 'Missing email'}), 400
     if password is None:
         return jsonify({'error': 'Missing password'}), 400
+    if password == '':
+        return jsonify({'error': 'Password must be non-empty'}), 400
     if firstname is None:
         return jsonify({'error': 'Missing first name'}), 400
     if lastname is None:

@@ -30,7 +30,7 @@ try {
 
   const data = response.data;
 
-  if (data.username) {
+  if (data.email) {
     console.log('Signup successful');
     navigate(loginPath); // navigate to login after successful registration.
   } else {

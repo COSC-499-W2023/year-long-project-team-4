@@ -125,7 +125,7 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
         return result
 
 
-def update_user(user_id:int,new_data:dict) -> int:
+def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None) -> int:
     '''
     Update user information in the database.
 
@@ -149,6 +149,16 @@ def update_user(user_id:int,new_data:dict) -> int:
     '''
     db = None
     result = 0  # Initialize the result to 0
+
+
+    # Setup our update data dictionary
+    new_data = {}
+    if new_email is not None:
+        new_data['email'] = new_email
+    if new_fname is not None:
+        new_data['firstname'] = new_fname
+    if new_lname is not None:
+        new_data['lastname'] = new_lname
     
     try:
         with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
@@ -165,13 +175,14 @@ def update_user(user_id:int,new_data:dict) -> int:
                 # Construct the SET clause dynamically based on the update_data dictionary
                 set_clause = ", ".join(f"{field} = %s" for field in new_data.keys())
 
-                query = f"UPDATE userprofile SET {set_clause} WHERE id = %s"
+                query = f"UPDATE userprofile SET {set_clause} WHERE email = %s"
                 
                 # Append the user_id to the values list
-                new_data["user_id"] = user_id
+                new_data["old_email"] = user_email
 
                 data = list(new_data.values())  # Convert the values from the dictionary to a list
                 cur.execute(query, data)
+
                 db.commit()
                 cur.close()
                 result = 1  # Set result to 1 to indicate success

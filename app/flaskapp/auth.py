@@ -87,6 +87,31 @@ def logout():
     return jsonify({'success': 'Successful logout'}), 200
 
 
+@auth.route('/updateinfo', methods=['POST'])
+def update_user_info():
+    if 'email' in session:
+        new_email = request.form.get('email')
+        if new_email == '':
+            new_email = None
+        firstname = request.form.get('firstname')
+        if firstname == '':
+            firstname = None
+        lastname = request.form.get('lastname')
+        if lastname == '':
+            lastname = None
+
+        result = database.update_user(session['email'], new_email=new_email, new_fname=firstname, new_lname=lastname)
+        if result == -1:
+            return jsonify({'error': 'Unknown error changing user info'}), 401
+
+        if new_email is not None:
+            session['email'] = new_email
+
+        return jsonify({'email': session['email']}), 200
+
+    return jsonify({'error': 'No user currently logged in'}), 401
+
+
 @auth.route('/currentuser')
 def get_current_user():
     if 'email' in session:

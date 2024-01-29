@@ -5,6 +5,7 @@ import UploadVideoPage from "./Pages/UploadVideoPage";
 import ViewVideoPage from "./Pages/ViewVideoPage";
 import RegisterPage from "./Pages/RegisterPage";
 import HomePage from "./Pages/HomePage";
+import MessagingPage from "./Pages/MessagingPage";
 import { Navbar, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import person from "./Assets/person.svg";
 import "./app.css";
@@ -17,10 +18,13 @@ import {
   viewVideoPath,
   uploadVideoPath,
   accountPath,
+  MessagingPath,
+  viewSentVideoPath,
 } from "./Path";
 import AccountPage from "./Pages/AccountPage";
 import PageNotFound from "./Pages/PageNotFound";
 import AlertGuestPage from "./Pages/AlertGuestPage";
+import ViewSentVideoPage from "./Pages/ViewSentVideoPage"
 
 function App() {
   return (
@@ -48,6 +52,8 @@ function App() {
         <Route path={uploadVideoPath} element={<UploadVideoPage />} />
         <Route path={viewVideoPath} element={<ViewVideoPage />} />
         <Route path={registerPath} element={<RegisterPage />} />
+        <Route path={MessagingPath} element={<MessagingPage />} />
+        <Route path={viewSentVideoPath} element={<ViewSentVideoPage />} />
         {/*Creating a Route element if no Route Path matches*/}
         <Route path="*" element={<PageNotFound />} />
       </Routes>

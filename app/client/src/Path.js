@@ -6,3 +6,5 @@ export const registerPath = "/Register";
 export const viewVideoPath = "/ViewVideo";
 export const uploadVideoPath = "/UploadVideo";
 export const accountPath = "/Account";
+export const MessagingPath = "/Messaging";
+export const viewSentVideoPath = "/viewSentVideo";

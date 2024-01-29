@@ -6,6 +6,7 @@ import {
   uploadVideoPath,
   loginPath,
   accountPath,
+  viewSentVideoPath,
 } from "../Path";
 import axios from 'axios';
 import {Fade} from 'react-reveal';
@@ -68,6 +69,7 @@ const ReceiveAndSendPage = () => {
         <div className="d-grid gap-2">
           <Button size="lg" href={uploadVideoPath}> Send Videos</Button>
           <Button size="lg" href={viewVideoPath}> Receive Videos</Button>
+          <Button size="lg" href={viewSentVideoPath}> Sent Videos</Button>
           <Button size="lg" onClick={handleLogout}>Logout</Button> 
         </div>
       </Fade>

@@ -3,12 +3,19 @@ import {Row, Col, Button, Modal} from 'react-bootstrap';
 import { receiveAndSendPath } from '../Path';
 import axios from 'axios';
 import {Fade} from 'react-reveal';
+import {useNavigate} from 'react-router-dom';
+import {
+    MessagingPath
+  } from "../Path";
 
 const ViewVideoPage = () => {
   
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const navigate = useNavigate();
   
   useEffect(() => {
       // Replace with the correct URL of your backend
@@ -22,8 +29,6 @@ const ViewVideoPage = () => {
               console.error('There was an error fetching the videos!', error);
           });
   }, []);
-  
-  
   
   const handleVideoClick = (videoName) => {
       const formData = new FormData();
@@ -47,7 +52,40 @@ const ViewVideoPage = () => {
       setShowVideoModal(false);
       setSelectedVideo(null);
   };
-  
+
+  const handleStartChat = (e, videoName) => {
+    e.preventDefault();
+    // Create a new FormData instance
+    const formData = new FormData();
+    formData.append('video_name', videoName); // Append the video name to the FormData
+
+    axios.post('http://localhost:8080/bucket/create_chat', formData, { 
+        withCredentials: true,
+        headers: {
+            'Content-Type': 'multipart/form-data' // Set the content type header for FormData
+        }
+    })
+    .then(response => {
+        console.log('Chat created:', response.data);
+        navigate(MessagingPath, { state: { videoName: videoName } });
+        // Handle the successful creation of the chat, e.g., showing a message or redirecting
+    })
+    .catch(error => {
+        if (error.response) {
+            console.error('Error response:', error.response.data);
+            // Check if the error is because the chat already exists
+            if (error.response.data.error === "Associated chat already exists") {
+                navigate(MessagingPath, { state: { videoName: videoName } }); // Navigate to messaging page if chat already exists
+            } else {
+                setErrorMessage(error.response.data.error || 'Error creating chat');
+            }
+        } else {
+            console.error('Error creating chat:', error);
+            setErrorMessage('Error creating chat');
+        }
+    });
+};
+
   return (
      <Fade cascade>
       <Row>
@@ -55,11 +93,14 @@ const ViewVideoPage = () => {
            <Col className="p-3">
                <div className="display-6 text-light"> Videos Viewable</div>
                {videos.map((video, index) => (
+                            <>
                           <div key={index} onClick={() => handleVideoClick(video.videoName)}>
                               <Button className='text-center mb-2' style={{minWidth: '150px'}}>
                               <p>Video{index + 1}</p>
                               </Button>
                           </div>
+                          <Button variant="info" onClick={(e) => handleStartChat(e, video.videoName)}>Start Chat</Button>
+                          </>
                       ))}
           </Col>   
       </Row>      
@@ -75,7 +116,8 @@ const ViewVideoPage = () => {
                       {selectedVideo && <video src={selectedVideo} width="100%" controls autoPlay />}
                   </Modal.Body>
           </Modal>
-     
+          {errorMessage && <div className="error-message">{errorMessage}</div>}
+            {/* ... rest of the component ... */}
      </Fade>
     )
   }

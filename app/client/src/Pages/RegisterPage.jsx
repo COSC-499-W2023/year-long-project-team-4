@@ -65,30 +65,35 @@ const handleSubmit = (e) => {
         <Form.Group className="p-3">
         <div className="row">
           <div className="col">
-            <Form.Label>First Name</Form.Label>
+            <Form.Label htmlFor='firstname'>First Name</Form.Label>
             <Form.Control
+              id='firstname'
               type="text"
               required
             />
-            <Form.Label>Last Name</Form.Label>
+            <Form.Label htmlFor='lastname'>Last Name</Form.Label>
             <Form.Control
+              id='lastname'
               type="text"
               required
             />
-            <Form.Label>Email</Form.Label>
+            <Form.Label htmlFor='email'>Email</Form.Label>
             <Form.Control
+              id='email'
               type="email"
               required
             />
           </div>
           <div className="col">
-            <Form.Label>Username</Form.Label>
+            <Form.Label htmlFor='username'>Username</Form.Label>
             <Form.Control
+              id='username'
               type="text"
               required
             />
-            <Form.Label>Password</Form.Label>
+            <Form.Label htmlFor='password'>Password</Form.Label>
             <Form.Control
+              id='password'
               type="password"
               required
             />

@@ -7,7 +7,7 @@ import pymysql
 from datetime import datetime, timezone
 
 sys.path.append(os.path.abspath('../app'))
-load_dotenv()
+load_dotenv('myenv.env')
 SSHUSER = os.getenv("SSHUSER")
 KPATH = os.getenv("KEYPATH")
 ADDRESS = os.getenv("ADDRESS")

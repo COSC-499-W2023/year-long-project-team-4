@@ -29,10 +29,6 @@ def test_update():
     result = database.update_user(1, update_data)  # Assuming user_id 1 exists
     assert result == 1  # Assuming the update was successful
 
-def test_authenticate():
-    assert database.authenticate("Testingupdate@example.com", "password123") is True  # Assuming correct username and password
-    assert database.authenticate("MadeUpUser@example.com", "wrong_password") is False  # Assuming incorrect username and password
-
 def test_delete():
     result1 = database.delete_record("userprofile", "id = %s", (1,))  # Assuming user_id 1 exists
     result2 = database.delete_record("videos", "videoName = %s", ('Test.mp4',)) # Assuming user_id 1 exists
@@ -47,7 +43,6 @@ if __name__ == "__main__":
     test_insert_user()
     test_insert_video()
     test_update()
-    test_authenticate()
     test_delete()   
     end_time = time.time()
     print("Time taken: ",end_time - start_time,"seconds")

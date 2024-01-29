@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 
 sys.path.append(os.path.abspath('../app'))
 load_dotenv()
+SSH = os.getenv("SSH") == 'True'
 SSHUSER = os.getenv("SSHUSER")
 KPATH = os.getenv("KEYPATH")
 ADDRESS = os.getenv("ADDRESS")
@@ -41,24 +42,39 @@ def get_passed_retDates() -> list:
         - int: -1 if an error occured during retrieval.
         
     """
+def get_passed_retDates() -> list:
+    """
+    Get a list of the videos needed to be deleted.
+
+    Returns:
+        - list: The videoNames with a retDate that has passed.
+        - int: -1 if an error occurred during retrieval.
+    """
     db = None
     result = []
+
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
-                ssh_username=SSHUSER,
-                ssh_pkey=KPATH, 
-                 remote_bind_address=(ADDRESS,PORT)
-        )as tunnel:
-            print("SSH Tunnel Established")
-            #Db connection string
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
-            if db:
+        if SSH:
+            # Creates the SSH tunnel to connect to the DB
+            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
+                print("SSH Tunnel Established")
+                # Db connection string using SSH tunnel
+                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
                 cur = db.cursor()
                 now = datetime.now(timezone.utc)
                 query = f"SELECT videoName FROM videos WHERE retDate <= %s"
-                cur.execute(query,(now,))
+                cur.execute(query, (now,))
                 result = cur.fetchall()
                 cur.close()
+        else:
+            # Db connection string without SSH tunnel
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
+            cur = db.cursor()
+            now = datetime.now(timezone.utc)
+            query = f"SELECT videoName FROM videos WHERE retDate <= %s"
+            cur.execute(query, (now,))
+            result = cur.fetchall()
+            cur.close()
     except Exception as e:
         print(e)
         result = -1
@@ -105,31 +121,49 @@ def retention_delete(condition: str, condition_values: tuple, obj_path: str) -> 
     
     db = None
     result = 0
+
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
-                ssh_username=SSHUSER,
-                ssh_pkey=KPATH, 
-                remote_bind_address=(ADDRESS,PORT)
-        )as tunnel:
-            print("SSH Tunnel Established")
-            #Db connection string
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
-            if db:
-                if db:
-                    cur = db.cursor()
-                    query1 = f"START TRANSACTION"
-                    cur.execute(query1)
-                    query2 = f"DELETE FROM videos WHERE {condition}"
-                    cur.execute(query2, condition_values)
-                    proceed = already_existing_file('team4-s3',obj_path)
-                    if(proceed):
-                        s3_client.delete_object(Bucket='team4-s3',Key=obj_path)
-                        db.commit()
-                        cur.close()
-                        result = 1
-                    else:
-                        db.rollback()
-                        result = -1
+        if SSH:
+            # Creates the SSH tunnel to connect to the DB
+            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
+                print("SSH Tunnel Established")
+                # Db connection string using SSH tunnel
+                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+                cur = db.cursor()
+                query1 = "START TRANSACTION"
+                cur.execute(query1)
+                query2 = f"DELETE FROM videos WHERE {condition}"
+                cur.execute(query2, condition_values)
+                proceed = already_existing_file('team4-s3', obj_path)
+                
+                if proceed:
+                    # Delete the object from S3
+                    s3_client.delete_object(Bucket='team4-s3', Key=obj_path)
+                    db.commit()
+                    cur.close()
+                    result = 1
+                else:
+                    db.rollback()
+                    result = -1
+        else:
+            # Db connection string without SSH tunnel
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
+            cur = db.cursor()
+            query1 = "START TRANSACTION"
+            cur.execute(query1)
+            query2 = f"DELETE FROM videos WHERE {condition}"
+            cur.execute(query2, condition_values)
+            proceed = already_existing_file('team4-s3', obj_path)
+            
+            if proceed:
+                # Delete the object from S3
+                s3_client.delete_object(Bucket='team4-s3', Key=obj_path)
+                db.commit()
+                cur.close()
+                result = 1
+            else:
+                db.rollback()
+                result = -1
     except Exception as e:
         print(e)
         result = -1

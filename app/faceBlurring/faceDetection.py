@@ -4,6 +4,7 @@ import time
 from moviepy.editor import VideoFileClip
 import os
 import concurrent.futures
+import subprocess
 boto3.setup_default_session(profile_name='team4-dev')
 
 
@@ -48,10 +49,17 @@ def blur_faces_opencv(frame, face_details):
     #print(f"BLUR CALL TIME: {end-start} seconds\n")
     return image
 
+# Code snippet from: https://github.com/aws-samples/rekognition-video-people-blurring-cdk/blob/bf7c1625ec2571c19889c141aef5615bcec30d6d/stack/lambdas/rekopoc-apply-faces-to-video-docker/video_processor.py#L91
 def integrate_audio(original_video, output_video, audio_path=os.path.dirname(__file__)+'/temp/audio.mp4'):
     # Extract audio
+    cap = cv2.VideoCapture(original_video)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    totalFrames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
     print(original_video)
-    my_clip = VideoFileClip(original_video)
+    my_clip = VideoFileClip(original_video, fps_source=fps)
+    my_clip.set_duration(totalFrames//fps)
+    # my_clip.set_fps(fps)
+    
     print(my_clip)
     my_clip.audio.write_audiofile(audio_path,codec='libmp3lame')
 
@@ -70,7 +78,7 @@ def integrate_audio(original_video, output_video, audio_path=os.path.dirname(__f
 def parallel_detect_faces(video_path, frame_skip,video_out_path):
     cap = cv2.VideoCapture(video_path)
     input_fps = cap.get(cv2.CAP_PROP_FPS)
-
+    print(f"Input FPS: {input_fps}\n\n\n\n\n\n")
     # Sample frames
     sampled_frames = []
     face_details_dict = {}
@@ -122,8 +130,9 @@ def parallel_detect_faces(video_path, frame_skip,video_out_path):
 
 def process_video(upload_path):
     
+
     start = time.time() # for timing the entire video 
-    frame_skip = 5
+    frame_skip = 3
     
     # Generate the video_out_path using the video name
     base = os.path.basename(upload_path)

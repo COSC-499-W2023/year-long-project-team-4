@@ -193,7 +193,8 @@ Completed:
 
 ## Tasks Completed:
 
-![2Week3act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/e002d21c-a8e0-4e41-97b1-45cf5a081b0b)
+![2Week3act](ttps://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/ce9d834b-0d20-4e66-a333-e8ca0094f81d)
+
 
 
 

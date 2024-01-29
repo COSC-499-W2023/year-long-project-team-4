@@ -41,6 +41,14 @@
 ### Database changes Tests:
 ![db_changes_test](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/cf3b2528-4c78-4121-bb47-4c5b1d475fdd)
 
+### Frontend Pages updated Tests:
+
+<img width="962" alt="Screen Shot 2024-01-28 at 11 06 57 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/dd20642c-09fe-47e9-8d7f-cac0c49e9998">
+
+<img width="969" alt="Screen Shot 2024-01-28 at 11 07 08 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/fd4de2ed-e509-42b1-8e2d-d279a2cab463">
+
+Still getting some console warnings which will be attended to in the next week.
+
 
 
 

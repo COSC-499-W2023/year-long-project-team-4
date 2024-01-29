@@ -10,7 +10,7 @@
 **Work performed (Monday - Sunday) Jan 22 - Jan 28:**
 * Deleting old content tied to keys that are no longer active
 * Face Blurring Integration
-* Chat feature Integrat
+* Chat feature Integrate
 * Frontend UI upgrades 
 
 **Milestone Recap:** 

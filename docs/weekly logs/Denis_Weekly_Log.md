@@ -245,3 +245,25 @@ Completed:
 
 Additional Context:
 - N/A
+
+# Term 2 Week 3: Jan 22 - Jan 28 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![weeklyLog](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/ea5fe67f-f555-4014-8018-852b1a764f8e)
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Face Blurring integration
+- prepare for containerization 
+
+Tasks from the Project Board:
+- Face blurring
+- Dockerizing
+
+Completed:
+- Got face blurring integrated with the front-end, only using uploaded video and not live stream video. 
+- Added local flag for SSH tunnel and corrected database code to reflect that. Plus requirement.txt gathering for docker
+
+Additional Context:
+- N/A

@@ -115,5 +115,18 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 # In progress: 
 - Add features such as UI for blurring a video.
 
+# Term 2 Week 3: Jan 21st - 28th
+
+## Tasks Completed: 
+![term2_week3](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/f2f7f167-5486-4179-83bb-ec28b4e19d50)
+
+- fixed more bugs
+- added reset password pages
+- Paritlal adding blurring to frontend (upload video works but recording does not).
+
+# In progress: 
+- Deal with recording part of the blurring in the frontend.
+- Deal with more bugs as they come along. 
+
 
   

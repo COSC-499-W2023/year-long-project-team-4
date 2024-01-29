@@ -240,3 +240,26 @@ Completed:
 
 Additional Context:
 - N/A
+
+
+# Term 2 Week 3: Jan 22 - Jan 28 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="1089" alt="Screen Shot 2024-01-28 at 11 12 56 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/cb98f538-93df-40eb-b27a-3846cb608192">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Chat feature frontend
+- Chat feature integration
+
+Tasks from the Project Board:
+- Creating Chats
+- Encryption/Decryption of Chats
+
+Completed:
+- Got basic frontend and UI for the chat feature working
+- Integrated the backend chat encryption/decryption endpoints to achieve the chat feature
+
+Additional Context:
+- Will work on adding websocket implementation using Socket.io mostly to enable real time update of chats
+- I was quite sick this week but was still able to work on the majority of my tasks

@@ -176,3 +176,19 @@ Things I worked on:
 Tasks from the project board relevant to things I worked on:
 - Creating chats
 - Encryption / decryption of chats
+
+
+# Term 2 Week (3): Jan 21 - Jan 28
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/5daab21a-efa8-4ad8-941e-cbad259799cb)
+
+## Goal Recap:
+Things I worked on:
+- Add backend support for changing user details such as email and name
+- Testcases for changing user details to ensure users still have access to their proper videos and chats
+- Switch username dependent stuff to email to get rid of usernames
+- Add backend endpoint for fetching user details
+  
+Tasks from the project board relevant to things I worked on:
+- Cleanup / stuff that needed to be changed that weren't project board

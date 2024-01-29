@@ -188,3 +188,24 @@ Completed:
 - Started testing
 - Had to make a lot of changes to update them with more current code, first function no longer deletes videos and just removes user's access
 - Made databaseUtil function to zero out keys
+
+# Week 3: Jan 22 - Jan 28
+
+## Tasks Completed:
+
+![2Week3act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/e002d21c-a8e0-4e41-97b1-45cf5a081b0b)
+
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Creating function that removes user's access to their videos when user changes password while logged out (forgot password)
+- Creating fuction to re-encrypt videos with new key when password changed while logged in
+- Web hosting (running project on ec2 instance)
+
+Completed:
+- Had to update both functions to be up to date with current project changes
+- Ran into bugs when testing changing password while logged in (with regards to encryption and aes keys) so I fixed those
+- Completed all testing (tests pass) and made pull request
+- Made ec2 instance for web hosting, still need to tunnel in to it

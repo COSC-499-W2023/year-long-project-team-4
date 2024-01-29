@@ -344,7 +344,7 @@ def change_password_reencrypt():
             retention_date = database.query_records(table_name='videos', fields='retDate', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]['retDate']
             aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
             receiver_email = database.query_records(table_name='videos', fields='receiverEmail', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]['receiverEmail']
-            video_path = f'/videos/{receiver_email}/{videos1["videoName"]}'
+            video_path = f'/videos/{videos1["videoName"]}'
             object_content = s3Bucket.get_object_content(video_path)
             decrypted_video = aes_decrypt_video(object_content, aes_key)
             s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
@@ -377,7 +377,7 @@ def change_password_reencrypt():
             video_details = database.query_records(table_name='videos', fields='retDate, senderEmail', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]
             encrypted_aes_key = query_result['receiverEncryption']
             aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
-            video_path = f'/videos/{user_email}/{videos2["videoName"]}'
+            video_path = f'/videos/{videos2["videoName"]}'
             object_content = s3Bucket.get_object_content(video_path)
             decrypted_video = aes_decrypt_video(object_content, aes_key)
             s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
@@ -428,7 +428,7 @@ def set_verificationcode():
     database.update_user(user_id,update_data)
     #Save code locally if Local is true
     if LOCAL:
-        obj_path = f"/verificationCode/{email}"
+        obj_path = f"/verificationCode"
         completeName = os.path.join(obj_path, "code.txt")   
         file = open(completeName, "w")
         file.write(created_code)

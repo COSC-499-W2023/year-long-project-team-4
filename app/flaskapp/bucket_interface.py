@@ -156,7 +156,8 @@ def processVideo():
     if file is None:
         return 'No file found'
     upload_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'faceBlurring', 'temp'))    
-    upload_path = os.path.join(upload_directory,file.filename)
+    video_name = str(uuid.uuid4())+".mp4"
+    upload_path = os.path.join(upload_directory,video_name)
     file.save(upload_path)
     print(f'upload_directory: {upload_directory}')
     print(f'upload_path: {upload_path}')
@@ -164,6 +165,6 @@ def processVideo():
 
     faceBlurring.process_video(upload_path)
     
-    blurred_upload_path = os.path.join(upload_directory, 'blurred_' + file.filename)  
+    blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)  
     print(f'blurred_upload_path: {blurred_upload_path}')
     return send_file(blurred_upload_path, as_attachment=True, mimetype='video/mp4')

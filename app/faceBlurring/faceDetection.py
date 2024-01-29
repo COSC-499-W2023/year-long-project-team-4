@@ -7,8 +7,6 @@ import concurrent.futures
 import subprocess
 boto3.setup_default_session(profile_name='team4-dev')
 
-
-
 def detect_faces(VideoFrame):
     #start = time.time()
     rek_client = boto3.client('rekognition')
@@ -53,11 +51,11 @@ def blur_faces_opencv(frame, face_details):
 def integrate_audio(original_video, output_video, audio_path=os.path.dirname(__file__)+'/temp/audio.mp4'):
     # Extract audio
     cap = cv2.VideoCapture(original_video)
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    totalFrames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
-    print(original_video)
-    my_clip = VideoFileClip(original_video, fps_source=fps)
-    my_clip.set_duration(totalFrames//fps)
+    #fps = cap.get(cv2.CAP_PROP_FPS)
+    #totalFrames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    #print(original_video)
+    my_clip = VideoFileClip(original_video)
+
     # my_clip.set_fps(fps)
     
     print(my_clip)

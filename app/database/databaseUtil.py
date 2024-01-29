@@ -363,15 +363,20 @@ def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
             db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database='Team4dbTest')
             if db:
                 cur = db.cursor()
-                #Create set clause depending on whether user is sender or reciever
+                #Create set clause depending on whether user is sender or receiver
                 if (sender):
-                    set_clause = "senderEncryption = 0"
-                elif (reciever):
-                    set_clause = "recieverEncryption = 0"
+                    set_clause = "senderEncryption = 0, senderEmail = NULL"
+                elif (receiver):
+                    set_clause = "recieverEncryption = 0, receiverEmail = NULL"
                 else:
                     result = -1
                 query = f"UPDATE videos SET {set_clause} WHERE videoName = %s"
                 cur.execute(query, videoName)   
+                # Check if video has chats associated with it and removes user's access
+                query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoName,))
+                if query_results:
+                    query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
+                    cur.execute(query2, videoName) 
                 cur.close()
                 result = 1  # Set result to 1 to indicate success
     except Exception as e:

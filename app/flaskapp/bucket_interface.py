@@ -24,6 +24,11 @@ from . import bcrypt
 
 bucket = Blueprint('bucket', __name__)
 
+ACCESS_KEY = os.getenv("ACCESSKEY")
+SECRET_KEY = os.getenv('SECRETKEY')
+SESSION_TOKEN = os.getenv('SESSTOKEN')
+LOCAL = os.getenv('LOCAL') == 'True'
+
 ses_client = boto3.client(
     'ses', 
     region_name='ca-central-1',
@@ -32,6 +37,12 @@ ses_client = boto3.client(
     aws_session_token=SESSION_TOKEN
     )
 
+if not LOCAL:
+    boto3.setup_default_session(profile_name='team4-dev')
+    ses_client = boto3.client('ses')
+else:
+    if not os.path.isdir('verificationCode'):
+        os.mkdir('verificationCode')
 
 def get_public_key(email):
     try:
@@ -409,11 +420,20 @@ def set_verificationcode():
     email = request.form.get('email')
     if email is None:
         return jsonify({'error': 'Missing email'}), 400
+    
     #Create verification code
     created_code = ''.join(random.choices(string.digits, k=6))
     update_data = {'verifyKey': f'{created_code}'}
     user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(email,))[0]['id']
     database.update_user(user_id,update_data)
+    #Save code locally if Local is true
+    if LOCAL:
+        obj_path = f"/verificationCode/{email}"
+        completeName = os.path.join(obj_path, "code.txt")   
+        file = open(completeName, "w")
+        file.write(created_code)
+        file.close()
+        return jsonify({"status": "success", "message": "code saved locally"}), 200
     #Send user an email with code
     try:
         response = ses_client.send_email(

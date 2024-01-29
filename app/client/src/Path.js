@@ -6,3 +6,6 @@ export const registerPath = "/Register";
 export const viewVideoPath = "/ViewVideo";
 export const uploadVideoPath = "/UploadVideo";
 export const accountPath = "/Account";
+export const changePasswordPath = "/PasswordChange";
+export const passwordCodePath = "/PasswordCode";
+export const resetPasswordPath = "/PasswordReset";

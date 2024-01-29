@@ -6,6 +6,7 @@ import {
   guestPath,
   receiveAndSendPath,
   registerPath,
+  changePasswordPath,
 } from "../Path";
 import axios from 'axios'
 import see from '../Assets/eye.svg';
@@ -91,6 +92,9 @@ const LoginHomePage = () => {
           </div>    
           <div className="col"> 
             <a href={registerPath}>No account?</a>
+          </div>
+          <div className="col"> 
+            <a href={changePasswordPath}>Forgot password?</a>
           </div>
         </div>
       </Fade>

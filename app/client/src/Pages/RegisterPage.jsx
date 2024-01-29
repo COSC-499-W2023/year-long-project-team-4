@@ -30,7 +30,7 @@ try {
 
   const data = response.data;
 
-  if (data.username) {
+  if (data.email) {
     console.log('Signup successful');
     navigate(loginPath); // navigate to login after successful registration.
   } else {
@@ -50,10 +50,10 @@ try {
 
 const handleSubmit = (e) => {
     e.preventDefault();
-    const firstname = e.target.elements[0].value;  // Assuming the first input is the username
+    const firstname = e.target.elements[0].value; 
     const lastname = e.target.elements[1].value;
     const email = e.target.elements[2].value;
-    const password = e.target.elements[4].value;  // Assuming the second input is the password
+    const password = e.target.elements[3].value;  // Assuming the second input is the password
     handleSignup(firstname,lastname, email, password);
 };
 

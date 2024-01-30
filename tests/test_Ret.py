@@ -14,8 +14,8 @@ def test_reset():
     assert database.resetTable("videos") is True
     
     #Added this in since we refresh the table, we want to make sure there are user IDs for receivers
-    database.insert_user("test_user", "updated@example.com", "password123", "John", "Doe","","")
-    database.insert_user("MadeUpUser", "Test@example.com", "password12233", "John", "Doe","","")
+    database.insert_user("updated@example.com", "password123", "John", "Doe","","")
+    database.insert_user("Test@example.com", "password12233", "John", "Doe","","")
     
 def test_passed_retDates():
     result1 = database.get_passed_retDates()

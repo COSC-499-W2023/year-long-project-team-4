@@ -72,16 +72,17 @@ useEffect(() => {
         
               if (response.data.email) {
                 setCurrentUser(response.data.email);
+              if (response.data.email) {
+                setCurrentUser(response.data.email);
               } else {
                 console.error('No user currently logged in');
               }
+            }
             } catch (error) {
               console.error('There was an error fetching the current user', error);
             }
-          };
-        
           fetchCurrentUser();
-}, []);
+}});
 
 return (
    <div className="container p-4">
@@ -120,6 +121,7 @@ return (
             <div className="display-6 text-center"> Account Info </div>
             <Col className="p-4 fs-5">
               <ListGroup variant="flush">
+                <ListGroup.Item> Email: {email}</ListGroup.Item>
                 <ListGroup.Item> Email: {email}</ListGroup.Item>
                 <ListGroup.Item> First Name: {firstName}</ListGroup.Item>
                 <ListGroup.Item> Last Name: {lastName}</ListGroup.Item>

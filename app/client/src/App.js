@@ -7,6 +7,7 @@ import UploadVideoPage from "./Pages/UploadVideoPage";
 import ViewVideoPage from "./Pages/ViewVideoPage";
 import RegisterPage from "./Pages/RegisterPage";
 import HomePage from "./Pages/HomePage";
+import MessagingPage from "./Pages/MessagingPage";
 import ForgotPasswordPage from "./Pages/ForgotPasswordPage";
 import PasswordCodePage from "./Pages/PasswordCodePage";
 import { Navbar, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -21,6 +22,8 @@ import {
   viewVideoPath,
   uploadVideoPath,
   accountPath,
+  MessagingPath,
+  viewSentVideoPath,
   changePasswordPath,
   passwordCodePath,
   resetPasswordPath,
@@ -28,6 +31,7 @@ import {
 import AccountPage from "./Pages/AccountPage";
 import PageNotFound from "./Pages/PageNotFound";
 import AlertGuestPage from "./Pages/AlertGuestPage";
+import ViewSentVideoPage from "./Pages/ViewSentVideoPage"
 import ResetPasswordPage from "./Pages/ResetPasswordPage";
 
 function App() {
@@ -85,6 +89,8 @@ function App() {
         <Route path={uploadVideoPath} element={<UploadVideoPage />} />
         <Route path={viewVideoPath} element={<ViewVideoPage />} />
         <Route path={registerPath} element={<RegisterPage />} />
+        <Route path={MessagingPath} element={<MessagingPage />} />
+        <Route path={viewSentVideoPath} element={<ViewSentVideoPage />} />
         <Route path={accountPath} element={<AccountPage />} />
         <Route path={changePasswordPath} element={<ForgotPasswordPage />} />
         <Route path={passwordCodePath} element={<PasswordCodePage />} />

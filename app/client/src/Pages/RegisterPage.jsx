@@ -65,13 +65,15 @@ const handleSubmit = (e) => {
         <Form.Group className="p-3">
         <div className="row">
           <div className="col">
-            <Form.Label>First Name</Form.Label>
+            <Form.Label htmlFor='firstname'>First Name</Form.Label>
             <Form.Control
+              id='firstname'
               type="text"
               required
             />
             <Form.Label>Email</Form.Label>
             <Form.Control
+              id='email'
               type="email"
               required
             />
@@ -79,6 +81,7 @@ const handleSubmit = (e) => {
           <div className="col">
           <Form.Label>Last Name</Form.Label>
             <Form.Control
+              id='username'
               type="text"
               required
             />

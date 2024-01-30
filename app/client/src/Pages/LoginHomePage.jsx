@@ -29,7 +29,6 @@ const LoginHomePage = () => {
         },
         withCredentials: true
       });
-  
       if (response.data.email) {
         setCurrentUser(response.data.email);
         navigate(receiveAndSendPath);
@@ -65,6 +64,7 @@ const LoginHomePage = () => {
           <Form.Group className="p-3">
             <Form.Label>Email</Form.Label>
             <Form.Control
+              id='username'
               type="text"
               required
             />

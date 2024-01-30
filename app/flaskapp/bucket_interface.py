@@ -284,8 +284,7 @@ def retrieve_chat():
     chat_data.seek(0)
 
     return send_file(chat_data, mimetype='application/json'), 200
-
-
+  
 @bucket.route('/blurRequest', methods=['POST'])
 def processVideo():
     file = request.files.get('file')

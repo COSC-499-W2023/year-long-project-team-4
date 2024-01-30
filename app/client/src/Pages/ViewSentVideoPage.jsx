@@ -2,13 +2,14 @@ import React, {useState, useEffect} from 'react';
 import {Row, Col, Button, Modal} from 'react-bootstrap';
 import { receiveAndSendPath } from '../Path';
 import axios from 'axios';
+// Animation library for smooth transitions
 import {Fade} from 'react-reveal';
 import {useNavigate} from 'react-router-dom';
 import {
     MessagingPath
   } from "../Path";
 
-const ViewVideoPage = () => {
+const ViewSentVideoPage = () => {
   
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -17,9 +18,9 @@ const ViewVideoPage = () => {
 
   const navigate = useNavigate();
   
-  //Fetch videos on component mount
+  // Fetch sent videos on component mount
   useEffect(() => {
-      axios.get('http://localhost:8080/bucket/getvideos', {
+      axios.get('http://localhost:8080/bucket/get_sent_videos', {
           withCredentials: true})
           .then(response => {
               setVideos(response.data);
@@ -30,7 +31,7 @@ const ViewVideoPage = () => {
           });
   }, []);
   
-  //Opens the video in a modal
+  // Handles video selection and retrieves video URL
   const handleVideoClick = (videoName) => {
       const formData = new FormData();
       formData.append('video_name', videoName);
@@ -54,21 +55,19 @@ const ViewVideoPage = () => {
       setSelectedVideo(null);
   };
 
-  //Function for starting a new chat
+  // Handles the creation of a chat associated with a video
   const handleStartChat = (e, videoName) => {
     e.preventDefault();
-
+    // Create a new FormData instance
     const formData = new FormData();
-    formData.append('video_name', videoName); // Append the video name to the FormData
+    formData.append('video_name', videoName); 
 
-    //POST request to create a new chat room
     axios.post('http://localhost:8080/bucket/create_chat', formData, { 
         withCredentials: true,
         headers: {
             'Content-Type': 'multipart/form-data'
         }
     })
-    //redirect to Messaging Page after creating the chat
     .then(response => {
         console.log('Chat created:', response.data);
         navigate(MessagingPath, { state: { videoName: videoName } });
@@ -92,9 +91,9 @@ const ViewVideoPage = () => {
   return (
      <Fade cascade>
       <Row>
-          <div className="display-4 text-center text-light"> Receive Videos </div>
+          <div className="display-4 text-center text-light"> Sent Videos </div>
            <Col className="p-3">
-               <div className="display-6 text-light"> Videos Viewable</div>
+               <div className="display-6 text-light"> Videos</div>
                {videos.map((video, index) => (
                             <>
                           <div key={index} onClick={() => handleVideoClick(video.videoName)}>
@@ -124,4 +123,4 @@ const ViewVideoPage = () => {
     )
   }
   
-  export default ViewVideoPage
+  export default ViewSentVideoPage

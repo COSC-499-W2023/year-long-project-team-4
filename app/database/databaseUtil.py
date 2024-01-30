@@ -20,12 +20,11 @@ TEST = os.getenv("TEST")
 if(TEST.lower() == "true"):
     DBNAME = 'Team4dbTest'
 
-def insert_user(username:str, email:str, password:str, firstname:str, lastname:str, salthash, pubKey) -> int:
+def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, pubKey) -> int:
     '''
     Insert a new user into the database.
 
     Args:
-        username (str): The username of the new user.
         email (str): The email address of the new user.
         password (str): The hashed password of the new user.
         firstname (str): The first name of the new user.
@@ -38,7 +37,7 @@ def insert_user(username:str, email:str, password:str, firstname:str, lastname:s
 
     Example:
         # Example usage to insert a new user into the database
-        result = insert_user("new_username", "new_email", "hashed_password", "John", "Doe")
+        result = insert_user("new_email", "hashed_password", "John", "Doe")
     '''
     db = None
     result = None
@@ -51,9 +50,9 @@ def insert_user(username:str, email:str, password:str, firstname:str, lastname:s
                 if db:
                     cur = db.cursor()
                     #Insert String
-                    query = "INSERT INTO userprofile (username, email, password_hash, firstname, lastname,salthash, publickey) values (%s,%s,%s,%s,%s,%s,%s)"
+                    query = "INSERT INTO userprofile (email, password_hash, firstname, lastname,salthash, publickey) values (%s,%s,%s,%s,%s,%s)"
                     #Creates list of the insertations
-                    data = (username,email,password,firstname,lastname, salthash, pubKey)
+                    data = (email,password,firstname,lastname, salthash, pubKey)
                     #Executes the query w/ the corrosponding data
                     cur.execute(query,data)
                     print("Insertation Complete")
@@ -272,12 +271,12 @@ def delete_record(table_name: str, condition: str, condition_values: tuple) -> i
         return result
     
     
-def authenticate(username: str, password: str) -> bool: 
+def authenticate(email: str, password: str) -> bool: 
     """
     Authenticate a user by checking if the provided password matches the password stored in the database.
 
     Args:
-        username (str): The username of the user to authenticate.
+        email (str): The email of the user to authenticate.
         password (str): The password provided by the user for authentication.
 
     Returns:
@@ -295,8 +294,8 @@ def authenticate(username: str, password: str) -> bool:
             db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
             if db:
                 cur = db.cursor()
-                query = "SELECT password_hash FROM userprofile WHERE username = %s"
-                cur.execute(query, (username,))
+                query = "SELECT password_hash FROM userprofile WHERE email = %s"
+                cur.execute(query, (email,))
                 stored_password = cur.fetchone()
 
                 if stored_password and stored_password[0] == password:

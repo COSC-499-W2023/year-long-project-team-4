@@ -11,8 +11,8 @@ def test_reset():
     assert database.resetTable("videos") is True
 
 def test_insert_user():
-    result1 = database.insert_user("test_user", "updated@example.com", "password123", "John", "Doe","","")
-    result2 = database.insert_user("MadeUpUser", "Test@example.com", "password12233", "John", "Doe","","")
+    result1 = database.insert_user("updated@example.com", "password123", "John", "Doe","","")
+    result2 = database.insert_user("Test@example.com", "password12233", "John", "Doe","","")
 
     assert result1 == 1  # Assuming insertion was successful
     assert result2 == 1  # Assuming insertion was successful
@@ -24,15 +24,14 @@ def test_insert_video():
 
 def test_update():
     update_data = {
-        "username": "updated_user",
         "email": "Testingupdate@example.com"
     }
     result = database.update_user(1, update_data)  # Assuming user_id 1 exists
     assert result == 1  # Assuming the update was successful
 
 def test_authenticate():
-    assert database.authenticate("updated_user", "password123") is True  # Assuming correct username and password
-    assert database.authenticate("MadeUpUser", "wrong_password") is False  # Assuming incorrect username and password 
+    assert database.authenticate("Testingupdate@example.com", "password123") is True  # Assuming correct username and password
+    assert database.authenticate("MadeUpUser@example.com", "wrong_password") is False  # Assuming incorrect username and password
 
 def test_delete():
     result1 = database.delete_record("userprofile", "id = %s", (1,))  # Assuming user_id 1 exists

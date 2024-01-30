@@ -12,18 +12,16 @@ const [currentUser, setCurrentUser] = useState(null);
 const [key, setKey] = useState('videos');
 const handleSubmit = (e) => {
     e.preventDefault();
-    const firstname = e.target.elements[0].value;  // Assuming the first input is the username
+    const firstname = e.target.elements[0].value;
     const lastname = e.target.elements[1].value;
     const email = e.target.elements[2].value;
-    const username = e.target.elements[3].value;
   }
 const handleDelete = () =>{
 
 }
-const userName = currentUser;
 const firstName = "firstname123";
 const lastName = "lastname123";
-const email = "email123@email.com";
+const email = currentUser;
 
 const [videos, setVideos] = useState([]);
 const [selectedVideo, setSelectedVideo] = useState(null);
@@ -72,18 +70,19 @@ useEffect(() => {
                 withCredentials: true
               });
         
-              if (response.data.username) {
-                setCurrentUser(response.data.username);
+              if (response.data.email) {
+                setCurrentUser(response.data.email);
+              if (response.data.email) {
+                setCurrentUser(response.data.email);
               } else {
                 console.error('No user currently logged in');
               }
+            }
             } catch (error) {
               console.error('There was an error fetching the current user', error);
             }
-          };
-        
           fetchCurrentUser();
-}, []);
+}});
 
 return (
    <div className="container p-4">
@@ -122,10 +121,10 @@ return (
             <div className="display-6 text-center"> Account Info </div>
             <Col className="p-4 fs-5">
               <ListGroup variant="flush">
-                <ListGroup.Item> Username: {userName}</ListGroup.Item>
+                <ListGroup.Item> Email: {email}</ListGroup.Item>
+                <ListGroup.Item> Email: {email}</ListGroup.Item>
                 <ListGroup.Item> First Name: {firstName}</ListGroup.Item>
                 <ListGroup.Item> Last Name: {lastName}</ListGroup.Item>
-                <ListGroup.Item> Email: {email}</ListGroup.Item>
               </ListGroup>
             </Col>
           </Tab>
@@ -173,8 +172,8 @@ return (
           </Tab>
           <Tab eventKey="delete" title="Delete profile">
             <div className="text-center">
-              <div className="display-6"> Are you sure you want to delete your account? </div>
-              <p className="m-3"> You will no longer be able to access any of the videos you sent or received.</p>
+              <div className="display-6 p-1"> Are you sure you want to delete your account? </div>
+              <p className="m-3 p-1"> You will no longer be able to access any of the videos you sent or received.</p>
               <Button className="m-3" href={homePath} onClick={()=>{handleDelete()}}> Delete Account</Button>
             </div>
           </Tab>

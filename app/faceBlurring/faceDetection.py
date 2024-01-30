@@ -4,8 +4,14 @@ import time
 from moviepy.editor import VideoFileClip
 import os
 import concurrent.futures
-import subprocess
-boto3.setup_default_session(profile_name='team4-dev')
+from dotenv import load_dotenv
+
+LOCAL = os.getenv('LOCAL') == 'True'
+
+if not LOCAL: # Flag for local or not
+    boto3.setup_default_session(profile_name='team4-dev')
+    s3_client = boto3.client('s3')
+
 
 def detect_faces(VideoFrame):
     #start = time.time()

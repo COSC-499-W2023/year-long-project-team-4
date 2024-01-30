@@ -8,3 +8,6 @@ export const uploadVideoPath = "/UploadVideo";
 export const accountPath = "/Account";
 export const MessagingPath = "/Messaging";
 export const viewSentVideoPath = "/viewSentVideo";
+export const changePasswordPath = "/PasswordChange";
+export const passwordCodePath = "/PasswordCode";
+export const resetPasswordPath = "/PasswordReset";

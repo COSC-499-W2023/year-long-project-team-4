@@ -15,8 +15,9 @@ const PasswordCodePage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const passcode = e.target.elements[0].value;
-    const email = e.target.elemets[1].value;  
+    const email = e.target.elements[1].value;  
     const passwordUpdated = e.target.elements[2].value; 
+    console.log(passcode+' '+email+' '+ passwordUpdated);
     handleReset(passcode, email, passwordUpdated);
     navigate(loginPath);
   }
@@ -69,14 +70,11 @@ const PasswordCodePage = () => {
                 />
             </InputGroup>
             <div className="mt-2"> Enter current email </div>
-            <InputGroup size="lg" className="mt-2">
-                <InputGroup.Text id="inputGroup-sizing-lg"> Email</InputGroup.Text>
-                <Form.Control
-                aria-label="Large"
-                type="text"
-                required
-                />
-            </InputGroup>
+            <Form.Control
+              id='email'
+              type="email"
+              required
+            />
             <div className="mt-2"> Enter new password </div>
             <InputGroup size="lg" className="mt-2">
                 <Form.Control

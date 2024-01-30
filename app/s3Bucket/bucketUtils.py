@@ -25,11 +25,13 @@ TEST = os.getenv("TEST") == 'True'
 LOCAL = os.getenv('LOCAL') == 'True'
 BUCKETNAME = os.getenv("BUCKETNAME")
 
-# s3_client = boto3.client(
-# 's3',
-# aws_access_key_id=ACCESS_KEY,
-# aws_secret_access_key=SECRET_KEY,
-# aws_session_token=SESSION_TOKEN)
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=ACCESS_KEY,
+    aws_secret_access_key=SECRET_KEY,
+    aws_session_token=SESSION_TOKEN
+    )
+
 if not LOCAL:
     boto3.setup_default_session(profile_name='team4-dev')
     s3_client = boto3.client('s3')
@@ -228,7 +230,7 @@ def list_objs():
         return False
     
     
-def delete_file(obj_path):
+def delete_file(BUCKETNAME, obj_path):
     """
     Deletes a file from an S3 bucket.
 

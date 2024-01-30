@@ -6,19 +6,41 @@ import datetime
 import uuid
 import pathlib
 import io
+import random
+import boto3
 import time
+import string
 
-from flask import Blueprint, request, session, jsonify, send_file
+from flask import Blueprint, request, session, jsonify, current_app, send_file, Flask
 from rsa import generate_key
 from Crypto import Random
 from Crypto.Cipher import AES, PKCS1_v1_5
 from Crypto.PublicKey import RSA
 
-import s3Bucket
 import database
+import s3Bucket
 import faceBlurring
+from . import bcrypt
 
 bucket = Blueprint('bucket', __name__)
+
+LOCAL = os.getenv('LOCAL') == 'True'
+
+if not LOCAL:
+    ACCESS_KEY = os.getenv("ACCESSKEY")
+    SECRET_KEY = os.getenv('SECRETKEY')
+    SESSION_TOKEN = os.getenv('SESSTOKEN')
+    ses_client = boto3.client(
+    'ses', 
+    region_name='ca-central-1',
+    aws_access_key_id=ACCESS_KEY,
+    aws_secret_access_key=SECRET_KEY,
+    aws_session_token=SESSION_TOKEN
+    )
+    boto3.setup_default_session(profile_name='team4-dev')
+else:
+    if not os.path.isdir('verificationCode'):
+        os.mkdir('verificationCode')
 
 def get_public_key(email):
     try:
@@ -90,7 +112,6 @@ def upload_video():
     encrypted_video, aes_key = aes_encrypt_video(content)
     recipient_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, recipient_public_key)
     sender_encrypted_aes_key = None
-
     # If user is guest, sender_email is empty string - otherwise, sender_email is the sender's email
     sender_email = ''
     if 'email' in session:
@@ -99,7 +120,6 @@ def upload_video():
         sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
 
     insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, dummy_retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
-
     if insert_result:
         return jsonify({'video_id': f'{video_name}'}), 200
     else:
@@ -142,7 +162,7 @@ def retrieve_video():
 def get_available_videos():
     available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
     return json.dumps(available_videos), 200
-
+    
 @bucket.route('/get_sent_videos', methods=['GET'])
 def get_sent_videos():
     available_videos = database.query_records(table_name='videos', fields='videoName, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
@@ -284,6 +304,198 @@ def retrieve_chat():
     chat_data.seek(0)
 
     return send_file(chat_data, mimetype='application/json'), 200
+
+@bucket.route('/change_password_reencrypt', methods=['POST'])
+def change_password_reencrypt():
+    new_password = request.form.get('new_password')
+    if new_password is None:
+        return jsonify({'error': 'Missing password'}), 400
+    #Make sure user is logged in
+    if 'email' in session:
+        #Get videos to reencrypt
+        old_private_key = get_private_key()
+        user_email = session['email']
+        videos_to_decrypt1 = database.query_records(table_name='videos', fields='videoName', condition=f'receiverEmail = %s', condition_values=(user_email,))
+        
+        #Repeat for sent
+        videos_to_decrypt2 = database.query_records(table_name='videos', fields='videoName', condition=f'senderEmail = %s', condition_values=(user_email,))
+           
+        #Change password, salt_hash, and pubKey
+        user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(user_email,))[0]['id']
+        if not user_id:
+            return jsonify({"error": 'Missing user_id'}), 400
+        salt_hash = os.urandom(64)
+        private_key_seed = new_password + salt_hash.hex()
+        private_key = generate_key(private_key_seed)
+        public_key = private_key.publickey().export_key('PEM')
+        hashed_password = bcrypt.generate_password_hash(new_password).decode()
+        #Insert new info into database
+        database.update_user(user_email = user_email, new_password = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+
+        #Loop through videos to reencrypt and insert back to database and s3Bucket
+        for videos1 in videos_to_decrypt2:        
+            #Decrypt
+            encrypted_aes_key = database.query_records(table_name='videos', fields='senderEncryption', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]['senderEncryption']
+            retention_date = database.query_records(table_name='videos', fields='retDate', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]['retDate']
+            aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
+            receiver_email = database.query_records(table_name='videos', fields='receiverEmail', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]['receiverEmail']
+            video_path = f'/videos/{videos1["videoName"]}'
+            object_content = s3Bucket.get_object_content(video_path)
+            decrypted_video = aes_decrypt_video(object_content, aes_key)
+            s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
+            database.delete_record("videos", "videoName = %s", videos1["videoName"])
+            #Reencrypt
+            aes_key = bytes
+            session['pkey_seed'] = private_key_seed
+            encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
+            #Insert into s3Bucket (sent videos first)
+            video_name = videos1['videoName']
+            sender_email = user_email
+                
+            sender_public_key = get_public_key(user_email)
+            sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
+            recipient_public_key = get_public_key(receiver_email)
+            recipient_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, recipient_public_key)
+            #Upload video
+            proceed = s3Bucket.already_existing_file(video_path)
+            print(sender_encrypted_aes_key) 
+            if (proceed == False):
+                s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
+            insert_video = s3Bucket.encrypt_insert(file_flag = 'videos', file_content = encrypted_video, file_name = video_name, retDate = retention_date, senderEmail = sender_email, receiverEmail = receiver_email, senderEncryption = sender_encrypted_aes_key, receiverEncryption = recipient_encrypted_aes_key)
+            
+            if insert_video == False:
+                return jsonify({"status": "error",'message': 'Video insertion failed'}), 502
+        #Repeat but for recieved videos
+        for videos2 in videos_to_decrypt1:
+            #Decrypt
+            query_result = database.query_records(table_name='videos', fields='receiverEncryption', condition=f'videoName = %s', condition_values=(videos2['videoName'],))[0]
+            video_details = database.query_records(table_name='videos', fields='retDate, senderEmail', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]
+            encrypted_aes_key = query_result['receiverEncryption']
+            aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
+            video_path = f'/videos/{videos2["videoName"]}'
+            object_content = s3Bucket.get_object_content(video_path)
+            decrypted_video = aes_decrypt_video(object_content, aes_key)
+            s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
+            database.delete_record("videos", "videoName = %s", videos2["videoName"])
+            #Reencrypt
+            session['pkey_seed'] = private_key_seed
+            aes_key = bytes
+            encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
+            print(aes_key)
+            #Insert into s3Bucket (received)
+            video_name = videos2['videoName']
+            retention_date = video_details["retDate"]
+            sender_email = video_details["senderEmail"]
+            receiver_email - user_email
+                
+            sender_public_key = get_public_key(sender_email)
+            sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
+            recipient_public_key = get_public_key(user_email)
+            recipient_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, recipient_public_key)
+            #Upload video
+            proceed = s3Bucket.already_existing_file(video_path)
+            if proceed == False:
+                s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
+            print(sender_encrypted_aes_key)  
+            insert_video = s3Bucket.encrypt_insert(file_flag = 'videos', file_content = encrypted_video, file_name = video_name, retDate = retention_date, senderEmail = sender_email, receiverEmail = receiver_email, senderEncryption = sender_encrypted_aes_key, receiverEncryption = recipient_encrypted_aes_key)    
+            if insert_video == False:
+                return jsonify({"status": "error",'message': 'Video insertion failed'}), 502
+                    
+        #Check if password has been changed
+        current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(user_email,))[0]['password_hash']
+        if current_password == hashed_password:
+            return (jsonify({"status": "success", "message": "password changed"}),200)
+        else:
+            return (jsonify({"status": "error", "message": f"password not changed {current_password}"}), 502)
+    else:
+        return jsonify({"status": "error",'message': 'User not logged in'}), 502
+                
+@bucket.route('/set_verificationcode', methods=['POST'])
+def set_verificationcode():
+    email = request.form.get('email')
+    if email is None:
+        return jsonify({'error': 'Missing email'}), 400
+    
+    #Create verification code
+    created_code = ''.join(random.choices(string.digits, k=6))
+    update_data = {'verifyKey': f'{created_code}'}
+    user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(email,))[0]['id']
+    database.update_user(user_id,update_data)
+    #Save code locally if Local is true
+    if LOCAL:
+        obj_path = f"/verificationCode"
+        completeName = os.path.join(obj_path, "code.txt")   
+        file = open(completeName, "w")
+        file.write(created_code)
+        file.close()
+        return jsonify({"status": "success", "message": "code saved locally"}), 200
+    #Send user an email with code
+    try:
+        response = ses_client.send_email(
+            Source='safemovnow@gmail.com',
+            Destination={'ToAddresses': [email]},
+            Message={
+                'Subject': {'Data': 'Password Change Verification Code'},
+                'Body': {'Text': {'Data': f'Your verification code is: {created_code}'}}
+            }
+        )
+        return jsonify({"status": "success", "message": "email sent"}), 200
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return jsonify({"error": "Failed to send verification code via email"}), 502
+                
+@bucket.route('/change_password_forgot', methods=['POST'])
+def change_password_forgot():
+    email = request.form.get('email')
+    new_password = request.form.get('new_password')
+    input_code = request.form.get('input_code')
+    old_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,))[0]['password_hash']
+    if email is None:
+        return jsonify({'error': 'Missing email'}), 400
+    if new_password is None:
+        return jsonify({'error': 'Missing password'}), 400
+    if input_code is None:
+        return jsonify({'error': 'Missing input_code'}), 400
+    if not old_password:
+        return jsonify({"error": 'Missing user_password'}), 400
+    #Get code
+    created_code = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(email,))[0]['verifyKey']
+    #Verify user input correct code
+    if input_code == created_code:
+        #Change password, salt_hash, and pubKey
+        user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(email,))[0]['id']
+        if not user_id:
+            return jsonify({"error": 'Missing user_id'}), 400
+        salt_hash = os.urandom(64)
+        private_key_seed = new_password + salt_hash.hex()
+        private_key = generate_key(private_key_seed)
+        public_key = private_key.publickey().export_key('PEM')
+        hashed_password = bcrypt.generate_password_hash(new_password).decode()
+        #Insert new info into database
+        database.update_user(user_email = email, new_password = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+        
+        #Get recieved videos that need key deleted
+        videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'receiverEmail = %s', condition_values=(email,))
+        #Loop through list, deleting files individually
+        for videos in videos_to_delete_key:
+            #Delete key from database for recieved videos
+            database.delete_key(videoName = videos['videoName'],sender =False,receiver =True)
+        #Get recieved videos that need key deleted
+        videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'senderEmail = %s', condition_values=(email,))
+        #Loop through list, deleting files individually
+        for videos in videos_to_delete_key:
+            #Delete key from database for recieved videos
+            database.delete_key(videoName = videos['videoName'],sender =True,receiver =False)
+            
+        current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,))[0]['password_hash']
+        if current_password == hashed_password:
+            return (jsonify({"status": "success", "message": "codes match, password changed"}),200)
+        else:
+            return (jsonify({"status": "error", "message": f"password not changed {current_password}"}), 502)
+    elif input_code != created_code:
+        return (jsonify({"status": "error", "message": "codes do not match"}),502)
+    else:
+        return (jsonify({"status": "error", "message": "code not found"}), 502)
   
 @bucket.route('/blurRequest', methods=['POST'])
 def processVideo():

@@ -16,6 +16,7 @@ DBUSER = os.getenv("DBUSER")
 DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
+SSH_TUNNEL_ADDRESS = os.getenv("EC2_ADDRESS")
 
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
@@ -44,7 +45,7 @@ def get_passed_retDates() -> list:
     db = None
     result = []
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
                 ssh_username=SSHUSER,
                 ssh_pkey=KPATH, 
                  remote_bind_address=(ADDRESS,PORT)
@@ -106,7 +107,7 @@ def retention_delete(condition: str, condition_values: tuple, obj_path: str) -> 
     db = None
     result = 0
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
                 ssh_username=SSHUSER,
                 ssh_pkey=KPATH, 
                 remote_bind_address=(ADDRESS,PORT)

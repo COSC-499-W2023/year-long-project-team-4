@@ -7,6 +7,8 @@ import UploadVideoPage from "./Pages/UploadVideoPage";
 import ViewVideoPage from "./Pages/ViewVideoPage";
 import RegisterPage from "./Pages/RegisterPage";
 import HomePage from "./Pages/HomePage";
+import ForgotPasswordPage from "./Pages/ForgotPasswordPage";
+import PasswordCodePage from "./Pages/PasswordCodePage";
 import { Navbar, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import person from "./Assets/person.svg";
 import "./app.css";
@@ -19,10 +21,14 @@ import {
   viewVideoPath,
   uploadVideoPath,
   accountPath,
+  changePasswordPath,
+  passwordCodePath,
+  resetPasswordPath,
 } from "./Path";
 import AccountPage from "./Pages/AccountPage";
 import PageNotFound from "./Pages/PageNotFound";
 import AlertGuestPage from "./Pages/AlertGuestPage";
+import ResetPasswordPage from "./Pages/ResetPasswordPage";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -36,8 +42,8 @@ function App() {
           }
         );
 
-        if (response.data.username) {
-          setCurrentUser(response.data.username);
+        if (response.data.email) {
+          setCurrentUser(response.data.email);
         } else {
           console.error("No user currently logged in");
         }
@@ -51,7 +57,7 @@ function App() {
   return (
     <Router>
       <Navbar bg="primary">
-        <Navbar.Brand href={homePath}>
+        <Navbar.Brand href={currentUser ? receiveAndSendPath : homePath}>
           <div className=" m-2 display-6">SafeMov</div>
         </Navbar.Brand>
         <>
@@ -80,6 +86,9 @@ function App() {
         <Route path={viewVideoPath} element={<ViewVideoPage />} />
         <Route path={registerPath} element={<RegisterPage />} />
         <Route path={accountPath} element={<AccountPage />} />
+        <Route path={changePasswordPath} element={<ForgotPasswordPage />} />
+        <Route path={passwordCodePath} element={<PasswordCodePage />} />
+        <Route path={resetPasswordPath} element={<ResetPasswordPage />} />
         {/*Creating a Route element if no Route Path matches*/}
         <Route path="*" element={<PageNotFound />} />
       </Routes>

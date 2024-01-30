@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Row, Col, Button, Modal} from 'react-bootstrap';
 import { receiveAndSendPath } from '../Path';
 import axios from 'axios';
+// Animation library for smooth transitions
 import {Fade} from 'react-reveal';
 import {useNavigate} from 'react-router-dom';
 import {
@@ -17,8 +18,8 @@ const ViewSentVideoPage = () => {
 
   const navigate = useNavigate();
   
+  // Fetch sent videos on component mount
   useEffect(() => {
-      // Replace with the correct URL of your backend
       axios.get('http://localhost:8080/bucket/get_sent_videos', {
           withCredentials: true})
           .then(response => {
@@ -30,6 +31,7 @@ const ViewSentVideoPage = () => {
           });
   }, []);
   
+  // Handles video selection and retrieves video URL
   const handleVideoClick = (videoName) => {
       const formData = new FormData();
       formData.append('video_name', videoName);
@@ -53,22 +55,22 @@ const ViewSentVideoPage = () => {
       setSelectedVideo(null);
   };
 
+  // Handles the creation of a chat associated with a video
   const handleStartChat = (e, videoName) => {
     e.preventDefault();
     // Create a new FormData instance
     const formData = new FormData();
-    formData.append('video_name', videoName); // Append the video name to the FormData
+    formData.append('video_name', videoName); 
 
     axios.post('http://localhost:8080/bucket/create_chat', formData, { 
         withCredentials: true,
         headers: {
-            'Content-Type': 'multipart/form-data' // Set the content type header for FormData
+            'Content-Type': 'multipart/form-data'
         }
     })
     .then(response => {
         console.log('Chat created:', response.data);
         navigate(MessagingPath, { state: { videoName: videoName } });
-        // Handle the successful creation of the chat, e.g., showing a message or redirecting
     })
     .catch(error => {
         if (error.response) {
@@ -117,7 +119,6 @@ const ViewSentVideoPage = () => {
                   </Modal.Body>
           </Modal>
           {errorMessage && <div className="error-message">{errorMessage}</div>}
-            {/* ... rest of the component ... */}
      </Fade>
     )
   }

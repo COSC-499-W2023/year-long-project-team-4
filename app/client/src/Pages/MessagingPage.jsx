@@ -19,24 +19,13 @@ function MessageSender() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    //const socket = io('http://localhost:8080');
-
-    /*const handleSubmit = (e) => {
-        e.preventDefault();
-        // Update the state with the new message
-        setSentMessage(`${name}: ${message}`);
-        // Clear the form fields
-        setName('');
-        setMessage('');
-    };*/
-
-    // Access the videoName from the location state
+    // Retreive video from location state
     const videoName = location.state?.videoName;
     console.log(videoName);
 
+    // Fetch existing chat messages on component mount or when videoName changes
     useEffect(() => {
         if (videoName) {
-            // Retrieve the existing chat messages
             const formData = new FormData();
             formData.append('video_name', videoName);
 
@@ -47,10 +36,9 @@ function MessageSender() {
                 withCredentials: true
             })
             .then(response => {
-                // Set the retrieved chat messages to state
                 console.log("checking");
                 console.log(response.data);
-                setChatMessages(response.data.messages); // Assuming response.data contains chat messages
+                setChatMessages(response.data.messages);
             })
             .catch(error => {
                 setErrorMessage(error.response?.data?.error || 'Error retrieving chat messages');
@@ -58,10 +46,12 @@ function MessageSender() {
         }
     }, [videoName]);
 
+    //Navigate back to view videos
     const handleBack = () => {
         navigate(viewVideoPath);
     };
 
+    // Display error if videoName is not available
     if (!videoName) {
         return (
             <div>
@@ -71,6 +61,7 @@ function MessageSender() {
         );
     }
 
+    //Handle form submission for sending a new message
     const handleSubmit = async (e) => {
         e.preventDefault();
 

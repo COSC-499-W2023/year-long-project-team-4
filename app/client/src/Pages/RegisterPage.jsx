@@ -51,8 +51,8 @@ try {
 const handleSubmit = (e) => {
     e.preventDefault();
     const firstname = e.target.elements[0].value; 
-    const lastname = e.target.elements[1].value;
-    const email = e.target.elements[2].value;
+    const email = e.target.elements[1].value;
+    const lastname = e.target.elements[2].value;
     const password = e.target.elements[3].value;  // Assuming the second input is the password
     handleSignup(firstname,lastname, email, password);
 };

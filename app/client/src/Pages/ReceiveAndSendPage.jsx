@@ -45,8 +45,8 @@ const ReceiveAndSendPage = () => {
           withCredentials: true
         });
   
-        if (response.data.username) {
-          setCurrentUser(response.data.username);
+        if (response.data.email) {
+          setCurrentUser(response.data.email);
         } else {
           console.error('No user currently logged in');
         }

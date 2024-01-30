@@ -423,7 +423,7 @@ def set_verificationcode():
     database.update_user(user_id,update_data)
     #Save code locally if Local is true
     if LOCAL:
-        obj_path = f"/verificationCode"
+        obj_path = f"./verificationCode"
         completeName = os.path.join(obj_path, "code.txt")   
         file = open(completeName, "w")
         file.write(created_code)

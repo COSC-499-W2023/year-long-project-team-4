@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react'
 import {Button} from 'react-bootstrap'
 import {useNavigate} from 'react-router-dom'
 import {
-  viewVideoPath,
   uploadVideoPath,
   loginPath,
   accountPath,
@@ -47,8 +46,8 @@ const ReceiveAndSendPage = () => {
           withCredentials: true
         });
   
-        if (response.data.username) {
-          setCurrentUser(response.data.username);
+        if (response.data.email) {
+          setCurrentUser(response.data.email);
         } else {
           console.error('No user currently logged in');
         }
@@ -68,9 +67,16 @@ const ReceiveAndSendPage = () => {
       <Fade>
         <div className="d-grid gap-2">
           <Button size="lg" href={uploadVideoPath}> Send Videos</Button>
-          <Button size="lg" href={viewVideoPath}> Receive Videos</Button>
           <Button size="lg" href={viewSentVideoPath}> Sent Videos</Button>
-          <Button size="lg" onClick={handleLogout}>Logout</Button> 
+          <Button size="lg" href={accountPath}> Receive Videos</Button>
+          <>
+          {currentUser?
+          (
+            <Button size="lg" onClick={handleLogout}>Logout</Button> 
+          ):
+          (<></>)
+          }
+          </>
         </div>
       </Fade>
     </div>

@@ -3,6 +3,7 @@ import sys
 import os
 import json
 sys.path.append(os.path.abspath('../app'))
+sys.path.append(os.path.abspath('../app/flaskapp'))
 
 from Crypto import Random
 from Crypto.PublicKey import RSA
@@ -10,6 +11,7 @@ from rsa import generate_key
 
 import database
 import flaskapp
+import bucket_interface
 
 
 @pytest.fixture
@@ -69,8 +71,8 @@ def test_encrypt_decrypt_key_success(client):
 
     # Generate AES key, encrypt it, decrypt it, check output matches initial key
     aes256_key = Random.get_random_bytes(32)
-    encrypted_aes_key = flaskapp.rsa_encrypt_aes256_key(aes256_key, public_key)
-    decrypted_aes_key = flaskapp.rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
+    encrypted_aes_key = bucket_interface.rsa_encrypt_aes256_key(aes256_key, public_key)
+    decrypted_aes_key = bucket_interface.rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
     assert aes256_key == decrypted_aes_key
 
 # Encrypt an AES key then try to decrypt it with the wrong private key
@@ -94,28 +96,28 @@ def test_encrypt_decrypt_key_fail(client):
 
     # Generate AES key, encrypt it, decrypt it, check output does not match initial key
     aes256_key = Random.get_random_bytes(32)
-    encrypted_aes_key = flaskapp.rsa_encrypt_aes256_key(aes256_key, public_key)
-    decrypted_aes_key = flaskapp.rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
+    encrypted_aes_key = bucket_interface.rsa_encrypt_aes256_key(aes256_key, public_key)
+    decrypted_aes_key = bucket_interface.rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
     assert aes256_key != decrypted_aes_key
 
 # Encrypt a message then decrypt it with correct AES key
 def test_encrypt_decrypt_message_success(client):
     test_message = Random.get_random_bytes(512)
-    encrypted_message, aes_key = flaskapp.aes_encrypt_video(test_message)
-    decrypted_message = flaskapp.aes_decrypt_video(encrypted_message, aes_key)
+    encrypted_message, aes_key = bucket_interface.aes_encrypt_video(test_message)
+    decrypted_message = bucket_interface.aes_decrypt_video(encrypted_message, aes_key)
     assert test_message == decrypted_message
 
 # Encrypt a video file then try to decrypt it with the wrong AES key
 def test_encrypt_decrypt_message_fail(client):
     test_message = Random.get_random_bytes(512)
-    encrypted_message, aes_key = flaskapp.aes_encrypt_video(test_message)
+    encrypted_message, aes_key = bucket_interface.aes_encrypt_video(test_message)
 
     # Generate new AES key that we will attempt to use
     wrong_key = Random.get_random_bytes(32)
 
     # We should expect a ValueError when using the wrong key
     try:
-        decrypted_message = flaskapp.aes_decrypt_video(encrypted_message, wrong_key)
+        decrypted_message = bucket_interface.aes_decrypt_video(encrypted_message, wrong_key)
         assert False
     except ValueError:
         assert True
@@ -142,14 +144,14 @@ def test_end_to_end(client):
     private_key = generate_key(private_key_seed)
 
     # Encrypt our message
-    encrypted_message, aes_key = flaskapp.aes_encrypt_video(test_message)
+    encrypted_message, aes_key = bucket_interface.aes_encrypt_video(test_message)
 
     # Encrypt then decrypt the AES key
-    encrypted_aes_key = flaskapp.rsa_encrypt_aes256_key(aes_key, public_key)
-    decrypted_aes_key = flaskapp.rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
+    encrypted_aes_key = bucket_interface.rsa_encrypt_aes256_key(aes_key, public_key)
+    decrypted_aes_key = bucket_interface.rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
 
     # Use decrypted AES key to decrypt message
-    decrypted_message = flaskapp.aes_decrypt_video(encrypted_message, decrypted_aes_key)
+    decrypted_message = bucket_interface.aes_decrypt_video(encrypted_message, decrypted_aes_key)
 
     # Compare decrypted message to input
     assert test_message == decrypted_message

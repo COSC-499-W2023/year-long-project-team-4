@@ -1,5 +1,5 @@
 from flaskapp import create_app
-from flaskapp import create_app, socketio
+from flaskapp import create_app
 
 app = create_app()
 

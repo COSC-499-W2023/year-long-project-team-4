@@ -5,10 +5,15 @@ import {Fade} from 'react-reveal';
 import axios from 'axios';
 import see from '../Assets/eye.svg';
 import unSee from '../Assets/eye-slash.svg';
+import {useNavigate} from 'react-router-dom';
+import {
+    MessagingPath
+  } from "../Path";
 
 const AccountPage = () => {
 const [type, setType] = useState(false)
 const [currentUser, setCurrentUser] = useState(null);
+const [errorMessage, setErrorMessage] = useState("");
 const [key, setKey] = useState('videos');
 const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,6 +24,9 @@ const handleSubmit = (e) => {
 const handleDelete = () =>{
 
 }
+
+const navigate = useNavigate();
+
 const firstName = "firstname123";
 const lastName = "lastname123";
 const email = currentUser;
@@ -84,6 +92,40 @@ useEffect(() => {
           fetchCurrentUser();
 }});
 
+const handleStartChat = (e, videoName) => {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append('video_name', videoName); // Append the video name to the FormData
+
+  //POST request to create a new chat room
+  axios.post('http://localhost:8080/bucket/create_chat', formData, { 
+      withCredentials: true,
+      headers: {
+          'Content-Type': 'multipart/form-data'
+      }
+  })
+  //redirect to Messaging Page after creating the chat
+  .then(response => {
+      console.log('Chat created:', response.data);
+      navigate(MessagingPath, { state: { videoName: videoName } });
+  })
+  .catch(error => {
+      if (error.response) {
+          console.error('Error response:', error.response.data);
+          // Check if the error is because the chat already exists
+          if (error.response.data.error === "Associated chat already exists") {
+              navigate(MessagingPath, { state: { videoName: videoName } }); // Navigate to messaging page if chat already exists
+          } else {
+              setErrorMessage(error.response.data.error || 'Error creating chat');
+          }
+      } else {
+          console.error('Error creating chat:', error);
+          setErrorMessage('Error creating chat');
+      }
+  });
+};
+
 return (
    <div className="container p-4">
     <Fade>
@@ -100,12 +142,15 @@ return (
               <Col className="p-3">
                   <div className="display-6"> Videos Viewable</div>
                   {videos.map((video, index) => (
-                      <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                      <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                      <p>Video{index + 1}</p>
-                      </Button>
-                      </div>
-                  ))}
+                            <>
+                          <div key={index} onClick={() => handleVideoClick(video.videoName)}>
+                              <Button className='text-center mb-2' style={{minWidth: '150px'}}>
+                              <p>Video{index + 1}</p>
+                              </Button>
+                          </div>
+                          <Button variant="info" onClick={(e) => handleStartChat(e, video.videoName)}>Start Chat</Button>
+                          </>
+                      ))}
               </Col>   
             </Row>      
             <Modal show={showVideoModal} onHide={handleCloseVideoModal}>

@@ -7,6 +7,8 @@ import concurrent.futures
 from dotenv import load_dotenv
 
 LOCAL = os.getenv('LOCAL') == 'True'
+if not os.path.isdir('faceBlurring/temp'):
+    os.mkdir('faceBlurring/temp')
 
 if not LOCAL: # Flag for local or not
     boto3.setup_default_session(profile_name='team4-dev')

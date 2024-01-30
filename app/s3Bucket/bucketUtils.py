@@ -16,6 +16,7 @@ DBUSER = os.getenv("DBUSER")
 DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
+SSH_TUNNEL_ADDRESS = os.getenv("EC2_ADDRESS")
 
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
@@ -24,11 +25,13 @@ TEST = os.getenv("TEST") == 'True'
 LOCAL = os.getenv('LOCAL') == 'True'
 BUCKETNAME = os.getenv("BUCKETNAME")
 
-# s3_client = boto3.client(
-# 's3',
-# aws_access_key_id=ACCESS_KEY,
-# aws_secret_access_key=SECRET_KEY,
-# aws_session_token=SESSION_TOKEN)
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=ACCESS_KEY,
+    aws_secret_access_key=SECRET_KEY,
+    aws_session_token=SESSION_TOKEN
+    )
+
 if not LOCAL:
     boto3.setup_default_session(profile_name='team4-dev')
     s3_client = boto3.client('s3')
@@ -227,7 +230,7 @@ def list_objs():
         return False
     
     
-def delete_file(obj_path):
+def delete_file(BUCKETNAME, obj_path):
     """
     Deletes a file from an S3 bucket.
 
@@ -265,7 +268,7 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
     result = 0
     subDate = datetime.now(timezone.utc)
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
                 ssh_username=SSHUSER,
                 ssh_pkey=KPATH, 
                 remote_bind_address=(ADDRESS,PORT)

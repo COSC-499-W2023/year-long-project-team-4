@@ -42,7 +42,7 @@ def test_delete():
     
 def test_delete_key():
     database.insert_video("TestDeleteKey.mp4", "2024-01-24 11:59:00", "updated@example.com", "Test@example.com","1","2")
-    result = database.delete_key("TestDeleteKey.mp4",True,False)
+    result = database.delete_key("TestDeleteKey.mp4", sender = True, receiver = False)
     assert result == 1  # Assuming the delete was successful
        
        

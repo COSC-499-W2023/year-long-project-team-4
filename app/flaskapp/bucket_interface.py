@@ -19,27 +19,25 @@ from Crypto.PublicKey import RSA
 
 import database
 import s3Bucket
-
+import faceBlurring
 from . import bcrypt
 
 bucket = Blueprint('bucket', __name__)
 
-ACCESS_KEY = os.getenv("ACCESSKEY")
-SECRET_KEY = os.getenv('SECRETKEY')
-SESSION_TOKEN = os.getenv('SESSTOKEN')
 LOCAL = os.getenv('LOCAL') == 'True'
 
-ses_client = boto3.client(
+if not LOCAL:
+    ACCESS_KEY = os.getenv("ACCESSKEY")
+    SECRET_KEY = os.getenv('SECRETKEY')
+    SESSION_TOKEN = os.getenv('SESSTOKEN')
+    ses_client = boto3.client(
     'ses', 
     region_name='ca-central-1',
     aws_access_key_id=ACCESS_KEY,
     aws_secret_access_key=SECRET_KEY,
     aws_session_token=SESSION_TOKEN
     )
-
-if not LOCAL:
     boto3.setup_default_session(profile_name='team4-dev')
-    ses_client = boto3.client('ses')
 else:
     if not os.path.isdir('verificationCode'):
         os.mkdir('verificationCode')

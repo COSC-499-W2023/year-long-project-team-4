@@ -16,6 +16,7 @@ from Crypto.PublicKey import RSA
 
 import s3Bucket
 import database
+import faceBlurring
 
 bucket = Blueprint('bucket', __name__)
 
@@ -283,3 +284,24 @@ def retrieve_chat():
     chat_data.seek(0)
 
     return send_file(chat_data, mimetype='application/json'), 200
+
+
+@bucket.route('/blurRequest', methods=['POST'])
+def processVideo():
+    file = request.files.get('file')
+
+    if file is None:
+        return jsonify({'error': 'No file found'}), 400
+    upload_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'faceBlurring', 'temp'))    
+    video_name = str(uuid.uuid4())+".mp4"
+    upload_path = os.path.join(upload_directory,video_name)
+    file.save(upload_path)
+    print(f'upload_directory: {upload_directory}')
+    print(f'upload_path: {upload_path}')
+    print(f'File received: {file.filename}')
+
+    faceBlurring.process_video(upload_path)
+    
+    blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)  
+    print(f'blurred_upload_path: {blurred_upload_path}')
+    return send_file(blurred_upload_path, as_attachment=True, mimetype='video/mp4')

@@ -16,6 +16,8 @@ DBUSER = os.getenv("DBUSER")
 DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
+SSH = os.getenv("SSH")
+EC2 = os.getenv("EC2_ADDRESS")
 
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
@@ -262,15 +264,93 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
         file_flag: sets the folder to be saved into 
     """
     db = None
-    result = 0
+    result = False
     subDate = datetime.now(timezone.utc)
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
-                ssh_username=SSHUSER,
-                ssh_pkey=KPATH, 
-                remote_bind_address=(ADDRESS,PORT)
-        )as tunnel:
-            print("SSH Tunnel Established")
+        if SSH:
+            with SSHTunnelForwarder((EC2), 
+                    ssh_username=SSHUSER,
+                    ssh_pkey=KPATH, 
+                    remote_bind_address=(ADDRESS,PORT)
+            )as tunnel:
+                print("SSH Tunnel Established")
+                #Db connection string
+                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+                if db:
+                    if db:
+                        cur = db.cursor()
+                        query1 = f"START TRANSACTION"
+                        cur.execute(query1)
+                        
+                        recQuery = "SELECT id, firstname, lastname FROM userprofile WHERE email LIKE %s"
+                        cur.execute(recQuery,(receiverEmail,))
+                        recInfo = cur.fetchall()
+                        
+                        if recInfo:
+                            recID = recInfo[0][0]
+                            recFname = recInfo[0][1]
+                            recLname = recInfo[0][2]
+                            obj_path = f"/{file_flag}/{receiverEmail}/{file_name}"
+                            if LOCAL:
+                                if not os.path.isdir(f"{file_flag}/{receiverEmail}"):
+                                    os.mkdir(f"{file_flag}/{receiverEmail}")
+                        else:
+                            raise ValueError("That email was not found.")
+                        
+                        # Checks to see if guest or not
+                        if senderEmail:
+                            userQuery = "SELECT id, firstname, lastname from userprofile WHERE email = %s"
+                            cur.execute(userQuery,(senderEmail,))
+                            userInfo = cur.fetchall()
+                            
+                            if userInfo:
+                                senderId = userInfo [0][0]
+                                userFname = userInfo[0][1]
+                                userLname = userInfo[0][2]
+                            else:
+                                raise ValueError("Error retrieving current users information.")
+                            
+                            if file_flag == "videos":
+                                insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                                data = (file_name, subDate, retDate, senderEmail, userFname, userLname, receiverEmail, senderEncryption, receiverEncryption)
+                                cur.execute(insertQuery, data)
+                                
+                            elif file_flag == "chats":  
+                                insertQuery = "INSERT INTO chats (chatName, timestamp, senderEmail, senderFName, senderLName, receiverEmail, receiverFirstName, receiverLastName, senderEncryption, receiverEncryption, retDate) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s,%s,%s)"
+                                data = (file_name, subDate, senderEmail, userFname, userLname, receiverEmail, recFname, recLname, senderEncryption, receiverEncryption, retDate)
+                                cur.execute(insertQuery, data)
+                                
+                            proceed = already_existing_file(obj_path)
+                            if(not proceed):
+                                upload_file(file_content,store_as=obj_path)
+                                db.commit()
+                                cur.close()
+                                result = True
+                            else:
+                                db.rollback()
+                                result = False
+                        #If guest it does the same calls just without senderId
+                        else: 
+                            if file_flag == 'videos':       
+                                insertQuery = "INSERT INTO videos (videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s)"
+                                data = (file_name, subDate, retDate, receiverEmail, receiverEncryption)
+                                cur.execute(insertQuery, data)
+                                
+                            elif file_flag == 'chats':       
+                                insertQuery = "INSERT INTO chats (chatName, timestamp, retDate, receiverEmail, receiverFirstName, receiverLastName, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s)"
+                                data = (file_name, subDate, retDate, receiverEmail, recFname, recLname, receiverEncryption)
+                                cur.execute(insertQuery, data)
+                                
+                            proceed = already_existing_file(obj_path)
+                            if(not proceed):
+                                upload_file(file_content,store_as=obj_path)
+                                db.commit()
+                                cur.close()
+                                result = True
+                            else:
+                                db.rollback()
+                                result = False   
+        else:
             #Db connection string
             db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
             if db:
@@ -346,7 +426,8 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
                             result = True
                         else:
                             db.rollback()
-                            result = False      
+                            result = False     
+
     except Exception as e:
         print(e)
         db.rollback()

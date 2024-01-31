@@ -17,6 +17,7 @@ DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
 TEST = os.getenv("TEST")
+EC2 = os.getenv("EC2_ADDRESS")
 
 if(TEST.lower() == "true"):
     DBNAME = 'Team4dbTest'
@@ -45,7 +46,7 @@ def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, 
     try:
         if SSH:
             # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
                 print("SSH Tunnel Established")
                 # Db connection string using SSH tunnel
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
@@ -108,7 +109,7 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
     try:
         if SSH:
             # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
+            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
                 print("SSH Tunnel Established")
                 # Db connection string using SSH tunnel
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
@@ -170,7 +171,7 @@ def update_user(user_id:int,new_data:dict) -> int:
     
     try:
         if SSH:
-            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
+            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
                 print("SSH Tunnel Established")
                 # Db connection string using SSH tunnel
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
@@ -227,7 +228,7 @@ def query_records(table_name: str, fields: str, condition: str = "", condition_v
     try:
         if SSH:
             # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
+            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
                 print("SSH Tunnel Established")
                 # Db connection string using SSH tunnel
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
@@ -273,7 +274,7 @@ def delete_record(table_name: str, condition: str, condition_values: tuple) -> i
     try:
         if SSH:
             # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
+            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
                 print("SSH Tunnel Established")
                 # Db connection string using SSH tunnel
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
@@ -307,7 +308,7 @@ def resetTable(tableName:str)-> bool:
     try:
         if SSH:
             # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
+            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
                 print("SSH Tunnel Established")
                 # Db connection string using SSH tunnel
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)

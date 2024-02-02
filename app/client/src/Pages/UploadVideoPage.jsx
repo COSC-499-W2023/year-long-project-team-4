@@ -10,6 +10,7 @@ import ysfixWebmDuration from "fix-webm-duration";
 
 const UploadVideoPage = () => {
   const [type, setType] = useState(1);
+  const [time, setTime] = useState(0);
   const [file, setFile] = useState(null);
   const [backend, setBackend] = useState(null);
   const [disable, setDisable] = useState(true);
@@ -24,7 +25,7 @@ const UploadVideoPage = () => {
   const [load, setLoad] = useState(false);
 
   let startTime;
-  let duration;
+  var duration;
 
   const handleClose = () => setShow(false);
   
@@ -59,14 +60,15 @@ const UploadVideoPage = () => {
       [setRecordedChunks]
     );
 
-    const handleStopRecord = React.useCallback(() => {
+    const handleStopRecord =  React.useCallback(() => {
       duration = Date.now() - startTime;
-      console.log(duration);
       setDisableRecord(true);
-
+      setTime(duration);
       mediaRecorderRef.current.stop();
       
       setCapturing(false);
+
+
     }, [mediaRecorderRef, webcamRef, setCapturing]);
 
   const handleSubmit =(e)=>{
@@ -112,8 +114,9 @@ const UploadVideoPage = () => {
 
   const handleRecord = async(mediaContent) => {
     try {
+      console.log(time);
       const mediablob = new Blob(mediaContent,{type: "video/mp4"});
-      const fixedblob = await ysfixWebmDuration(mediablob,duration,{logger:false});
+      const fixedblob = await ysfixWebmDuration(mediablob,time,{logger:false});
       setBackend(fixedblob);
       setFile(URL.createObjectURL(fixedblob));
       

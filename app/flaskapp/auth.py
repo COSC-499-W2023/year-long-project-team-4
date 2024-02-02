@@ -12,12 +12,13 @@ from . import bcrypt
 
 auth = Blueprint('auth', __name__)
 
-LOCAL = os.getenv('LOCAL') == 'True'
+LOCAL = os.getenv("LOCAL") == 'True'
 
 if not LOCAL:
     ACCESS_KEY = os.getenv("ACCESSKEY")
     SECRET_KEY = os.getenv('SECRETKEY')
     SESSION_TOKEN = os.getenv('SESSTOKEN')
+    boto3.setup_default_session(profile_name='team4-dev')
     ses_client = boto3.client(
     'ses', 
     region_name='ca-central-1',
@@ -25,7 +26,6 @@ if not LOCAL:
     aws_secret_access_key=SECRET_KEY,
     aws_session_token=SESSION_TOKEN
     )
-    boto3.setup_default_session(profile_name='team4-dev')
 else:
     if not os.path.isdir('verificationCode'):
         os.mkdir('verificationCode')
@@ -34,20 +34,29 @@ else:
 def signup():
     email = request.form.get('email')
     password = request.form.get('password')
+    firstname = request.form.get('firstname')
+    
     # Ensure request is valid
     if email is None:
         return jsonify({'error': 'Missing email'}), 400
     if password is None:
         return jsonify({'error': 'Missing password'}), 400
-    specialCharacters = set('$#@!*')
+    if firstname is None:
+        return jsonify({'error': 'Missing first name'}), 400
     if len(password) < 8:
         return jsonify({"error": "Password less than 8 characters"}), 502
     elif re.search('[0-9]',password) is None:
         return jsonify({"error": "Password has no numbers"}), 502
     elif re.search('[A-Z]',password) is None: 
         return jsonify({"error": "Password has no capital letters"}), 502
-    elif re.search(specialCharacters,password) is None: 
-        return jsonify({"error": "Password has no special characters"}), 502
+    specialchars = '@_!#$%^&*()<>?/\|}{~:'
+    howmany = 0
+    for i in range(len(specialchars)):
+        char = specialchars[i]
+        if char in password:
+            howmany += 1
+    if howmany == 0:
+            return jsonify({"error": "Password has no special characters"}), 502
 
     # Ensure user doesn't already exist
     existing_user = database.query_records(table_name='userprofile', fields='email', condition=f'email = %s', condition_values=(email,))
@@ -56,7 +65,8 @@ def signup():
 
     #Create verification code
     created_code = ''.join(random.choices(string.digits, k=6))
-    database.update_user(email,new_verifyKey = created_code)
+    # database.update_user(email, new_verifyKey = created_code)
+    
     #Save code locally if Local is true
     if LOCAL:
         obj_path = f"./verificationCode"
@@ -65,20 +75,89 @@ def signup():
         file.write(created_code)
         file.close()
         return jsonify({"status": "success", "message": "code saved locally"}), 200
-    #Send user an email with code
-    try:
-        response = ses_client.send_email(
-            Source='safemovnow@gmail.com',
-            Destination={'ToAddresses': [email]},
-            Message={
-                'Subject': {'Data': 'Password Change Verification Code'},
-                'Body': {'Text': {'Data': f'Your verification code is: {created_code}'}}
-            }
-        )
-        return jsonify({"status": "success", "message": "email sent"}), 200
-    except Exception as e:
-        print(f"Error sending email: {e}")
-        return jsonify({"error": "Failed to send verification code via email"}), 502
+    
+    else:
+        #Send user an email with code
+        sender_email = 'safemovnow@gmail.com'
+        # Compose the email message
+        subject = "Confirm your account"
+        html_body = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome to Safemov</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f4f4f4;
+                    text-align: center;
+                }
+
+                .container {
+                    max-width: 600px;
+                    margin: 20px auto;
+                    background-color: #fff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                }
+
+                h1 {
+                    color: #333;
+                }
+
+                p {
+                    color: #666;
+                }
+
+                .verification-code {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #3498db;
+                }
+
+                .footer {
+                    margin-top: 20px;
+                    color: #999;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Welcome to Safemov, {firstname}!</h1>
+                <p>Thank you for signing up. We're excited to have you on board.</p>
+                <p>Your verification code is: <span class="verification-code">{created_code}</span></p>
+                <p>Please use this code to confirm your email address and complete the registration process.</p>
+        
+                <div class="footer">
+                    <p>If you have any questions or need assistance, feel free to contact our support team at support@safemov.com.</p>
+                    <p>Best regards,<br> The Safemov Team</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        try:
+            # Send the email
+            email = ses_client.send_email(
+                Source=sender_email,
+                Destination={'ToAddresses': [email]},
+                Message={
+                    'Subject': {'Data': subject},
+                    'Body': {'Html': {'Data': html_body}}
+                }
+            )
+
+            print(f"Email sent to {email}.")
+            return 1
+        except Exception as e:
+            print(f"Error sending email: {e}")
+            return jsonify({"error": "Failed to send verification code via email"}), 502
 
 @auth.route('/confirm_user', methods=['POST'])
 def confirm_user():

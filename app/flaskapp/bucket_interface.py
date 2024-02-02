@@ -419,11 +419,10 @@ def set_verificationcode():
     #Create verification code
     created_code = ''.join(random.choices(string.digits, k=6))
     update_data = {'verifyKey': f'{created_code}'}
-    user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(email,))[0]['id']
-    database.update_user(user_id,update_data)
+    database.update_user(user_email = email, new_verifyKey = created_code)
     #Save code locally if Local is true
     if LOCAL:
-        obj_path = f"/verificationCode"
+        obj_path = f"./verificationCode"
         completeName = os.path.join(obj_path, "code.txt")   
         file = open(completeName, "w")
         file.write(created_code)

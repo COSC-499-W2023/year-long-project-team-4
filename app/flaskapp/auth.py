@@ -1,4 +1,7 @@
 import os
+import boto3
+import random
+import string
 
 from flask import Blueprint, request, session, jsonify, current_app
 from rsa import generate_key
@@ -8,13 +11,30 @@ from . import bcrypt
 
 auth = Blueprint('auth', __name__)
 
+LOCAL = os.getenv('LOCAL') == 'True'
+
+if not LOCAL:
+    ACCESS_KEY = os.getenv("ACCESSKEY")
+    SECRET_KEY = os.getenv('SECRETKEY')
+    SESSION_TOKEN = os.getenv('SESSTOKEN')
+    ses_client = boto3.client(
+    'ses', 
+    region_name='ca-central-1',
+    aws_access_key_id=ACCESS_KEY,
+    aws_secret_access_key=SECRET_KEY,
+    aws_session_token=SESSION_TOKEN
+    )
+    boto3.setup_default_session(profile_name='team4-dev')
+else:
+    if not os.path.isdir('verificationCode'):
+        os.mkdir('verificationCode')
+
 @auth.route('/signup', methods=['POST'])
 def signup():
     email = request.form.get('email')
     password = request.form.get('password')
     firstname = request.form.get('firstname')
     lastname = request.form.get('lastname')
-
     # Ensure request is valid
     if email is None:
         return jsonify({'error': 'Missing email'}), 400
@@ -38,6 +58,30 @@ def signup():
     public_key = private_key.publickey().export_key('PEM')
 
     hashed_password = bcrypt.generate_password_hash(password).decode()
+    
+    #Create verification code
+    created_code = ''.join(random.choices(string.digits, k=6))
+    database.update_user(email,new_verifyKey = created_code)
+    #Save code locally if Local is true
+    if LOCAL:
+        obj_path = f"./verificationCode"
+        completeName = os.path.join(obj_path, "code.txt")   
+        file = open(completeName, "w")
+        file.write(created_code)
+        file.close()
+    #Send user an email with code
+    try:
+        response = ses_client.send_email(
+            Source='safemovnow@gmail.com',
+            Destination={'ToAddresses': [email]},
+            Message={
+                'Subject': {'Data': 'Password Change Verification Code'},
+                'Body': {'Text': {'Data': f'Your verification code is: {created_code}'}}
+            }
+        )
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return jsonify({"error": "Failed to send verification code via email"}), 502
 
     result = database.insert_user(email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash, pubKey=public_key)
     

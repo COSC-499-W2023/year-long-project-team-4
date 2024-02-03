@@ -19,7 +19,7 @@ const LoginHomePage = () => {
 
   const handleLogin = async (email, password) => {
     try {
-      const response = await axios.post('http://localhost:8080/auth/login', {
+      const response = await axios.post('${process.env.REACT_APP_IP_ADDRESS}/auth/login', {
         email: email,
         password: password
       }, {

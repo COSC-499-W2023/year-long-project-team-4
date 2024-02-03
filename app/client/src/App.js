@@ -30,7 +30,7 @@ function App() {
     const fetchCurrentUser = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/auth/currentuser",
+          "${process.env.REACT_APP_IP_ADDRESS}/auth/currentuser",
           {
             withCredentials: true,
           }

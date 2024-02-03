@@ -29,7 +29,7 @@ const [showVideoModal, setShowVideoModal] = useState(false);
 
 useEffect(() => {
     // Replace with the correct URL of your backend
-    axios.get('http://localhost:8080/bucket/getvideos', {
+    axios.get('${process.env.REACT_APP_IP_ADDRESS}/bucket/getvideos', {
         withCredentials: true})
         .then(response => {
             setVideos(response.data);
@@ -44,7 +44,7 @@ const handleVideoClick = (videoName) => {
     const formData = new FormData();
     formData.append('video_name', videoName);
 
-    axios.post('http://localhost:8080/bucket/retrieve', formData, {
+    axios.post('${process.env.REACT_APP_IP_ADDRESS}/bucket/retrieve', formData, {
         withCredentials: true,
         responseType: 'blob' // Sets the expected response type to 'blob' since a video file is binary data
     })
@@ -66,7 +66,7 @@ const handleCloseVideoModal = () => {
 useEffect(() => {
         const fetchCurrentUser = async () => {
             try {
-              const response = await axios.get('http://localhost:8080/auth/currentuser', {
+              const response = await axios.get('${process.env.REACT_APP_IP_ADDRESS}/auth/currentuser', {
                 withCredentials: true
               });
         

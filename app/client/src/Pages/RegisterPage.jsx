@@ -23,7 +23,7 @@ const handleSignup = async (firstname, lastname, email, password) => {
 try {
   const response = await axios({
     method: 'post',
-    url: 'http://localhost:8080/auth/signup',
+    url: '${process.env.REACT_APP_IP_ADDRESS}/auth/signup',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }
   });

@@ -5,23 +5,31 @@ import {Fade} from 'react-reveal';
 import axios from 'axios';
 import see from '../Assets/eye.svg';
 import unSee from '../Assets/eye-slash.svg';
+import {useNavigate} from 'react-router-dom';
+import {
+    MessagingPath
+  } from "../Path";
 
 const AccountPage = () => {
 const [type, setType] = useState(false)
 const [currentUser, setCurrentUser] = useState(null);
+const [errorMessage, setErrorMessage] = useState("");
 const [key, setKey] = useState('videos');
 const handleSubmit = (e) => {
     e.preventDefault();
-    const firstname = e.target.elements[0].value;  // Assuming the first input is the username
+    const firstname = e.target.elements[0].value;
     const lastname = e.target.elements[1].value;
     const email = e.target.elements[2].value;
   }
 const handleDelete = () =>{
 
 }
-const email = currentUser;
+
+const navigate = useNavigate();
+
 const firstName = "firstname123";
 const lastName = "lastname123";
+const email = currentUser;
 
 const [videos, setVideos] = useState([]);
 const [selectedVideo, setSelectedVideo] = useState(null);
@@ -72,16 +80,51 @@ useEffect(() => {
         
               if (response.data.email) {
                 setCurrentUser(response.data.email);
+              if (response.data.email) {
+                setCurrentUser(response.data.email);
               } else {
                 console.error('No user currently logged in');
               }
+            }
             } catch (error) {
               console.error('There was an error fetching the current user', error);
             }
-          };
-        
           fetchCurrentUser();
-}, []);
+}});
+
+const handleStartChat = (e, videoName) => {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append('video_name', videoName); // Append the video name to the FormData
+
+  //POST request to create a new chat room
+  axios.post('http://localhost:8080/bucket/create_chat', formData, { 
+      withCredentials: true,
+      headers: {
+          'Content-Type': 'multipart/form-data'
+      }
+  })
+  //redirect to Messaging Page after creating the chat
+  .then(response => {
+      console.log('Chat created:', response.data);
+      navigate(MessagingPath, { state: { videoName: videoName } });
+  })
+  .catch(error => {
+      if (error.response) {
+          console.error('Error response:', error.response.data);
+          // Check if the error is because the chat already exists
+          if (error.response.data.error === "Associated chat already exists") {
+              navigate(MessagingPath, { state: { videoName: videoName } }); // Navigate to messaging page if chat already exists
+          } else {
+              setErrorMessage(error.response.data.error || 'Error creating chat');
+          }
+      } else {
+          console.error('Error creating chat:', error);
+          setErrorMessage('Error creating chat');
+      }
+  });
+};
 
 return (
    <div className="container p-4">
@@ -99,12 +142,15 @@ return (
               <Col className="p-3">
                   <div className="display-6"> Videos Viewable</div>
                   {videos.map((video, index) => (
-                      <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                      <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                      <p>Video{index + 1}</p>
-                      </Button>
-                      </div>
-                  ))}
+                            <>
+                          <div key={index} onClick={() => handleVideoClick(video.videoName)}>
+                              <Button className='text-center mb-2' style={{minWidth: '150px'}}>
+                              <p>Video{index + 1}</p>
+                              </Button>
+                          </div>
+                          <Button variant="info" onClick={(e) => handleStartChat(e, video.videoName)}>Start Chat</Button>
+                          </>
+                      ))}
               </Col>   
             </Row>      
             <Modal show={showVideoModal} onHide={handleCloseVideoModal}>
@@ -120,6 +166,7 @@ return (
             <div className="display-6 text-center"> Account Info </div>
             <Col className="p-4 fs-5">
               <ListGroup variant="flush">
+                <ListGroup.Item> Email: {email}</ListGroup.Item>
                 <ListGroup.Item> Email: {email}</ListGroup.Item>
                 <ListGroup.Item> First Name: {firstName}</ListGroup.Item>
                 <ListGroup.Item> Last Name: {lastName}</ListGroup.Item>
@@ -170,8 +217,8 @@ return (
           </Tab>
           <Tab eventKey="delete" title="Delete profile">
             <div className="text-center">
-              <div className="display-6"> Are you sure you want to delete your account? </div>
-              <p className="m-3"> You will no longer be able to access any of the videos you sent or received.</p>
+              <div className="display-6 p-1"> Are you sure you want to delete your account? </div>
+              <p className="m-3 p-1"> You will no longer be able to access any of the videos you sent or received.</p>
               <Button className="m-3" href={homePath} onClick={()=>{handleDelete()}}> Delete Account</Button>
             </div>
           </Tab>

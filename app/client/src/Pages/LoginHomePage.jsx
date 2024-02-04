@@ -6,6 +6,7 @@ import {
   guestPath,
   receiveAndSendPath,
   registerPath,
+  changePasswordPath,
 } from "../Path";
 import axios from 'axios'
 import see from '../Assets/eye.svg';
@@ -28,7 +29,6 @@ const LoginHomePage = () => {
         },
         withCredentials: true
       });
-  
       if (response.data.email) {
         setCurrentUser(response.data.email);
         navigate(receiveAndSendPath);
@@ -47,8 +47,8 @@ const LoginHomePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const email = e.target.elements[0].value;  // Assuming the first input is the email
-    const password = e.target.elements[1].value;  // Assuming the second input is the password
+    const email = e.target.elements[0].value;  
+    const password = e.target.elements[1].value; 
     handleLogin(email, password);
   };
   
@@ -64,8 +64,9 @@ const LoginHomePage = () => {
           <Form.Group className="p-3">
             <Form.Label>Email</Form.Label>
             <Form.Control
+              id='username'
               type="text"
-                      required
+              required
             />
             <Form.Label>Password</Form.Label>
               <InputGroup>
@@ -91,6 +92,9 @@ const LoginHomePage = () => {
           </div>    
           <div className="col"> 
             <a href={registerPath}>No account?</a>
+          </div>
+          <div className="col"> 
+            <a href={changePasswordPath}>Forgot password?</a>
           </div>
         </div>
       </Fade>

@@ -19,6 +19,7 @@ HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
 EC2 = os.getenv("EC2_ADDRESS")
 
+
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')

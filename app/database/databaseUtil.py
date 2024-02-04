@@ -19,6 +19,7 @@ DBNAME = os.getenv("MYDB")
 TEST = os.getenv("TEST")
 EC2 = os.getenv("EC2_ADDRESS")
 
+
 if(TEST.lower() == "true"):
     DBNAME = 'Team4dbTest'
 
@@ -47,6 +48,7 @@ def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, 
         if SSH:
             # Creates the SSH tunnel to connect to the DB
             with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+        # Creates the SSH tunnel to connect to the DB
                 print("SSH Tunnel Established")
                 # Db connection string using SSH tunnel
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
@@ -341,3 +343,51 @@ def resetTable(tableName:str)-> bool:
         if db:
             db.close()
     return False  # Reset failed
+
+def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
+    '''
+    Zeros out a user's key so they can no longer access a video
+
+    Args:
+        videoName(str): The video's name where the key will be deleted
+        sender(bool): true if the user is the sender
+        reciever(bool): true if the user is the reciever
+
+    Returns:
+        int: An integer result code indicating the outcome of the delete operation.
+             - 1: Delete was successful.
+             - -1: An error occurred during the delete.
+    '''
+    db = None
+    result = 0  # Initialize the result to 0
+    
+    try:
+        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database='Team4dbTest')
+            if db:
+                cur = db.cursor()
+                #Create set clause depending on whether user is sender or receiver
+                if (sender):
+                    set_clause = "senderEncryption = 0, senderEmail = NULL"
+                elif (receiver):
+                    set_clause = "recieverEncryption = 0, receiverEmail = NULL"
+                else:
+                    result = -1
+                query = f"UPDATE videos SET {set_clause} WHERE videoName = %s"
+                cur.execute(query, videoName)   
+                # Check if video has chats associated with it and removes user's access
+                query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoName,))
+                if query_results:
+                    query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
+                    cur.execute(query2, videoName) 
+                cur.close()
+                result = 1  # Set result to 1 to indicate success
+    except Exception as e:
+        print(e)
+        result = -1  # Set result to -1 to indicate an error
+    finally:
+        if db:
+            db.close()
+    return result  # Return the result

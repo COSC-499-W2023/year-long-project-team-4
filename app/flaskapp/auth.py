@@ -3,6 +3,7 @@ import boto3
 import random
 import string
 import re
+import jinja2
 
 from flask import Blueprint, request, session, jsonify, current_app
 from rsa import generate_key
@@ -65,7 +66,7 @@ def signup():
 
     #Create verification code
     created_code = ''.join(random.choices(string.digits, k=6))
-    # database.update_user(email, new_verifyKey = created_code)
+    database.update_user(email, new_verifyKey = created_code)
     
     #Save code locally if Local is true
     if LOCAL:
@@ -128,20 +129,19 @@ def signup():
         </head>
         <body>
             <div class="container">
-                <h1>Welcome to Safemov, {firstname}!</h1>
+                <h1>Welcome to Safemov, {{firstname}}!</h1>
                 <p>Thank you for signing up. We're excited to have you on board.</p>
-                <p>Your verification code is: <span class="verification-code">{created_code}</span></p>
+                <p>Your verification code is: <span class="verification-code">{{created_code}}</span></p>
                 <p>Please use this code to confirm your email address and complete the registration process.</p>
-        
                 <div class="footer">
-                    <p>If you have any questions or need assistance, feel free to contact our support team at support@safemov.com.</p>
                     <p>Best regards,<br> The Safemov Team</p>
                 </div>
             </div>
         </body>
         </html>
         """
-
+        formatted = jinja2.Template(html_body).render(firstname = firstname, created_code = created_code)
+        
         try:
             # Send the email
             email = ses_client.send_email(
@@ -149,12 +149,12 @@ def signup():
                 Destination={'ToAddresses': [email]},
                 Message={
                     'Subject': {'Data': subject},
-                    'Body': {'Html': {'Data': html_body}}
+                    'Body': {'Html': {'Data': formatted}}
                 }
             )
 
             print(f"Email sent to {email}.")
-            return 1
+            return jsonify({"status": "success", "message": "email sent"}), 200
         except Exception as e:
             print(f"Error sending email: {e}")
             return jsonify({"error": "Failed to send verification code via email"}), 502

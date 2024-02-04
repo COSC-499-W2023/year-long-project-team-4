@@ -26,6 +26,11 @@ def test_confirm_user(client):
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
     
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=('fakeusertest987@gmail.com',))[0]['verifyKey']
+    post_object = {'input_code': f'{inputcode}', 'email': 'fakeusertest987@gmail.com', 'password': 'Test_password@1', 'firstname': 'Beth', 'lastname': 'Chesman'}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+    
 if __name__ == "__main__":
     app = flaskapp.create_app()
     app.config['TESTING'] = True

@@ -8,6 +8,8 @@ import axios from 'axios'
 import {Fade} from 'react-reveal';
 import see from '../Assets/eye.svg';
 import unSee from '../Assets/eye-slash.svg';
+
+
 const RegisterPage = () => {
   const [type, setType] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -19,11 +21,11 @@ const handleSignup = async (firstname, lastname, email, password) => {
   formData.append('lastname', lastname);
   formData.append('email', email);
   formData.append('password', password); // Add other form details as needed.
-
+  
 try {
   const response = await axios({
     method: 'post',
-    url: '${process.env.REACT_APP_IP_ADDRESS}/auth/signup',
+    url: `${process.env.REACT_APP_IP_ADDRESS}/auth/signup`,
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }
   });

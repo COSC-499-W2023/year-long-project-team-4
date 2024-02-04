@@ -12,7 +12,7 @@ const ViewVideoPage = () => {
   
   useEffect(() => {
       // Replace with the correct URL of your backend
-      axios.get('${process.env.REACT_APP_IP_ADDRESS}/bucket/getvideos', {
+      axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bucket/getvideos`, {
           withCredentials: true})
           .then(response => {
               setVideos(response.data);
@@ -29,7 +29,7 @@ const ViewVideoPage = () => {
       const formData = new FormData();
       formData.append('video_name', videoName);
   
-      axios.post('${process.env.REACT_APP_IP_ADDRESS}/bucket/retrieve', formData, {
+      axios.post(`${process.env.REACT_APP_IP_ADDRESS}/bucket/retrieve`, formData, {
           withCredentials: true,
           responseType: 'blob' // Sets the expected response type to 'blob' since a video file is binary data
       })

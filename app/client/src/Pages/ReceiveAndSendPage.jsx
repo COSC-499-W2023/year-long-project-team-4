@@ -17,7 +17,7 @@ const ReceiveAndSendPage = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.get('${process.env.REACT_APP_IP_ADDRESS}/auth/logout', {
+      const response = await axios.get(`${process.env.REACT_APP_IP_ADDRESS}/auth/logout`, {
         withCredentials: true  // Important for handling sessions with cookies
       });
   
@@ -41,7 +41,7 @@ const ReceiveAndSendPage = () => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await axios.get('${process.env.REACT_APP_IP_ADDRESS}/auth/currentuser', {
+        const response = await axios.get(`${process.env.REACT_APP_IP_ADDRESS}/auth/currentuser`, {
           withCredentials: true
         });
   

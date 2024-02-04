@@ -70,7 +70,7 @@ const UploadVideoPage = () => {
     videoData.append('file', backend, 'videoFile.mp4');
     videoData.append('recipient', recipientEmail);
   
-    axios.post("${process.env.REACT_APP_IP_ADDRESS}/bucket/upload", videoData, {
+    axios.post(`${process.env.REACT_APP_IP_ADDRESS}/bucket/upload`, videoData, {
     withCredentials: true,
     headers: {
       'Content-Type': 'multipart/form-data'

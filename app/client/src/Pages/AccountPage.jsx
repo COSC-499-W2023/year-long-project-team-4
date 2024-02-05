@@ -94,36 +94,7 @@ useEffect(() => {
 
 const handleStartChat = (e, videoName) => {
   e.preventDefault();
-
-  const formData = new FormData();
-  formData.append('video_name', videoName); // Append the video name to the FormData
-
-  //POST request to create a new chat room
-  axios.post('http://localhost:8080/bucket/create_chat', formData, { 
-      withCredentials: true,
-      headers: {
-          'Content-Type': 'multipart/form-data'
-      }
-  })
-  //redirect to Messaging Page after creating the chat
-  .then(response => {
-      console.log('Chat created:', response.data);
-      navigate(MessagingPath, { state: { videoName: videoName } });
-  })
-  .catch(error => {
-      if (error.response) {
-          console.error('Error response:', error.response.data);
-          // Check if the error is because the chat already exists
-          if (error.response.data.error === "Associated chat already exists") {
-              navigate(MessagingPath, { state: { videoName: videoName } }); // Navigate to messaging page if chat already exists
-          } else {
-              setErrorMessage(error.response.data.error || 'Error creating chat');
-          }
-      } else {
-          console.error('Error creating chat:', error);
-          setErrorMessage('Error creating chat');
-      }
-  });
+  navigate(MessagingPath, { state: { videoName: videoName } });
 };
 
 return (

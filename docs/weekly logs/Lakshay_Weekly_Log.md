@@ -263,3 +263,25 @@ Completed:
 Additional Context:
 - Will work on adding websocket implementation using Socket.io mostly to enable real time update of chats
 - I was quite sick this week but was still able to work on the majority of my tasks
+
+
+# Term 2 Week 4: Jan 28 - Feb 4 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="794" alt="Screen Shot 2024-02-04 at 10 47 54 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/3adb8754-1c85-4c70-b06a-50f4dbda5a55">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Integrating socket.io/websockets for real receiving real time messages
+- Updating frontend test cases
+
+Tasks from the Project Board:
+- Creating Chats
+- Frontend testing
+
+Completed:
+- Still working on websockets implementation
+- Added test cases for the frontend pages
+
+Additional Context:
+- Spent a significant time working with the team to review the peer testing feedback and priotizing tasks for next milestone

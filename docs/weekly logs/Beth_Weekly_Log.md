@@ -210,3 +210,25 @@ Completed:
 - Ran into bugs when testing changing password while logged in (with regards to encryption and aes keys) so I fixed those
 - Completed all testing (tests pass) and made pull request
 - Made ec2 instance for web hosting, still need to tunnel in to it
+
+# Week 4: Jan 29 - Feb 4
+
+## Tasks Completed:
+
+![2Week4act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/befe6c08-c43d-4c38-9d63-92719ab74e4f)
+
+
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Creating password requirements
+- Verifying user's email upon signup
+- Web hosting (running project on ec2 instance)
+
+Completed:
+- Tunneled into ec2 instance and had a mock webpage up
+- Added in password requirements to signmup function
+- Created a verify email function thatt creates code and send email
+- Wrote tests for both, but only tested positive input so far

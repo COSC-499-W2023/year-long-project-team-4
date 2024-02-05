@@ -1,24 +1,27 @@
-import React, {useEffect, useState} from 'react'
-import {Card, Button, Form} from 'react-bootstrap';
+import React, {useState} from 'react'
+import {Button, InputGroup, Form} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom'
 import {Fade} from "react-reveal";
 import {
   guestPath,
-  recieveAndSendPath,
+  receiveAndSendPath,
   registerPath,
+  changePasswordPath,
 } from "../Path";
 import axios from 'axios'
+import see from '../Assets/eye.svg';
+import unSee from '../Assets/eye-slash.svg';
 
 const LoginHomePage = () => {
-
+  const [type, setType] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
-  const handleLogin = async (username, password) => {
+  const handleLogin = async (email, password) => {
     try {
       const response = await axios.post('http://localhost:8080/auth/login', {
-        username: username,
+        email: email,
         password: password
       }, {
         headers: {
@@ -26,10 +29,9 @@ const LoginHomePage = () => {
         },
         withCredentials: true
       });
-  
-      if (response.data.username) {
-        setCurrentUser(response.data.username);
-        navigate(recieveAndSendPath);
+      if (response.data.email) {
+        setCurrentUser(response.data.email);
+        navigate(receiveAndSendPath);
       } else {
         setErrorMessage(response.data.error);
       }
@@ -45,9 +47,9 @@ const LoginHomePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const username = e.target.elements[0].value;  // Assuming the first input is the username
-    const password = e.target.elements[1].value;  // Assuming the second input is the password
-    handleLogin(username, password);
+    const email = e.target.elements[0].value;  
+    const password = e.target.elements[1].value; 
+    handleLogin(email, password);
   };
   
   
@@ -60,17 +62,26 @@ const LoginHomePage = () => {
       <Fade big cascade>
         <Form onSubmit={handleSubmit}>
           <Form.Group className="p-3">
-            <Form.Label>Username</Form.Label>
+            <Form.Label>Email</Form.Label>
             <Form.Control
+              id='username'
               type="text"
-                      required
-            />
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
               required
             />
-          </Form.Group>   
+            <Form.Label>Password</Form.Label>
+              <InputGroup>
+                <Form.Control
+                  type={type ? "text" : "password"}
+                  required
+                />
+                <Button 
+                  variant="primary" 
+                  onClick={()=> setType(!type)}
+                >
+                  {!type? <img src={see}/> :<img src={unSee}/>}
+                </Button>
+              </InputGroup>
+            </Form.Group>   
           <Button type="submit" className="mb-2" variant="primary"> Login </Button>
         </Form>
       </Fade>
@@ -81,6 +92,9 @@ const LoginHomePage = () => {
           </div>    
           <div className="col"> 
             <a href={registerPath}>No account?</a>
+          </div>
+          <div className="col"> 
+            <a href={changePasswordPath}>Forgot password?</a>
           </div>
         </div>
       </Fade>

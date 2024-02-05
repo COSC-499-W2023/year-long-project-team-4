@@ -1,10 +1,10 @@
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-
-from .bucket_interface import rsa_encrypt_aes256_key, rsa_decrypt_aes256_key, aes_encrypt_video, aes_decrypt_video
+from flask_socketio import SocketIO
 
 bcrypt = Bcrypt()
+socketio = SocketIO()
 
 # Function to create and configure the Flask application
 def create_app():
@@ -16,6 +16,8 @@ def create_app():
 
     # Initialize Bcrypt for hashing passwords
     bcrypt.init_app(app)
+
+    socketio.init_app(app, cors_allowed_origins="*")
 
     from .auth import auth
     from .bucket_interface import bucket

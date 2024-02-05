@@ -16,16 +16,16 @@ DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
 TEST = os.getenv("TEST")
+SSH_TUNNEL_ADDRESS = os.getenv("EC2_ADDRESS")
 
 if(TEST.lower() == "true"):
     DBNAME = 'Team4dbTest'
 
-def insert_user(username:str, email:str, password:str, firstname:str, lastname:str, salthash, pubKey) -> int:
+def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, pubKey) -> int:
     '''
     Insert a new user into the database.
 
     Args:
-        username (str): The username of the new user.
         email (str): The email address of the new user.
         password (str): The hashed password of the new user.
         firstname (str): The first name of the new user.
@@ -38,22 +38,22 @@ def insert_user(username:str, email:str, password:str, firstname:str, lastname:s
 
     Example:
         # Example usage to insert a new user into the database
-        result = insert_user("new_username", "new_email", "hashed_password", "John", "Doe")
+        result = insert_user("new_email", "hashed_password", "John", "Doe")
     '''
     db = None
     result = None
     try:
         # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+            with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
                 print("SSH Tunnel Established")
                 #Db connection string
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
                 if db:
                     cur = db.cursor()
                     #Insert String
-                    query = "INSERT INTO userprofile (username, email, password_hash, firstname, lastname,salthash, publickey) values (%s,%s,%s,%s,%s,%s,%s)"
+                    query = "INSERT INTO userprofile (email, password_hash, firstname, lastname,salthash, publickey) values (%s,%s,%s,%s,%s,%s)"
                     #Creates list of the insertations
-                    data = (username,email,password,firstname,lastname, salthash, pubKey)
+                    data = (email,password,firstname,lastname, salthash, pubKey)
                     #Executes the query w/ the corrosponding data
                     cur.execute(query,data)
                     print("Insertation Complete")
@@ -96,7 +96,7 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
     
     try:
         # Creates the SSH tunnel to connect to the DB
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
             print("SSH Tunnel Established")
             #Db connection string
             db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
@@ -152,7 +152,7 @@ def update_user(user_id:int,new_data:dict) -> int:
     result = 0  # Initialize the result to 0
     
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
                 ssh_username=SSHUSER,
                 ssh_pkey=KPATH, 
                  remote_bind_address=(ADDRESS,PORT)
@@ -207,7 +207,7 @@ def query_records(table_name: str, fields: str, condition: str = "", condition_v
     db = None
     records = []
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
                 ssh_username=SSHUSER,
                 ssh_pkey=KPATH, 
                  remote_bind_address=(ADDRESS,PORT)
@@ -248,7 +248,7 @@ def delete_record(table_name: str, condition: str, condition_values: tuple) -> i
     result = 0
 
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
                 ssh_username=SSHUSER,
                 ssh_pkey=KPATH, 
                  remote_bind_address=(ADDRESS,PORT)
@@ -272,12 +272,12 @@ def delete_record(table_name: str, condition: str, condition_values: tuple) -> i
         return result
     
     
-def authenticate(username: str, password: str) -> bool: 
+def authenticate(email: str, password: str) -> bool: 
     """
     Authenticate a user by checking if the provided password matches the password stored in the database.
 
     Args:
-        username (str): The username of the user to authenticate.
+        email (str): The email of the user to authenticate.
         password (str): The password provided by the user for authentication.
 
     Returns:
@@ -285,7 +285,7 @@ def authenticate(username: str, password: str) -> bool:
     """
     db = None
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
                 ssh_username=SSHUSER,
                 ssh_pkey=KPATH, 
                  remote_bind_address=(ADDRESS,PORT)
@@ -295,8 +295,8 @@ def authenticate(username: str, password: str) -> bool:
             db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
             if db:
                 cur = db.cursor()
-                query = "SELECT password_hash FROM userprofile WHERE username = %s"
-                cur.execute(query, (username,))
+                query = "SELECT password_hash FROM userprofile WHERE email = %s"
+                cur.execute(query, (email,))
                 stored_password = cur.fetchone()
 
                 if stored_password and stored_password[0] == password:
@@ -313,7 +313,7 @@ def authenticate(username: str, password: str) -> bool:
 def resetTable(tableName:str)-> bool:
     db = None
     try:
-         with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
+         with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
                 ssh_username=SSHUSER,
                 ssh_pkey=KPATH, 
                  remote_bind_address=(ADDRESS,PORT)
@@ -338,3 +338,51 @@ def resetTable(tableName:str)-> bool:
         if db:
             db.close()
     return False  # Reset failed
+
+def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
+    '''
+    Zeros out a user's key so they can no longer access a video
+
+    Args:
+        videoName(str): The video's name where the key will be deleted
+        sender(bool): true if the user is the sender
+        reciever(bool): true if the user is the reciever
+
+    Returns:
+        int: An integer result code indicating the outcome of the delete operation.
+             - 1: Delete was successful.
+             - -1: An error occurred during the delete.
+    '''
+    db = None
+    result = 0  # Initialize the result to 0
+    
+    try:
+        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database='Team4dbTest')
+            if db:
+                cur = db.cursor()
+                #Create set clause depending on whether user is sender or receiver
+                if (sender):
+                    set_clause = "senderEncryption = 0, senderEmail = NULL"
+                elif (receiver):
+                    set_clause = "recieverEncryption = 0, receiverEmail = NULL"
+                else:
+                    result = -1
+                query = f"UPDATE videos SET {set_clause} WHERE videoName = %s"
+                cur.execute(query, videoName)   
+                # Check if video has chats associated with it and removes user's access
+                query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoName,))
+                if query_results:
+                    query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
+                    cur.execute(query2, videoName) 
+                cur.close()
+                result = 1  # Set result to 1 to indicate success
+    except Exception as e:
+        print(e)
+        result = -1  # Set result to -1 to indicate an error
+    finally:
+        if db:
+            db.close()
+    return result  # Return the result

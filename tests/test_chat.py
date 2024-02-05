@@ -136,9 +136,3 @@ def test_send_receive_chat(client):
     assert response['messages'][0]['message'] == '0'
     assert response['messages'][1]['message'] == '1'
     assert response['messages'][2]['message'] == '2'
-
-
-if __name__ == '__main__':
-    app = flaskapp.create_app()
-    app.config['TESTING'] = True
-    test_create_chat_fail(app.test_client())

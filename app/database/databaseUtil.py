@@ -125,7 +125,7 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
         return result
 
 
-def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None) -> int:
+def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None, new_password_hash: str = None, new_salt_hash: bytes = None, new_public_key: str = None) -> int:
     '''
     Update user information in the database.
 
@@ -159,6 +159,13 @@ def update_user(user_email: str, new_email: str = None, new_fname: str = None, n
         new_data['firstname'] = new_fname
     if new_lname is not None:
         new_data['lastname'] = new_lname
+    if new_password_hash is not None:
+        new_data['password_hash'] = new_password_hash
+    if new_salt_hash is not None:
+        new_data['salthash'] = new_salt_hash
+    if new_public_key is not None:
+        new_data['publickey'] = new_public_key
+
     
     try:
         with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 

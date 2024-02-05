@@ -125,7 +125,7 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
         return result
 
 
-def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None, new_password_hash: str = None, new_salt_hash: bytes = None, new_public_key: str = None) -> int:
+def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None, new_password_hash: str = None, new_salt_hash: bytes = None, new_public_key: str = None, new_verify_key: str = None) -> int:
     '''
     Update user information in the database.
 
@@ -165,6 +165,8 @@ def update_user(user_email: str, new_email: str = None, new_fname: str = None, n
         new_data['salthash'] = new_salt_hash
     if new_public_key is not None:
         new_data['publickey'] = new_public_key
+    if new_verify_key is not None:
+        new_data['verifyKey'] = new_verify_key
 
     
     try:

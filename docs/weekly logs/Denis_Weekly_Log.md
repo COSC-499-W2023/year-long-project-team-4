@@ -267,3 +267,24 @@ Completed:
 
 Additional Context:
 - N/A
+
+# Term 2 Week 4: Jan 28 - Feb 4 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![WhatIDid](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/29b46705-2956-47b0-95ac-0cbedc41106c)
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Face Blurring integration (Live video testing, and code clean up)
+- prepare for containerization - Frontend section + getting everything working on the EC2
+
+Tasks from the Project Board:
+- Face blurring
+- Dockerizing
+
+Completed:
+- Got face blurring integrated with the front-end live recording. 
+- Added more .env variables to make EC2 running easier, and setup EC2 to be available to the web
+
+Additional Context:
+- N/A

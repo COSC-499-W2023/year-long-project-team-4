@@ -192,3 +192,19 @@ Things I worked on:
   
 Tasks from the project board relevant to things I worked on:
 - Cleanup / stuff that needed to be changed that weren't project board
+
+
+# Term 2 Week (4): Jan 28 - Feb 4
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/9222625a-44b2-4e88-a80c-518bd76dc0a5)
+
+## Goal Recap:
+Things I worked on:
+- Updated PRs based on feedback
+- Code reviews
+- Refactor creating of message rooms, make them auto create when videos are uploaded. Changes both frontend/backend
+- Wrote full coverage testcases for messaging feature
+  
+Tasks from the project board relevant to things I worked on:
+- Creating chats

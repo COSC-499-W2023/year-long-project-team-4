@@ -125,8 +125,21 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 - Paritlal adding blurring to frontend (upload video works but recording does not).
 
 # In progress: 
-- Deal with recording part of the blurring in the frontend.
-- Deal with more bugs as they come along. 
+- Deal with recording part of the blurring in the front end.
+- Deal with more bugs as they come along.
+
+# Term 2 Week 4: Jan 28th - Feb 04th
+
+## Tasks Completed: 
+![term2_week4](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/91f3564e-be45-492a-a1ef-8bbd05bbbe17)
+
+- Dealt with blurring for recording.
+- Created new pages for dealing with forgotten passwords. 
+- Helped update endpoints to work with tokenization.
+
+# In progress: 
+- Implementing feedback from peer testing
+- Integrating the backend to the front end for updating/deleting accounts. 
 
 
   

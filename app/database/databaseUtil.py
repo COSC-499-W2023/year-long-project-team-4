@@ -126,7 +126,7 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
         return result
 
 
-def update_user(user_id:int,new_data:dict) -> int:
+def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None, new_password_hash: str = None, new_salt_hash: bytes = None, new_public_key: str = None, new_verify_key: str = None) -> int:
     '''
     Update user information in the database.
 
@@ -150,6 +150,25 @@ def update_user(user_id:int,new_data:dict) -> int:
     '''
     db = None
     result = 0  # Initialize the result to 0
+
+
+    # Setup our update data dictionary
+    new_data = {}
+    if new_email is not None:
+        new_data['email'] = new_email
+    if new_fname is not None:
+        new_data['firstname'] = new_fname
+    if new_lname is not None:
+        new_data['lastname'] = new_lname
+    if new_password_hash is not None:
+        new_data['password_hash'] = new_password_hash
+    if new_salt_hash is not None:
+        new_data['salthash'] = new_salt_hash
+    if new_public_key is not None:
+        new_data['publickey'] = new_public_key
+    if new_verify_key is not None:
+        new_data['verifyKey'] = new_verify_key
+
     
     try:
         with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
@@ -166,13 +185,14 @@ def update_user(user_id:int,new_data:dict) -> int:
                 # Construct the SET clause dynamically based on the update_data dictionary
                 set_clause = ", ".join(f"{field} = %s" for field in new_data.keys())
 
-                query = f"UPDATE userprofile SET {set_clause} WHERE id = %s"
+                query = f"UPDATE userprofile SET {set_clause} WHERE email = %s"
                 
                 # Append the user_id to the values list
-                new_data["user_id"] = user_id
+                new_data["old_email"] = user_email
 
                 data = list(new_data.values())  # Convert the values from the dictionary to a list
                 cur.execute(query, data)
+
                 db.commit()
                 cur.close()
                 result = 1  # Set result to 1 to indicate success

@@ -144,7 +144,7 @@ def retrieve_video():
         return jsonify({'error': 'Currently logged in user is neither sender or receiver of requested video'}), 409
 
     aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
-    video_path = f'/videos/{receiver_email}/{video_name}'
+    video_path = f'/videos/{video_name}'
 
     # Decrypt the file and write the data to an IO buffer
     video_data = io.BytesIO()
@@ -240,7 +240,7 @@ def send_chat():
 
     # Decrypt the file and write the data to an IO buffer
     chat_data = io.BytesIO()
-    object_content = s3Bucket.get_object_content(f"/chats/{chat_info['receiverEmail']}/{chat_name}")
+    object_content = s3Bucket.get_object_content(f"/chats/{chat_name}")
     decrypted_chat = aes_decrypt_video(object_content, aes_key)
     chat_data.write(decrypted_chat)
     chat_data.seek(0)
@@ -264,7 +264,7 @@ def send_chat():
     encrypted_chat, _ = aes_encrypt_video(json.dumps(chat_json).encode('utf-8'), aes_key)
 
     # Directly upload to S3 since no DB changes are made
-    path = f'/chats/{chat_info["receiverEmail"]}/{chat_name}'
+    path = f'/chats/{chat_name}'
     upload_result = s3Bucket.upload_file(encrypted_chat, path)
 
     if upload_result:
@@ -298,7 +298,7 @@ def retrieve_chat():
 
     # Decrypt the file and write the data to an IO buffer
     chat_data = io.BytesIO()
-    object_content = s3Bucket.get_object_content(f"/chats/{chat_info['receiverEmail']}/{chat_name}")
+    object_content = s3Bucket.get_object_content(f"/chats/{chat_name}")
     decrypted_chat = aes_decrypt_video(object_content, aes_key)
     chat_data.write(decrypted_chat)
     chat_data.seek(0)

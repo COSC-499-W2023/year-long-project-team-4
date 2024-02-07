@@ -191,8 +191,8 @@ def update_user(user_id:int,new_data:dict) -> int:
             db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
             cur = db.cursor()
             set_clause = ", ".join(f"{field} = %s" for field in new_data.keys())
-            query = f"UPDATE userprofile SET {set_clause} WHERE id = %s"
-            new_data["user_id"] = user_id
+            query = f"UPDATE userprofile SET {set_clause} WHERE email = %s"
+            new_data["old_email"] = user_email
             data = list(new_data.values())
             cur.execute(query, data)
             db.commit()

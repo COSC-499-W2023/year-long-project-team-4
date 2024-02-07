@@ -363,10 +363,10 @@ def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
     
     try:
         if SSH:
-            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
                 print("SSH Tunnel Established")
                 #Db connection string
-                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database='Team4dbTest')
+                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
                 if db:
                     cur = db.cursor()
                     #Create set clause depending on whether user is sender or receiver
@@ -386,7 +386,7 @@ def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
                     cur.close()
                     result = 1  # Set result to 1 to indicate success
         else:
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database='Team4dbTest')
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
             if db:
                 cur = db.cursor()
                 #Create set clause depending on whether user is sender or receiver

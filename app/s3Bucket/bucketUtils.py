@@ -354,7 +354,7 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
                                 result = False   
         else:
             #Db connection string
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
             if db:
                 if db:
                     cur = db.cursor()

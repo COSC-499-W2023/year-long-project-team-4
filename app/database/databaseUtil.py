@@ -225,7 +225,7 @@ def query_records(table_name: str, fields: str, condition: str = "", condition_v
         records = query_records("userprofile", "username, email, firstname, lastname")
 
     """
-    b = None
+    db = None
     records = []
     try:
         if SSH:

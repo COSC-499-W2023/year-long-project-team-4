@@ -8,8 +8,10 @@ import axios from 'axios'
 import {Fade} from 'react-reveal';
 import see from '../Assets/eye.svg';
 import unSee from '../Assets/eye-slash.svg';
+import PasswordCheckList from "react-password-checklist";
 const RegisterPage = () => {
   const [type, setType] = useState(false);
+  const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
 
@@ -51,10 +53,10 @@ try {
 const handleSubmit = (e) => {
     e.preventDefault();
     const firstname = e.target.elements[0].value; 
-    const email = e.target.elements[1].value;
-    const lastname = e.target.elements[2].value;
-    const password = e.target.elements[3].value;  // Assuming the second input is the password
-    handleSignup(firstname,lastname, email, password);
+    const lastname = e.target.elements[1].value;
+    const email = e.target.elements[2].value;
+    const pass= password;
+    handleSignup(firstname,lastname, email, pass);
 };
 
   return (
@@ -63,11 +65,15 @@ const handleSubmit = (e) => {
       <Fade cascade>
         <Form onSubmit={handleSubmit}>
         <Form.Group className="p-3">
-        <div className="row">
-          <div className="col">
             <Form.Label htmlFor='firstname'>First Name</Form.Label>
             <Form.Control
               id='firstname'
+              type="text"
+              required
+            />
+            <Form.Label>Last Name</Form.Label>
+            <Form.Control
+              id='username'
               type="text"
               required
             />
@@ -76,20 +82,14 @@ const handleSubmit = (e) => {
               id='email'
               type="email"
               required
-            />
-          </div>
-          <div className="col">
-          <Form.Label>Last Name</Form.Label>
-            <Form.Control
-              id='username'
-              type="text"
-              required
-            />
+            />        
             <Form.Label>Password</Form.Label>
               <InputGroup>
                 <Form.Control
                   type={type ? "text" : "password"}
                   required
+                  value={password}
+                  onChange={(e)=>{setPassword(e.target.value)}}
                 />
                 <Button 
                   variant="primary" 
@@ -98,9 +98,21 @@ const handleSubmit = (e) => {
                   {!type? <img src={see}/> :<img src={unSee}/>}
                 </Button>
               </InputGroup>
-          </div>     
+              <PasswordCheckList
+                className='pt-3'
+                rules={["capital", "specialChar", "minLength","maxLength", "number"]}
+                minLength={8}
+                maxLength={25}
+                value={password}
+                messages={{
+                  minLength: "Password requires at least 8 characters.",
+                  maxLength: "Password requires at most 25 characters.",
+                  number: "Password must contain at least 1 number.",
+                  capital: "Password must contain at least 1 capital letter.",
+                  specialChar: "Password must contain at least 1 special character",
+                }}
+                />
           <Button className="m-2" variant="primary" type="submit"> Register </Button>
-          </div>
         </Form.Group>  
         </Form>
         <a href={loginPath}>Have an account?</a>

@@ -6,7 +6,8 @@ import axios from "axios";
 import info from "../Assets/info-circle.svg"
 import { Fade } from 'react-reveal';
 import ysfixWebmDuration from "fix-webm-duration";
-
+import { useNavigate } from 'react-router-dom';
+import {viewSentVideoPath} from "../Path";  
 
 const UploadVideoPage = () => {
   const [type, setType] = useState(1);
@@ -26,6 +27,7 @@ const UploadVideoPage = () => {
 
   let startTime;
   var duration;
+  const navigate = useNavigate();
 
   const handleClose = () => setShow(false);
   
@@ -88,7 +90,8 @@ const UploadVideoPage = () => {
   })
   .then(response => {
     console.log('Video uploaded successfully', response.data);
-    setUploadSuccess(true); // Updates the state to reflect a successful upload;
+    setUploadSuccess(true);
+    navigate(viewSentVideoPath);
   })
   .catch(error => {
     console.error('Error uploading video', error);
@@ -201,7 +204,7 @@ const UploadVideoPage = () => {
         </p>
       </Offcanvas.Body>
     </Offcanvas>
-    {uploadSuccess && <div className="alert alert-success" role="alert">Video sent successfully!</div>}
+    {uploadSuccess && <div className="alert alert-success p-3" role="alert">Video sent successfully!</div>}
     <Fade>
       <div className="position-absolute top-50 start-50 translate-middle text-center">
         <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>

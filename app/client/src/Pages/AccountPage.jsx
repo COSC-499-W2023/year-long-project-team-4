@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Card, Col, Button, Row, ListGroup, Tab, Form, Modal, Tabs, InputGroup} from 'react-bootstrap';
+import {Card, Col, Button, Row, ListGroup, Tab, Form, Modal, Tabs, InputGroup, Alert} from 'react-bootstrap';
 import { homePath, receiveAndSendPath } from '../Path';
 import {Fade} from 'react-reveal';
 import axios from 'axios';
@@ -15,12 +15,50 @@ const [type, setType] = useState(false)
 const [currentUser, setCurrentUser] = useState(null);
 const [errorMessage, setErrorMessage] = useState("");
 const [key, setKey] = useState('videos');
+
 const handleSubmit = (e) => {
     e.preventDefault();
     const firstname = e.target.elements[0].value;
     const lastname = e.target.elements[1].value;
     const email = e.target.elements[2].value;
+    const password = e.target.elements[3].value;
+    handleUpdate(firstname,lastname,email,password);
   }
+const handleUpdate = async(firstname,lastname,email,password) => {
+  const formData = new FormData();
+  formData.append('firstname',firstName);
+  formData.append('lastname',lastName);
+  formData.append('email', email);
+  formData.append('password', password);
+  
+  try {
+    const response = await axios(
+      {
+        method: 'post',
+        url:'http://localhost:8080/auth/updateinfo',
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      const data = response.data;
+
+  if (data.email) {
+    console.log('update successful');
+    setKey('account');
+  
+  } else {
+    setErrorMessage(data.error);
+  }
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.error) {
+      setErrorMessage(error.response.data.error);
+    } else {
+      // Set a generic error message for other types of errors
+      setErrorMessage('There was an error signing up');
+    }
+  }
+}
+
 const handleDelete = () =>{
 
 }
@@ -130,6 +168,7 @@ return (
    <div className="container p-4">
     <Fade>
       <Card>
+        {errorMessage? (<Alert>{errorMessage}</Alert>):(<></>)}
         <Tabs
         id="controlled-tab-example"
         activeKey={key}
@@ -166,7 +205,6 @@ return (
             <div className="display-6 text-center"> Account Info </div>
             <Col className="p-4 fs-5">
               <ListGroup variant="flush">
-                <ListGroup.Item> Email: {email}</ListGroup.Item>
                 <ListGroup.Item> Email: {email}</ListGroup.Item>
                 <ListGroup.Item> First Name: {firstName}</ListGroup.Item>
                 <ListGroup.Item> Last Name: {lastName}</ListGroup.Item>

@@ -21,7 +21,7 @@ SSH_TUNNEL_ADDRESS = os.getenv("EC2_ADDRESS")
 if(TEST.lower() == "true"):
     DBNAME = 'Team4dbTest'
 
-def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, pubKey) -> int:
+def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, pubKey, verifyKey) -> int:
     '''
     Insert a new user into the database.
 
@@ -51,9 +51,9 @@ def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, 
                 if db:
                     cur = db.cursor()
                     #Insert String
-                    query = "INSERT INTO userprofile (email, password_hash, firstname, lastname,salthash, publickey) values (%s,%s,%s,%s,%s,%s)"
+                    query = "INSERT INTO userprofile (email, password_hash, firstname, lastname,salthash, publickey, verifyKey) values (%s,%s,%s,%s,%s,%s,%s)"
                     #Creates list of the insertations
-                    data = (email,password,firstname,lastname, salthash, pubKey)
+                    data = (email,password,firstname,lastname, salthash, pubKey, verifyKey)
                     #Executes the query w/ the corrosponding data
                     cur.execute(query,data)
                     print("Insertation Complete")

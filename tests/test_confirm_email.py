@@ -22,16 +22,22 @@ def client(app):
 def test_confirm_user(client):
     assert database.resetTable(tableName="userprofile")
     
-    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'Test_password@1', 'firstname': 'Beth'}
+    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'Test_password@1', 'firstname': 'Beth', 'lastname': 'Chesman'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
     
     inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=('fakeusertest987@gmail.com',))[0]['verifyKey']
-    post_object = {'input_code': f'{inputcode}', 'email': 'fakeusertest987@gmail.com', 'password': 'Test_password@1', 'firstname': 'Beth', 'lastname': 'Chesman'}
+    post_object = {'input_code': f'{inputcode}', 'email': 'fakeusertest987@gmail.com'}
     response = json.loads(client.post('/auth/confirm_user', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
+    
+def bad_password_failure(client):
+    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'Test1', 'firstname': 'Beth'}
+    response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
+    assert 'error' in response
     
 if __name__ == "__main__":
     app = flaskapp.create_app()
     app.config['TESTING'] = True
     test_confirm_user(app.test_client())
+    bad_password_failure(app.test_client())

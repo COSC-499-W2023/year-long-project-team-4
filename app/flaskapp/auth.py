@@ -19,7 +19,6 @@ if not LOCAL:
     ACCESS_KEY = os.getenv("ACCESSKEY")
     SECRET_KEY = os.getenv('SECRETKEY')
     SESSION_TOKEN = os.getenv('SESSTOKEN')
-    boto3.setup_default_session(profile_name='team4-dev')
     ses_client = boto3.client(
     'ses', 
     region_name='ca-central-1',
@@ -36,6 +35,7 @@ def signup():
     email = request.form.get('email')
     password = request.form.get('password')
     firstname = request.form.get('firstname')
+    lastname = request.form.get('lastname')
     
     # Ensure request is valid
     if email is None:
@@ -44,6 +44,8 @@ def signup():
         return jsonify({'error': 'Missing password'}), 400
     if firstname is None:
         return jsonify({'error': 'Missing first name'}), 400
+    if lastname is None:
+        return jsonify({'error': 'Missing last name'}), 400
     if len(password) < 8:
         return jsonify({"error": "Password less than 8 characters"}), 502
     elif re.search('[0-9]',password) is None:
@@ -63,10 +65,20 @@ def signup():
     existing_user = database.query_records(table_name='userprofile', fields='email', condition=f'email = %s', condition_values=(email,))
     if existing_user:
         return jsonify({'error': 'User already exists'}), 409
+    
+    salt_hash = os.urandom(64)
+    private_key_seed = password + salt_hash.hex()
+    private_key = generate_key(private_key_seed)
+    public_key = private_key.publickey().export_key('PEM')
+
+    hashed_password = bcrypt.generate_password_hash(password).decode()
 
     #Create verification code
     created_code = ''.join(random.choices(string.digits, k=6))
-    database.update_user(email, new_verifyKey = created_code)
+    result = database.insert_user(email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash, pubKey=public_key, verifyKey=created_code)
+    
+    if result != 1:
+        return jsonify({'error': 'Unknown error adding user'})
     
     #Save code locally if Local is true
     if LOCAL:
@@ -163,39 +175,23 @@ def signup():
 def confirm_user():
     input_code = request.form.get('input_code')
     email = request.form.get('email')
-    password = request.form.get('password')
-    firstname = request.form.get('firstname')
-    lastname = request.form.get('lastname')
     # Ensure request is valid
     if input_code is None:
         return jsonify({'error': 'Missing input code'}), 400
     if email is None:
         return jsonify({'error': 'Missing email'}), 400
-    if password is None:
-        return jsonify({'error': 'Missing password'}), 400
-    if firstname is None:
-        return jsonify({'error': 'Missing first name'}), 400
-    if lastname is None:
-        return jsonify({'error': 'Missing last name'}), 400
     
     created_code = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(email,))[0]['verifyKey']
     
+    # Check if input code is same as emailed
     if input_code == created_code:
-        salt_hash = os.urandom(64)
-        private_key_seed = password + salt_hash.hex()
-        private_key = generate_key(private_key_seed)
-        public_key = private_key.publickey().export_key('PEM')
-
-        hashed_password = bcrypt.generate_password_hash(password).decode()
+        # Set verified to True
+        result = database.update_user(user_email = email, new_verified = True)
         
-        result = database.insert_user(email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash, pubKey=public_key)
-    
         if result == 1:
-            session['email'] = email
-            session['pkey_seed'] = password + salt_hash.hex()
-            return jsonify({'email': email}), 200
+            return jsonify({'status': 'success', 'message': 'Email verified'}), 200
         else:
-            return jsonify({'error': 'Unknown error adding user'})
+            return jsonify({'error': 'Unknown error verifying email'})
     elif input_code != created_code:
         return (jsonify({"status": "error", "message": "codes do not match"}),502)
     else:
@@ -221,6 +217,11 @@ def login():
     stored_hashed_password = existing_user_password[0]['password_hash']
     if not bcrypt.check_password_hash(stored_hashed_password, password):
         return jsonify({'error': 'Incorrect password'}), 401
+    
+    # Check email verified
+    email_verified = database.query_records(table_name='userprofile', fields='verified', condition=f'email = %s', condition_values=(email,))
+    if not email_verified:
+        return jsonify({'error': 'User email is not verified'}), 404
 
     query_results = database.query_records(table_name='userprofile', fields='salthash, email', condition=f'email = %s', condition_values=(email,))[0]
     salt_hash = query_results['salthash']

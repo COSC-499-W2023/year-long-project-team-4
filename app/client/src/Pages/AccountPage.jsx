@@ -22,14 +22,13 @@ const handleSubmit = (e) => {
     const lastname = e.target.elements[1].value;
     const email = e.target.elements[2].value;
     const password = e.target.elements[3].value;
-    handleUpdate(firstname,lastname,email,password);
+    handleUpdate(firstname,lastname,email, password);
   }
-const handleUpdate = async(firstname,lastname,email,password) => {
+const handleUpdate = async(firstname,lastname,email) => {
   const formData = new FormData();
   formData.append('firstname',firstName);
   formData.append('lastname',lastName);
   formData.append('email', email);
-  formData.append('password', password);
   
   try {
     const response = await axios(
@@ -40,9 +39,18 @@ const handleUpdate = async(firstname,lastname,email,password) => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      const data = response.data;
+      const passwordUpdate = await axios({
+        method: 'post',
+        url: 'http://localhost:8080/bucket/change_password_reencrypt',
+        data: password,
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }
+      );
 
-  if (data.email) {
+      const data = response.data;
+      const passwordData = passwordUpdate.data;
+
+  if (data.email&&passwordData.json()) {
     console.log('update successful');
     setKey('account');
   
@@ -65,8 +73,8 @@ const handleDelete = () =>{
 
 const navigate = useNavigate();
 
-const firstName = "firstname123";
-const lastName = "lastname123";
+//const firstName = "firstname123";
+//const lastName = "lastname123";
 const email = currentUser;
 
 const [videos, setVideos] = useState([]);

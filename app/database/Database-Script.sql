@@ -27,7 +27,7 @@ CREATE TABLE videos (
     receiverEmail VARCHAR(100),
     senderEncryption VARCHAR(500),
 	receiverEncryption VARCHAR(500),
-    FOREIGN KEY (receiverEmail) REFERENCES userprofile(email) ON DELETE CASCADE
+    FOREIGN KEY (receiverEmail) REFERENCES userprofile(email) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE forms (
@@ -51,6 +51,6 @@ CREATE TABLE chats (
 	senderEncryption VARCHAR(500),
 	receiverEncryption VARCHAR(500),
 	retDate DATETIME,
-	FOREIGN KEY (senderEmail) REFERENCES userprofile(email) ON DELETE CASCADE,
-    FOREIGN KEY (receiverEmail) REFERENCES userprofile(email) ON DELETE CASCADE
+	FOREIGN KEY (senderEmail) REFERENCES userprofile(email) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (receiverEmail) REFERENCES userprofile(email) ON DELETE CASCADE ON UPDATE CASCADE
 );

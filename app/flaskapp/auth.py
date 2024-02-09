@@ -75,7 +75,7 @@ def signup():
 
     #Create verification code
     created_code = ''.join(random.choices(string.digits, k=6))
-    result = database.insert_user(email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash, pubKey=public_key, verifyKey=created_code)
+    result = database.insert_user(email=email, password=hashed_password, firstname=firstname, lastname=lastname, salthash=salt_hash, pubKey=public_key, verifyKey=created_code, verified_user='False')
     
     if result != 1:
         return jsonify({'error': 'Unknown error adding user'})
@@ -186,7 +186,7 @@ def confirm_user():
     # Check if input code is same as emailed
     if input_code == created_code:
         # Set verified to True
-        result = database.update_user(user_email = email, new_verified = True)
+        result = database.update_user(user_email = email, new_verified_user = 'True')
         
         if result == 1:
             return jsonify({'status': 'success', 'message': 'Email verified'}), 200

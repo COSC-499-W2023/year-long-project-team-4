@@ -27,6 +27,7 @@ CREATE TABLE videos (
     receiverEmail VARCHAR(100),
     senderEncryption VARCHAR(500),
     receiverEncryption VARCHAR(500),
+    FOREIGN KEY (senderEmail) REFERENCES userprofile(email) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (receiverEmail) REFERENCES userprofile(email) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -85,6 +86,7 @@ CREATE TABLE videos (
     receiverEmail VARCHAR(100),
     senderEncryption VARCHAR(500),
     receiverEncryption VARCHAR(500),
+    FOREIGN KEY (senderEmail) REFERENCES userprofile(email) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (receiverEmail) REFERENCES userprofile(email) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

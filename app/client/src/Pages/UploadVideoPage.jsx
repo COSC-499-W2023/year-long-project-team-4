@@ -6,9 +6,11 @@ import axios from "axios";
 import info from "../Assets/info-circle.svg"
 import { Fade } from 'react-reveal';
 import { IP_ADDRESS } from '../Path';
+import ysfixWebmDuration from "fix-webm-duration";
 
 const UploadVideoPage = () => {
   const [type, setType] = useState(1);
+  const [time, setTime] = useState(0);
   const [file, setFile] = useState(null);
   const [backend, setBackend] = useState(null);
   const [disable, setDisable] = useState(true);
@@ -22,6 +24,9 @@ const UploadVideoPage = () => {
   const [show, setShow] = useState(false);
   const [load, setLoad] = useState(false);
 
+  let startTime;
+  var duration;
+
   const handleClose = () => setShow(false);
   
   const handleShow = () => setShow(true);  
@@ -33,7 +38,7 @@ const UploadVideoPage = () => {
 
   const handleStartRecord = React.useCallback(() => {
     setCapturing(true);
-
+    startTime = Date.now();
     mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
       mimeType: "video/webm"
       });
@@ -55,12 +60,15 @@ const UploadVideoPage = () => {
       [setRecordedChunks]
     );
 
-    const handleStopRecord = React.useCallback(() => {
+    const handleStopRecord =  React.useCallback(() => {
+      duration = Date.now() - startTime;
       setDisableRecord(true);
-
+      setTime(duration);
       mediaRecorderRef.current.stop();
       
       setCapturing(false);
+
+
     }, [mediaRecorderRef, webcamRef, setCapturing]);
 
   const handleSubmit =(e)=>{
@@ -104,11 +112,13 @@ const UploadVideoPage = () => {
     setDisableRecord(false);
   }
 
-  const handleRecord = (mediaContent) => {
+  const handleRecord = async(mediaContent) => {
     try {
+      console.log(time);
       const mediablob = new Blob(mediaContent,{type: "video/mp4"});
-      setBackend(mediablob);
-      setFile(URL.createObjectURL(mediablob));
+      const fixedblob = await ysfixWebmDuration(mediablob,time,{logger:false});
+      setBackend(fixedblob);
+      setFile(URL.createObjectURL(fixedblob));
       
       setDisable(false);
 

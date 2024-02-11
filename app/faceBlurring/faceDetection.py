@@ -9,78 +9,82 @@ from dotenv import load_dotenv
 LOCAL = os.getenv('LOCAL') == 'True'
 
 if not LOCAL: # Flag for local or not
+    # RUN "AWS CONFIGURE SSO" before running code - this one included if local is not set to True 
     boto3.setup_default_session(profile_name='team4-dev')
     s3_client = boto3.client('s3')
 
 
 def detect_faces(VideoFrame):
-    #start = time.time()
-    rek_client = boto3.client('rekognition')
-    #Load frame - Calls a tuple - ignore first varible using '_', only care about the second
-    _, img_bytes = cv2.imencode(".jpg", VideoFrame)
-    img_bytes = img_bytes.tobytes()
-    
-    # Call rekognition api for each frame 
-    response = rek_client.detect_faces(Image={'Bytes': img_bytes}) 
-    face_details = []
-    for faces in response['FaceDetails']:
-        face_details.append(faces['BoundingBox'])
-    
-    #end = time.time()
-    #print(f"AWS CALL TIME: {end - start}\n")
-    return face_details
+    try:
+        rek_client = boto3.client('rekognition')
+        #Load frame - Calls a tuple - ignore first varible using '_', only care about the second
+        _, img_bytes = cv2.imencode(".jpg", VideoFrame)
+        img_bytes = img_bytes.tobytes()
+        
+        # Call rekognition api for each frame 
+        response = rek_client.detect_faces(Image={'Bytes': img_bytes}) 
+        face_details = []
+        for faces in response['FaceDetails']:
+            face_details.append(faces['BoundingBox'])
+        
+        return face_details
+    except Exception as e:
+        print(f'Failed to do the rekognition call: {e}')
 
 def blur_faces_opencv(frame, face_details):
     #Copy frame into new variable
-    #start = time.time()
-    image = frame.copy()
-    h, w, _ = image.shape
+    try:
+        image = frame.copy()
+        h, w, _ = image.shape
+        
+        for face_detail in face_details:
+            x = int(face_detail['Left'] * w)
+            y = int(face_detail['Top'] * h)
+            
+            # Change these numbers below to change the blur box size
+            width = int((face_detail['Width'] * w)*1.2)
+            height = int(face_detail['Height'] * h)
 
-    for face_detail in face_details:
-        x = int(face_detail['Left'] * w)
-        y = int(face_detail['Top'] * h)
-        width = int((face_detail['Width'] * w)*1.2)
-        height = int(face_detail['Height'] * h)
+                # Extract the face region            
+            face_region = image[y:y+height, x:x+width]
+            if not face_region.size == 0:
+                # Apply blur to the face region
+                blurred_face = cv2.GaussianBlur(face_region, (99, 99), 30)
+            # Replace the original face region with the blurred version
+                image[y:y+height, x:x+width] = blurred_face
 
-            # Extract the face region            
-        face_region = image[y:y+height, x:x+width]
-        if not face_region.size == 0:
-            # Apply blur to the face region
-            blurred_face = cv2.GaussianBlur(face_region, (99, 99), 30)
-        # Replace the original face region with the blurred version
-            image[y:y+height, x:x+width] = blurred_face
-    #end = time.time()
-    #print(f"BLUR CALL TIME: {end-start} seconds\n")
-    return image
+        return image
+    except Exception as e:
+        print(f"Failed to find frame and face information to blur: {e}")
 
 # Code snippet from: https://github.com/aws-samples/rekognition-video-people-blurring-cdk/blob/bf7c1625ec2571c19889c141aef5615bcec30d6d/stack/lambdas/rekopoc-apply-faces-to-video-docker/video_processor.py#L91
 def integrate_audio(original_video, output_video, audio_path=os.path.dirname(__file__)+'/temp/audio.mp4'):
+    try:
     # Extract audio
-    cap = cv2.VideoCapture(original_video)
-    #fps = cap.get(cv2.CAP_PROP_FPS)
-    #totalFrames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
-    #print(original_video)
-    my_clip = VideoFileClip(original_video)
-
-    # my_clip.set_fps(fps)
-    
-    print(my_clip)
-    my_clip.audio.write_audiofile(audio_path,codec='libmp3lame')
-
-    temp_location = os.path.join(os.path.dirname(__file__), 'temp', 'output_video.mp4')
-    
-    # Join output video with extracted audio
-    videoclip = VideoFileClip(output_video)
-    #videoclip = videoclip.set_audio(VideoFileClip(audio_path))
-    videoclip.write_videofile(temp_location, codec='libx264', audio=audio_path, audio_codec='libmp4lame')
-    videoLoc = os.path.basename(original_video)
-    os.rename(temp_location, os.path.dirname(__file__)+'/temp/blurred_'+videoLoc)
-    # Delete audio
-    os.remove(audio_path)
-    os.remove(output_video)
+        my_clip = VideoFileClip(original_video)
+        my_clip.audio.write_audiofile(audio_path,codec='libmp3lame')
+        temp_location = os.path.join(os.path.dirname(__file__), 'temp', 'output_video.mp4')
+        
+        # Join output video with extracted audio
+        videoclip = VideoFileClip(output_video)
+        videoclip.write_videofile(temp_location, codec='libx264', audio=audio_path, audio_codec='libmp4lame')
+        videoLoc = os.path.basename(original_video)
+        os.rename(temp_location, os.path.dirname(__file__)+'/temp/blurred_'+videoLoc)
+        
+        # Delete audio
+        os.remove(audio_path)
+        os.remove(output_video)
+    except Exception as e:
+        print(f'Could not integrate audio to blurred video: {e}, removing all files')
+        os.remove(audio_path)
+        os.remove(output_video)    
 
 def parallel_detect_faces(video_path, frame_skip,video_out_path):
     cap = cv2.VideoCapture(video_path)
+    
+    if not cap.isOpened():
+        print(f'Error: Failed to open video at {video_path}')
+        
     input_fps = cap.get(cv2.CAP_PROP_FPS)
     print(f"Input FPS: {input_fps}\n\n\n\n\n\n")
     # Sample frames
@@ -94,6 +98,7 @@ def parallel_detect_faces(video_path, frame_skip,video_out_path):
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
+                print("Error: Failed to read frame from video")
                 break
 
             # Check for new frame to pull
@@ -132,10 +137,11 @@ def parallel_detect_faces(video_path, frame_skip,video_out_path):
     cap.release()
     out.release()
 
-def process_video(upload_path):
-    
 
+def process_video(upload_path):
     start = time.time() # for timing the entire video 
+    
+    # Change this number to change number of frames skipped - Higher number faster processing, however, blur is more jumpy
     frame_skip = 3
     
     # Generate the video_out_path using the video name
@@ -143,11 +149,11 @@ def process_video(upload_path):
     video_out_path = os.path.join(os.path.dirname(__file__), 'temp', 'processed_' + base)
     print(video_out_path)
     
-    # Start handling video - Load, and save the output
+    # Start handling video - Parallel call for face detection
     parallel_detect_faces(upload_path,frame_skip,video_out_path)
+    # Intregrate original video audio to new blurred
     integrate_audio(upload_path, video_out_path)
     end = time.time()
     print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n") # printing the speed 
     
-if __name__ == "__main__":
-    process_video(upload_path = r"C:\Users\Gauth\COSC499\year-long-project-team-4\tests\AudioTest.mp4")
+    

@@ -6,7 +6,6 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.5.1",
     "bootstrap": "^5.3.2",
-    "dotenv": "^16.4.1",
     "install": "^0.13.0",
     "js-cookie": "^3.0.5",
     "npm": "^10.2.1",

@@ -3,6 +3,7 @@ import { Button, Form, InputGroup} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom'
 import {
     loginPath,
+    IP_ADDRESS,
   } from "../Path";
 import axios from 'axios'
 import {Fade} from 'react-reveal';
@@ -25,7 +26,7 @@ const handleSignup = async (firstname, lastname, email, password) => {
 try {
   const response = await axios({
     method: 'post',
-    url: `${process.env.REACT_APP_IP_ADDRESS}/auth/signup`,
+    url: `${IP_ADDRESS}/auth/signup`,
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }
   });

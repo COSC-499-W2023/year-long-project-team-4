@@ -11,3 +11,4 @@ export const viewSentVideoPath = "/viewSentVideo";
 export const changePasswordPath = "/PasswordChange";
 export const passwordCodePath = "/PasswordCode";
 export const resetPasswordPath = "/PasswordReset";
+export const IP_ADDRESS = "http://localhost:8080";

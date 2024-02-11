@@ -19,8 +19,10 @@ def test_insert_user():
 
 def test_insert_video():
     result = database.insert_video("Test.mp4", "2024-01-24 11:59:00", "updated@example.com", "Test@example.com","1","2")
+    resultGuest = database.insert_video("TestGuest.mp4", "2024-01-24 11:59:00",None, "Test@example.com","1","2")
 
     assert result == 1  # Assuming insertion was successful
+    assert resultGuest == 1
 
 def test_update():
     update_data = {

@@ -5,7 +5,8 @@ import axios from 'axios';
 import {Fade} from 'react-reveal';
 import {useNavigate} from 'react-router-dom';
 import {
-    MessagingPath
+    MessagingPath,
+    IP_ADDRESS,
   } from "../Path";
 
 const ViewVideoPage = () => {
@@ -20,7 +21,7 @@ const ViewVideoPage = () => {
   //Fetch videos on component mount
   useEffect(() => {
       // Replace with the correct URL of your backend
-      axios.get(`${process.env.REACT_APP_IP_ADDRESS}/bucket/getvideos`, {
+      axios.get(`${IP_ADDRESS}/bucket/getvideos`, {
           withCredentials: true})
           .then(response => {
               setVideos(response.data);
@@ -36,7 +37,7 @@ const ViewVideoPage = () => {
       const formData = new FormData();
       formData.append('video_name', videoName);
   
-      axios.post(`${process.env.REACT_APP_IP_ADDRESS}/bucket/retrieve`, formData, {
+      axios.post(`${IP_ADDRESS}/bucket/retrieve`, formData, {
           withCredentials: true,
           responseType: 'blob' // Sets the expected response type to 'blob' since a video file is binary data
       })
@@ -63,7 +64,7 @@ const ViewVideoPage = () => {
     formData.append('video_name', videoName); // Append the video name to the FormData
 
     //POST request to create a new chat room
-    axios.post('http://localhost:8080/bucket/create_chat', formData, { 
+    axios.post(`${IP_ADDRESS}/bucket/create_chat`, formData, { 
         withCredentials: true,
         headers: {
             'Content-Type': 'multipart/form-data'

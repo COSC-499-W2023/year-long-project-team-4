@@ -288,3 +288,25 @@ Completed:
 
 Additional Context:
 - N/A
+
+# Term 2 Week 5: Feb 4 - Feb 11 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![WhatIDid](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/bda89267-28c1-4423-8355-487143be8feb)
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- prepare for containerization - Frontend section + getting everything working on the EC2
+- Get our app running on the ec2
+
+Tasks from the Project Board:
+- Get the app working on the EC2
+
+Completed:
+- Finally able to get the application accessible and running on the ec2
+- Finished up making the code easy to change for the docker setup 
+
+Additional Context:
+I did not complete as much as I wanted since getting the code to work on the EC2 proved to be a bit more tricky than I anticipated
+- I had a few midterms in the next week that required me not to work as much. 

@@ -141,5 +141,16 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 - Implementing feedback from peer testing
 - Integrating the backend to the front end for updating/deleting accounts. 
 
+# Term 2 Week 5:  Feb 5th - Feb 11th
+
+## Tasks Completed: 
+![term2_week5](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/efd1c575-c17d-430a-897f-809668f3902f)
+
+- Handled integration for updating and password reset.
+- Small front-end changes based on peer testing feedback.
+
+# In progress: 
+- Focusing on implementing all feedback from peer testing.
+
 
   

@@ -285,3 +285,24 @@ Completed:
 
 Additional Context:
 - Spent a significant time working with the team to review the peer testing feedback and priotizing tasks for next milestone
+
+# Term 2 Week 5: Feb 4 - Feb 11 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="835" alt="Screen Shot 2024-02-11 at 11 18 04 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/0ee80088-1543-4a79-8c2c-da319712f42e">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Add web sockets implementation to chats
+- Add chat and video player on the same page
+
+Tasks from the Project Board:
+- Creating Chats
+
+Completed:
+- Able to get research done on the working of web sockets
+- Finished design for the updated chat frontend
+
+Additional Context:
+I did not complete as much as I wanted since getting web sockets implemented was a bit challenging considering i have not implemented it before
+

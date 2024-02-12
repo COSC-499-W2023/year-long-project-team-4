@@ -218,8 +218,6 @@ Completed:
 ![2Week4act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/befe6c08-c43d-4c38-9d63-92719ab74e4f)
 
 
-
-
 ## Goal Recap:
 
 Tasks from project board:
@@ -232,3 +230,22 @@ Completed:
 - Added in password requirements to signmup function
 - Created a verify email function thatt creates code and send email
 - Wrote tests for both, but only tested positive input so far
+
+# Week 4: Feb 5 - Feb 11
+
+## Tasks Completed:
+
+![2Week5act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/be76efe6-f207-458c-a482-4a0035bdb3af)
+
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Creating password requirements
+- Verifying user's email upon signup
+
+Completed:
+- Adjusted the functions so the user is created upon signup, but verifiedAcc is set to false. This is changed after user is verified and is checked upon login now
+- Completed testing, including negative input
+- Had to get verifiedAcc added to database, so I adjusted update_user and insert_user to align with this

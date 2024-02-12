@@ -168,12 +168,32 @@ def retrieve_video():
 
 @bucket.route('/getvideos', methods=['GET'])
 def get_available_videos():
-    available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
+    tags = request.form.get('tags')
+    available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
+
+    if tags:
+        condition_statement = 'tagName = %s OR ' * len(tags)
+        condition_statement = condition_statement[:-4]
+        for tag in tags:
+            condition_statement
+        available_by_tags = database.query_records(table_name='tags', fields='videoName', condition=condition_statement, condition_values=tags)
+        available_videos = [video for video in available_videos if video['videoName'] in available_by_tags]
+
     return json.dumps(available_videos), 200
     
 @bucket.route('/get_sent_videos', methods=['GET'])
 def get_sent_videos():
-    available_videos = database.query_records(table_name='videos', fields='videoName, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
+    tags = request.form.get('tags')
+    available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
+
+    if tags:
+        condition_statement = 'tagName = %s OR ' * len(tags)
+        condition_statement = condition_statement[:-4]
+        for tag in tags:
+            condition_statement
+        available_by_tags = database.query_records(table_name='tags', fields='videoName', condition=condition_statement, condition_values=tags)
+        available_videos = [video for video in available_videos if video['videoName'] in available_by_tags]
+
     return json.dumps(available_videos), 200
 
 def create_chat(video_name, retention_date, sender_email, receiver_email, sender_key, receiver_key):

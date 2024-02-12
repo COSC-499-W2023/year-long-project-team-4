@@ -146,6 +146,52 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
             db.close()
     return result
 
+
+def insert_tags(video_name: str, tags: list[str]) -> int:
+    result = 0
+
+    query_data = []
+    for tag in tags:
+        query_data.append(video_name)
+        query_data.append(tag)
+
+    try:
+        if SSH:
+            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
+                print("SSH Tunnel Established")
+                # Db connection string using SSH tunnel
+                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+                cur = db.cursor()
+                set_clause = "(%s,%s)," * len(tags)
+                set_clause = set_clause[:-1] # Get rid of last comma
+                query = f"INSERT INTO tags (tagName, videoName) VALUES {set_clause}"
+                cur.execute(query, query_data)
+
+                db.commit()
+                cur.close()
+                result = 1
+        else:
+            # Db connection string without SSH tunnel
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            cur = db.cursor()
+            set_clause = "(%s,%s)," * len(tags)
+            set_clause = set_clause[:-1] # Get rid of last comma
+            query = f"INSERT INTO tags (tagName, videoName) VALUES {set_clause}"
+            cur.execute(query, query_data)
+
+            db.commit()
+            cur.close()
+            result = 1
+    except Exception as e:
+        print(e)
+        result = -1
+    finally:
+        if db:
+            db.close()
+
+    return result  # Return the result
+
+
 def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None, new_password_hash: str = None, new_salt_hash: bytes = None, new_public_key: str = None, new_verify_key: str = None) -> int:
     '''
     Update user information in the database.

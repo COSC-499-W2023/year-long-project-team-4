@@ -89,6 +89,7 @@ def upload_video():
     # Read the file and email from post
     file = request.files.get('file')
     recipient_email = request.form.get('recipient')
+    tags = request.form.get('tags')
 
     # Get the public key corresponding to the recipient
     recipient_public_key = get_public_key(recipient_email)
@@ -122,7 +123,12 @@ def upload_video():
             return jsonify({'error': 'Failed to create chat'}), 502
 
     insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, dummy_retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
+
     if insert_result:
+        if tags:
+            tag_result = database.insert_tags(video_name, tags)
+            if tag_result == -1:
+                return jsonify({'video_id': f'{video_name}', 'error': 'Tag upload failed'}), 503
         return jsonify({'video_id': f'{video_name}'}), 200
     else:
         return jsonify({'error': 'Video insertion failed'}), 502

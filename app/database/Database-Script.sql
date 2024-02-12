@@ -14,7 +14,8 @@ CREATE TABLE userprofile (
 	lastname VARCHAR (50),
 	salthash VARBINARY(128),
 	publickey VARCHAR(500),
-	verifyKey VARCHAR(10)
+	verifyKey VARCHAR(10),
+	verifiedAcc BOOLEAN
 );
 
 CREATE TABLE videos (

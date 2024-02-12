@@ -21,7 +21,7 @@ SSH_TUNNEL_ADDRESS = os.getenv("EC2_ADDRESS")
 if(TEST.lower() == "true"):
     DBNAME = 'Team4dbTest'
 
-def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, pubKey, verifyKey) -> int:
+def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, pubKey, verifyKey, verifiedAcc) -> int:
     '''
     Insert a new user into the database.
 
@@ -51,9 +51,9 @@ def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, 
                 if db:
                     cur = db.cursor()
                     #Insert String
-                    query = "INSERT INTO userprofile (email, password_hash, firstname, lastname,salthash, publickey, verifyKey) values (%s,%s,%s,%s,%s,%s,%s)"
+                    query = "INSERT INTO userprofile (email, password_hash, firstname, lastname,salthash, publickey, verifyKey, verifiedAcc) values (%s,%s,%s,%s,%s,%s,%s,%s)"
                     #Creates list of the insertations
-                    data = (email,password,firstname,lastname, salthash, pubKey, verifyKey)
+                    data = (email,password,firstname,lastname, salthash, pubKey, verifyKey, verifiedAcc)
                     #Executes the query w/ the corrosponding data
                     cur.execute(query,data)
                     print("Insertation Complete")
@@ -126,7 +126,7 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
         return result
 
 
-def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None, new_password_hash: str = None, new_salt_hash: bytes = None, new_public_key: str = None, new_verify_key: str = None) -> int:
+def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None, new_password_hash: str = None, new_salt_hash: bytes = None, new_public_key: str = None, new_verify_key: str = None, new_verifiedAcc: bool = None) -> int:
     '''
     Update user information in the database.
 
@@ -168,6 +168,8 @@ def update_user(user_email: str, new_email: str = None, new_fname: str = None, n
         new_data['publickey'] = new_public_key
     if new_verify_key is not None:
         new_data['verifyKey'] = new_verify_key
+    if new_verifiedAcc is not None:
+        new_data['verifiedAcc'] = new_verifiedAcc
 
     
     try:

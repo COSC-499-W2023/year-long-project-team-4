@@ -479,7 +479,11 @@ def processVideo():
 
     if file is None:
         return jsonify({'error': 'No file found'}), 400
+    
     upload_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'faceBlurring', 'temp'))    
+    if not os.path.exists(upload_directory):
+        os.makedirs(upload_directory)
+        
     video_name = str(uuid.uuid4())+".mp4"
     upload_path = os.path.join(upload_directory,video_name)
     file.save(upload_path)

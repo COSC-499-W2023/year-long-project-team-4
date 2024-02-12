@@ -3,7 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
-import { viewVideoPath } from '../Path';
+import { viewVideoPath,
+    IP_ADDRESS,
+ } from '../Path';
 import axios from 'axios';
 
 
@@ -29,7 +31,7 @@ function MessageSender() {
             const formData = new FormData();
             formData.append('video_name', videoName);
 
-            axios.post('http://localhost:8080/bucket/retrieve_chat', formData, {
+            axios.post(`${IP_ADDRESS}/bucket/retrieve_chat`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
@@ -70,7 +72,7 @@ function MessageSender() {
         formData.append('chat_text', message);
 
         try {
-            const response = await axios.post('http://localhost:8080/bucket/send_chat', formData, {
+            const response = await axios.post(`${IP_ADDRESS}/bucket/send_chat`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },

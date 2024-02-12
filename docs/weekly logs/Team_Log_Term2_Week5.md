@@ -35,7 +35,8 @@
 ![BoardView](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/e64020f4-eb95-427d-9967-11e4b3858d7b)
 
 **Test Report:**
-
+Email confirmation upon signup:
+![SignupTests](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/6175d324-9ed2-45f2-950d-3df971a2f7b1)
 
 
 

@@ -208,3 +208,19 @@ Things I worked on:
   
 Tasks from the project board relevant to things I worked on:
 - Creating chats
+
+
+# Term 2 Week (4): Feb 4 - Feb 11
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/f5c64b5e-cbf7-4e07-8055-a542e5b4bbee)
+
+## Goal Recap:
+Things I worked on:
+- Metadata tags
+- Users can now send in a list of tags to be associated with a video, added logic for sorting arbitrary numbers of tags into the database associated to one video
+- Users can also now search for videos by these tags
+- Reviews of PRs
+  
+Tasks from the project board relevant to things I worked on:
+- Meta data Tagging

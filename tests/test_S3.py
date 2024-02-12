@@ -6,7 +6,7 @@ import os
 sys.path.append(os.path.abspath('../app'))
 
 import s3Bucket
-import database
+
 
 def test_list_buckets():
     assert s3Bucket.list_buckets() is True
@@ -39,7 +39,6 @@ def test_delete_file():
 # to properly test this file, you must make sure there is no duplicates in the s3 already (Call just s3_bucketUtils.py) 
 #and reset the DB to make sure there are not duplicate obj_path names
 def test_encrpyted_insert():
-    database.insert_user("Test@example.com", "password12233", "John", "Doe","","")
     result1 = s3Bucket.encrypt_insert("videos",'test test file for encrpyt', 'testFile34.txt', "2022-01-22 11:59:00", "Test@example.com", "Test@example.com", "213asdada","as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
     result2 = s3Bucket.encrypt_insert("chats",'test test file for encrpyt', 'testFile34.txt', "2022-01-22 11:59:00", "Test@example.com", "Test@example.com", "213asdada","as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
     result3 = s3Bucket.encrypt_insert(file_flag="chats",file_content='test test file for encrpyt', file_name='testFile30.txt', retDate= "2022-01-22 11:59:00",senderEmail=None, receiverEmail="Test@example.com", senderEncryption="as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs", receiverEncryption="2asdad")

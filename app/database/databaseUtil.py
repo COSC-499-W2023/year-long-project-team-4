@@ -6,8 +6,7 @@ import sys
 from datetime import datetime, timezone
 
 sys.path.append(os.path.abspath('../app'))
-load_dotenv() 
-SSH = os.getenv("SSH") == 'True'
+load_dotenv()
 SSHUSER = os.getenv("SSHUSER")
 KPATH = os.getenv("KEYPATH")
 ADDRESS = os.getenv("ADDRESS")
@@ -17,8 +16,7 @@ DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
 TEST = os.getenv("TEST")
-EC2 = os.getenv("EC2_ADDRESS")
-
+SSH_TUNNEL_ADDRESS = os.getenv("EC2_ADDRESS")
 
 if(TEST.lower() == "true"):
     DBNAME = 'Team4dbTest'
@@ -45,38 +43,24 @@ def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, 
     db = None
     result = None
     try:
-        if SSH:
-            # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
         # Creates the SSH tunnel to connect to the DB
+            with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
                 print("SSH Tunnel Established")
-                # Db connection string using SSH tunnel
+                #Db connection string
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
-                cur = db.cursor()
-                # Insert String
-                query = "INSERT INTO userprofile (email, password_hash, firstname, lastname, salthash, publickey) values (%s,%s,%s,%s,%s,%s)"
-                # Creates list of the insertations
-                data = (email, password, firstname, lastname, salthash, pubKey)
-                # Executes the query w/ the corresponding data
-                cur.execute(query, data)
-                print("Insertation Complete")
-                db.commit()
-                # Returns 1 if successful
-                result = 1
-        else:
-            # Db connection string without SSH tunnel
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
-            cur = db.cursor()
-            # Insert String
-            query = "INSERT INTO userprofile (email, password_hash, firstname, lastname, salthash, publickey) values (%s,%s,%s,%s,%s,%s)"
-            # Creates list of the insertations
-            data = (email, password, firstname, lastname, salthash, pubKey)
-            # Executes the query w/ the corresponding data
-            cur.execute(query, data)
-            print("Insertation Complete")
-            db.commit()
-            # Returns 1 if successful
-            result = 1
+                if db:
+                    cur = db.cursor()
+                    #Insert String
+                    query = "INSERT INTO userprofile (email, password_hash, firstname, lastname,salthash, publickey) values (%s,%s,%s,%s,%s,%s)"
+                    #Creates list of the insertations
+                    data = (email,password,firstname,lastname, salthash, pubKey)
+                    #Executes the query w/ the corrosponding data
+                    cur.execute(query,data)
+                    print("Insertation Complete")
+                    db.commit()
+                    #Returns 1 if successful
+                    result = 1
+    #except pymysql.Error as e:
     except Exception as e:
         print(e)
         # Returns 1 if errors
@@ -86,6 +70,7 @@ def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, 
             db.close()
         # Returns what 1 or -1 
         return result
+
 
 def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail:str, senderEncryption, receiverEncryption) -> int:
     '''
@@ -108,45 +93,40 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
     '''
     db = None
     result = None
+    
     try:
-        if SSH:
-            # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
-                print("SSH Tunnel Established")
-                # Db connection string using SSH tunnel
-                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+        # Creates the SSH tunnel to connect to the DB
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            if db:
                 cur = db.cursor()
                 subDate = datetime.now(timezone.utc)
-                retDate = datetime.strptime(retDate, '%Y-%m-%d %H:%M:%S')
-                query = "INSERT INTO videos(videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                retDate = datetime.strptime(retDate,'%Y-%m-%d %H:%M:%S')
+                #Insert String
+                query = "INSERT INTO videos(videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) values (%s, %s, %s, %s, %s, %s, %s)"
+                #Creates list of the insertations 
                 data = (videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption)
-                cur.execute(query, data)
+                #Executes the query w/ the corrosponding data
+                cur.execute(query,data)
                 print("Insertation Complete")
                 db.commit()
+                #Returns 1 if successful
                 result = 1
-                
-        else:
-            # Db connection string without SSH tunnel
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
-            cur = db.cursor()
-            subDate = datetime.now(timezone.utc)
-            retDate = datetime.strptime(retDate, '%Y-%m-%d %H:%M:%S')
-            query = "INSERT INTO videos(videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-            data = (videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption)
-            cur.execute(query, data)
-            print("Insertation Complete")
-            db.commit()
-            result = 1
-            
+    #except pymysql.Error as e:
     except Exception as e:
         print(e)
+        # Returns 1 if errors
         result = -1
     finally:
         if db:
             db.close()
-    return result
+        # Returns what 1 or -1 
+        return result
 
-def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None, new_password_hash: str = None, new_salt_hash: bytes = None, new_public_key: str = None, new_verify_key: str = None) -> int:
+
+def update_user(user_id:int,new_data:dict) -> int:
     '''
     Update user information in the database.
 
@@ -170,62 +150,41 @@ def update_user(user_email: str, new_email: str = None, new_fname: str = None, n
     '''
     db = None
     result = 0  # Initialize the result to 0
-
-
-    # Setup our update data dictionary
-    new_data = {}
-    if new_email is not None:
-        new_data['email'] = new_email
-    if new_fname is not None:
-        new_data['firstname'] = new_fname
-    if new_lname is not None:
-        new_data['lastname'] = new_lname
-    if new_password_hash is not None:
-        new_data['password_hash'] = new_password_hash
-    if new_salt_hash is not None:
-        new_data['salthash'] = new_salt_hash
-    if new_public_key is not None:
-        new_data['publickey'] = new_public_key
-    if new_verify_key is not None:
-        new_data['verifyKey'] = new_verify_key
-
     
     try:
-        if SSH:
-            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
-                print("SSH Tunnel Established")
-                # Db connection string using SSH tunnel
-                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
+                ssh_username=SSHUSER,
+                ssh_pkey=KPATH, 
+                 remote_bind_address=(ADDRESS,PORT)
+        )as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            if db:
                 cur = db.cursor()
-                set_clause = ", ".join(f"{field} = %s" for field in new_data.keys())
-                query = f"UPDATE userprofile SET {set_clause} WHERE email = %s"
-                new_data["old_email"] = user_email
-                data = list(new_data.values())
-                cur.execute(query, data)
 
+                # Construct the SET clause dynamically based on the update_data dictionary
+                set_clause = ", ".join(f"{field} = %s" for field in new_data.keys())
+
+                query = f"UPDATE userprofile SET {set_clause} WHERE id = %s"
+                
+                # Append the user_id to the values list
+                new_data["user_id"] = user_id
+
+                data = list(new_data.values())  # Convert the values from the dictionary to a list
+                cur.execute(query, data)
                 db.commit()
                 cur.close()
-                result = 1
-        else:
-            # Db connection string without SSH tunnel
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
-            cur = db.cursor()
-            set_clause = ", ".join(f"{field} = %s" for field in new_data.keys())
-            query = f"UPDATE userprofile SET {set_clause} WHERE email = %s"
-            new_data["old_email"] = user_email
-            data = list(new_data.values())
-            cur.execute(query, data)
-            db.commit()
-            cur.close()
-            result = 1
+                result = 1  # Set result to 1 to indicate success
     except Exception as e:
         print(e)
-        result = -1
+        result = -1  # Set result to -1 to indicate an error
     finally:
         if db:
             db.close()
 
     return result  # Return the result
+
 
 def query_records(table_name: str, fields: str, condition: str = "", condition_values: tuple = ()) -> list:
     """
@@ -248,34 +207,29 @@ def query_records(table_name: str, fields: str, condition: str = "", condition_v
     db = None
     records = []
     try:
-        if SSH:
-            # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
-                print("SSH Tunnel Established")
-                # Db connection string using SSH tunnel
-                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
+                ssh_username=SSHUSER,
+                ssh_pkey=KPATH, 
+                 remote_bind_address=(ADDRESS,PORT)
+        )as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            if db:
                 cur = db.cursor()
                 query = f"SELECT {fields} FROM {table_name}"
                 if condition:
                     query += f" WHERE {condition}"
                 cur.execute(query, condition_values)
                 records = [dict(zip([desc[0] for desc in cur.description], row)) for row in cur.fetchall()]
-        else:
-            # Db connection string without SSH tunnel
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
-            cur = db.cursor()
-            query = f"SELECT {fields} FROM {table_name}"
-            if condition:
-                query += f" WHERE {condition}"
-            cur.execute(query, condition_values)
-            records = [dict(zip([desc[0] for desc in cur.description], row)) for row in cur.fetchall()]
     except Exception as e:
         print(e)
     finally:
         if db:
             db.close()
         return records
-        
+    
+    
 def delete_record(table_name: str, condition: str, condition_values: tuple) -> int:
     """
     Delete records from a table based on a condition.
@@ -294,29 +248,21 @@ def delete_record(table_name: str, condition: str, condition_values: tuple) -> i
     result = 0
 
     try:
-        if SSH:
-            # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
-                print("SSH Tunnel Established")
-                # Db connection string using SSH tunnel
-                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
+                ssh_username=SSHUSER,
+                ssh_pkey=KPATH, 
+                 remote_bind_address=(ADDRESS,PORT)
+        )as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            if db:
                 cur = db.cursor()
                 query = f"DELETE FROM {table_name} WHERE {condition}"
                 cur.execute(query, condition_values)
                 db.commit()
                 cur.close()
                 result = 1
-                
-        else:
-            # Db connection string without SSH tunnel
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
-            cur = db.cursor()
-            query = f"DELETE FROM {table_name} WHERE {condition}"
-            cur.execute(query, condition_values)
-            db.commit()
-            cur.close()
-            result = 1
-            
     except Exception as e:
         print(e)
         result = -1
@@ -324,16 +270,58 @@ def delete_record(table_name: str, condition: str, condition_values: tuple) -> i
         if db:
             db.close()
         return result
+    
+    
+def authenticate(email: str, password: str) -> bool: 
+    """
+    Authenticate a user by checking if the provided password matches the password stored in the database.
+
+    Args:
+        email (str): The email of the user to authenticate.
+        password (str): The password provided by the user for authentication.
+
+    Returns:
+        bool: True if authentication is successful (password matches), otherwise False.
+    """
+    db = None
+    try:
+        with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
+                ssh_username=SSHUSER,
+                ssh_pkey=KPATH, 
+                 remote_bind_address=(ADDRESS,PORT)
+        )as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            if db:
+                cur = db.cursor()
+                query = "SELECT password_hash FROM userprofile WHERE email = %s"
+                cur.execute(query, (email,))
+                stored_password = cur.fetchone()
+
+                if stored_password and stored_password[0] == password:
+                    return True  # Authentication successful
+    except Exception as e:
+        print(e)
+    finally:
+        if db:
+            db.close()
+
+    return False  # Authentication failed
+
 
 def resetTable(tableName:str)-> bool:
     db = None
     try:
-        if SSH:
-            # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
-                print("SSH Tunnel Established")
-                # Db connection string using SSH tunnel
-                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+         with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), 
+                ssh_username=SSHUSER,
+                ssh_pkey=KPATH, 
+                 remote_bind_address=(ADDRESS,PORT)
+        )as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            if db:
                 cur = db.cursor()
                 query = f"SET FOREIGN_KEY_CHECKS = 0"
                 cur.execute(query)
@@ -344,19 +332,6 @@ def resetTable(tableName:str)-> bool:
                 query = f"SET FOREIGN_KEY_CHECKS = 1"
                 cur.execute(query)
                 return True  # Reset successful
-        else:
-            # Db connection string without SSH tunnel
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
-            cur = db.cursor()
-            query = f"SET FOREIGN_KEY_CHECKS = 0"
-            cur.execute(query)
-            query = f"TRUNCATE TABLE {tableName}"
-            cur.execute(query)
-            query = f"ALTER TABLE {tableName} AUTO_INCREMENT = 1;"
-            cur.execute(query)
-            query = f"SET FOREIGN_KEY_CHECKS = 1"
-            cur.execute(query)
-            return True  # Reset successful
     except Exception as e:
         print(e)
     finally:
@@ -382,31 +357,10 @@ def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
     result = 0  # Initialize the result to 0
     
     try:
-        if SSH:
-            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
-                print("SSH Tunnel Established")
-                #Db connection string
-                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
-                if db:
-                    cur = db.cursor()
-                    #Create set clause depending on whether user is sender or receiver
-                    if (sender):
-                        set_clause = "senderEncryption = 0, senderEmail = NULL"
-                    elif (receiver):
-                        set_clause = "recieverEncryption = 0, receiverEmail = NULL"
-                    else:
-                        result = -1
-                    query = f"UPDATE videos SET {set_clause} WHERE videoName = %s"
-                    cur.execute(query, videoName)   
-                    # Check if video has chats associated with it and removes user's access
-                    query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoName,))
-                    if query_results:
-                        query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
-                        cur.execute(query2, videoName) 
-                    cur.close()
-                    result = 1  # Set result to 1 to indicate success
-        else:
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
+        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+            print("SSH Tunnel Established")
+            #Db connection string
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database='Team4dbTest')
             if db:
                 cur = db.cursor()
                 #Create set clause depending on whether user is sender or receiver
@@ -424,7 +378,7 @@ def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
                     query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
                     cur.execute(query2, videoName) 
                 cur.close()
-                result = 1  # Set result to 1 to indicate success 
+                result = 1  # Set result to 1 to indicate success
     except Exception as e:
         print(e)
         result = -1  # Set result to -1 to indicate an error

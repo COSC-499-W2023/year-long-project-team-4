@@ -27,7 +27,6 @@ import {
   changePasswordPath,
   passwordCodePath,
   resetPasswordPath,
-  IP_ADDRESS,
 } from "./Path";
 import AccountPage from "./Pages/AccountPage";
 import PageNotFound from "./Pages/PageNotFound";
@@ -41,7 +40,7 @@ function App() {
     const fetchCurrentUser = async () => {
       try {
         const response = await axios.get(
-          `${IP_ADDRESS}/auth/currentuser`,
+          "http://localhost:8080/auth/currentuser",
           {
             withCredentials: true,
           }

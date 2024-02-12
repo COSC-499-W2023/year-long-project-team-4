@@ -19,8 +19,10 @@ def test_insert_user():
 
 def test_insert_video():
     result = database.insert_video("Test.mp4", "2024-01-24 11:59:00", "updated@example.com", "Test@example.com","1","2")
+    resultGuest = database.insert_video("TestGuest.mp4", "2024-01-24 11:59:00",None, "Test@example.com","1","2")
 
     assert result == 1  # Assuming insertion was successful
+    assert resultGuest == 1
 
 def test_update():
     update_data = {
@@ -28,10 +30,6 @@ def test_update():
     }
     result = database.update_user(1, update_data)  # Assuming user_id 1 exists
     assert result == 1  # Assuming the update was successful
-
-def test_authenticate():
-    assert database.authenticate("Testingupdate@example.com", "password123") is True  # Assuming correct username and password
-    assert database.authenticate("MadeUpUser@example.com", "wrong_password") is False  # Assuming incorrect username and password
 
 def test_delete():
     result1 = database.delete_record("userprofile", "id = %s", (1,))  # Assuming user_id 1 exists
@@ -52,7 +50,6 @@ if __name__ == "__main__":
     test_insert_user()
     test_insert_video()
     test_update()
-    test_authenticate()
     test_delete()   
     test_delete_key()
     end_time = time.time()

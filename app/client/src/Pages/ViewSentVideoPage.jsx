@@ -57,36 +57,9 @@ const ViewSentVideoPage = () => {
   };
 
   // Handles the creation of a chat associated with a video
-  const handleStartChat = (e, videoName) => {
+  const handleOpenChat = (e, videoName) => {
     e.preventDefault();
-    // Create a new FormData instance
-    const formData = new FormData();
-    formData.append('video_name', videoName); 
-
-    axios.post(`${IP_ADDRESS}/bucket/create_chat`, formData, { 
-        withCredentials: true,
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    })
-    .then(response => {
-        console.log('Chat created:', response.data);
-        navigate(MessagingPath, { state: { videoName: videoName } });
-    })
-    .catch(error => {
-        if (error.response) {
-            console.error('Error response:', error.response.data);
-            // Check if the error is because the chat already exists
-            if (error.response.data.error === "Associated chat already exists") {
-                navigate(MessagingPath, { state: { videoName: videoName } }); // Navigate to messaging page if chat already exists
-            } else {
-                setErrorMessage(error.response.data.error || 'Error creating chat');
-            }
-        } else {
-            console.error('Error creating chat:', error);
-            setErrorMessage('Error creating chat');
-        }
-    });
+    navigate(MessagingPath, { state: { videoName: videoName } });
 };
 
   return (
@@ -102,7 +75,7 @@ const ViewSentVideoPage = () => {
                               <p>Video{index + 1}</p>
                               </Button>
                           </div>
-                          <Button variant="info" onClick={(e) => handleStartChat(e, video.videoName)}>Start Chat</Button>
+                          <Button variant="info" onClick={(e) => handleOpenChat(e, video.videoName)}>Start Chat</Button>
                           </>
                       ))}
           </Col>   

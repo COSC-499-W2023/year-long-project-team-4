@@ -6,7 +6,6 @@ import {
   loginPath,
   accountPath,
   viewSentVideoPath,
-  IP_ADDRESS
 } from "../Path";
 import axios from 'axios';
 import {Fade} from 'react-reveal';
@@ -19,7 +18,7 @@ const ReceiveAndSendPage = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.get(`${IP_ADDRESS}/auth/logout`, {
+      const response = await axios.get('http://localhost:8080/auth/logout', {
         withCredentials: true  // Important for handling sessions with cookies
       });
   
@@ -43,7 +42,7 @@ const ReceiveAndSendPage = () => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
+        const response = await axios.get('http://localhost:8080/auth/currentuser', {
           withCredentials: true
         });
   

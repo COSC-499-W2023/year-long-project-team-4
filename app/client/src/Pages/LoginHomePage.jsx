@@ -7,7 +7,6 @@ import {
   receiveAndSendPath,
   registerPath,
   changePasswordPath,
-  IP_ADDRESS,
 } from "../Path";
 import axios from 'axios'
 import see from '../Assets/eye.svg';
@@ -21,7 +20,7 @@ const LoginHomePage = () => {
 
   const handleLogin = async (email, password) => {
     try {
-      const response = await axios.post(`${IP_ADDRESS}/auth/login`, {
+      const response = await axios.post('http://localhost:8080/auth/login', {
         email: email,
         password: password
       }, {

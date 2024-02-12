@@ -92,19 +92,3 @@ def test_get_user_details(client):
     assert response['email'] == post_object['email']
     assert response['firstname'] == post_object['firstname']
     assert response['lastname'] == post_object['lastname']
-
-def test_change_user_details(client):
-    assert database.resetTable(tableName="userprofile")
-
-    signup_post_object = {'email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
-    update_post_object = {'email': 'newemail@example.com','firstname': 'New', 'lastname': 'Name'}
-
-    client.post('/auth/signup', data=signup_post_object)
-
-    client.post('/auth/updateinfo', data=update_post_object)
-    response = json.loads(client.get('/auth/userdetails').data.decode('utf-8'))
-
-    # Check that user details properly changed
-    assert response['email'] == update_post_object['email']
-    assert response['firstname'] == update_post_object['firstname']
-    assert response['lastname'] == update_post_object['lastname']

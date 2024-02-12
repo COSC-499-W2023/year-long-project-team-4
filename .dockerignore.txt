@@ -1,7 +1,0 @@
-*.pyc
-*.pyo
-*.pyd
-*.pem
-*__pycache__
-.DS_Store
-*.env

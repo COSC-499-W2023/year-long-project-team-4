@@ -122,8 +122,72 @@ def upload_video():
             return jsonify({'error': 'Failed to create chat'}), 502
 
     insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, dummy_retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
-    if insert_result:
-        return jsonify({'video_id': f'{video_name}'}), 200
+    if insert_result & (LOCAL == False):
+        sender_email = 'safemovnow@gmail.com'
+    
+        # Compose the email message
+        subject = "You've Recieved a Video"
+        html_body = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Video Received Notification</title>
+            <style>
+                <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+        
+            h1 {
+                color: #007bff;
+            }
+        
+            p {
+                margin-bottom: 20px;
+            }
+        </style>
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>A New Video!</h1>
+                <p>We are pleased to inform you that you have a new video ready for viewing.</p>
+                <p>Thank you for choosing SafeMov!</p>
+                <p>Best regards,<br>SafeMov</p>
+            </div>
+        </body>
+        </html>
+        """
+
+        try:
+            # Send the email
+            email = ses_client.send_email(
+                Source=sender_email,
+                Destination={'ToAddresses': [recipient_email]},
+                Message={
+                    'Subject': {'Data': subject},
+                    'Body': {'Html': {'Data': html_body}}
+                }
+            )
+
+            return jsonify({'video_id': f'/videos/{recipient_email}/{video_name}'}), 200
+        except Exception as e:
+            print(e)
     else:
         return jsonify({'error': 'Video insertion failed'}), 502
 
@@ -307,7 +371,7 @@ def change_password_reencrypt():
         public_key = private_key.publickey().export_key('PEM')
         hashed_password = bcrypt.generate_password_hash(new_password).decode()
         #Insert new info into database
-        database.update_user(user_email = user_email, new_password = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+        database.update_user(user_email = user_email, new_password_hash = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
 
         #Loop through videos to reencrypt and insert back to database and s3Bucket
         for videos1 in videos_to_decrypt2:        
@@ -396,7 +460,7 @@ def set_verificationcode():
     #Create verification code
     created_code = ''.join(random.choices(string.digits, k=6))
     update_data = {'verifyKey': f'{created_code}'}
-    database.update_user(user_email = email, new_verifyKey = created_code)
+    database.update_user(user_email = email, new_verify_Key = created_code)
     #Save code locally if Local is true
     if LOCAL:
         obj_path = f"./verificationCode"
@@ -448,7 +512,7 @@ def change_password_forgot():
         public_key = private_key.publickey().export_key('PEM')
         hashed_password = bcrypt.generate_password_hash(new_password).decode()
         #Insert new info into database
-        database.update_user(user_email = email, new_password = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+        database.update_user(user_email = email, new_password_hash = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
         
         #Get recieved videos that need key deleted
         videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'receiverEmail = %s', condition_values=(email,))

@@ -118,6 +118,8 @@ def upload_video():
         sender_email = session['email']
         sender_public_key = get_public_key(session['email'])
         sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
+        if not create_chat(video_name, dummy_retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):
+            return jsonify({'error': 'Failed to create chat'}), 502
 
     insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, dummy_retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
     if insert_result:
@@ -168,37 +170,12 @@ def get_sent_videos():
     available_videos = database.query_records(table_name='videos', fields='videoName, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
     return json.dumps(available_videos), 200
 
-@bucket.route('/create_chat', methods=['POST'])
-def create_chat():
-    dummy_retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
+def create_chat(video_name, retention_date, sender_email, receiver_email, sender_key, receiver_key):
     chat_json = {
         'messages': []
     }
 
-    # Read video name associated with the new chat, and ensure that said video exists
-    chat_name = request.form.get('video_name')
-    query_results = database.query_records(table_name='videos', fields='senderEmail, receiverEmail', condition=f'videoName = %s', condition_values=(chat_name,))
-    if not query_results:
-        return jsonify({'error': 'Associated video does not exist'}), 409
-
-    query_results = query_results[0]
-    video_sender_email = query_results['senderEmail']
-    video_receiver_email = query_results['receiverEmail']
-
-    if video_sender_email is None or video_receiver_email is None:
-        return jsonify({'error': 'Invalid users associated with video, perhaps one account is guest?'}), 409
-
-    # Ensure chat not already created
-    if database.query_records(table_name='chats', fields='chatName', condition=f'chatName = %s', condition_values=(chat_name,)):
-        return jsonify({'error': 'Associated chat already exists'}), 409
-
-    sender_key = get_public_key(video_sender_email)
-    if sender_key is None:
-        return jsonify({'error': 'Could not get video sender public key'}), 409
-
-    receiver_key = get_public_key(video_receiver_email)
-    if receiver_key is None:
-        return jsonify({'error': 'Could not get video recipient public key'}), 409
+    chat_name = video_name
 
     # Encrypt the chat log
     encrypted_chat, aes_key = aes_encrypt_video(json.dumps(chat_json).encode('utf-8'))
@@ -208,12 +185,12 @@ def create_chat():
     encrypted_aes_key_receiver = rsa_encrypt_aes256_key(aes_key, receiver_key)
 
     # Insert the new chat into the DB and S3 bucket
-    insert_result = s3Bucket.encrypt_insert('chats', encrypted_chat, chat_name, dummy_retention_date, video_sender_email, video_receiver_email, encrypted_aes_key_sender, encrypted_aes_key_receiver)
+    insert_result = s3Bucket.encrypt_insert('chats', encrypted_chat, chat_name, retention_date, sender_email, receiver_email, encrypted_aes_key_sender, encrypted_aes_key_receiver)
 
     if insert_result:
-        return jsonify({'chat_id': f'{chat_name}'}), 200
+        return True
     else:
-        return jsonify({'error': 'Chat insertion failed'}), 502
+        return False
 
 
 @bucket.route('/send_chat', methods=['POST'])
@@ -502,7 +479,11 @@ def processVideo():
 
     if file is None:
         return jsonify({'error': 'No file found'}), 400
+    
     upload_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'faceBlurring', 'temp'))    
+    if not os.path.exists(upload_directory):
+        os.makedirs(upload_directory)
+        
     video_name = str(uuid.uuid4())+".mp4"
     upload_path = os.path.join(upload_directory,video_name)
     file.save(upload_path)

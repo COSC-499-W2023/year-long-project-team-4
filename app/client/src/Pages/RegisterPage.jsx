@@ -3,11 +3,14 @@ import { Button, Form, InputGroup} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom'
 import {
     loginPath,
+    IP_ADDRESS,
   } from "../Path";
 import axios from 'axios'
 import {Fade} from 'react-reveal';
 import see from '../Assets/eye.svg';
 import unSee from '../Assets/eye-slash.svg';
+
+
 const RegisterPage = () => {
   const [type, setType] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -19,11 +22,11 @@ const handleSignup = async (firstname, lastname, email, password) => {
   formData.append('lastname', lastname);
   formData.append('email', email);
   formData.append('password', password); // Add other form details as needed.
-
+  
 try {
   const response = await axios({
     method: 'post',
-    url: 'http://localhost:8080/auth/signup',
+    url: `${IP_ADDRESS}/auth/signup`,
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }
   });

@@ -176,7 +176,6 @@ def get_object_content(obj_path):
 
             content = response['Body'].read().decode('utf-8')
 
-            print(f'Content of {obj_path}:\n{content}')
             return content
         except Exception as e:
             print(f"Error retrieving content from {obj_path}: {e}")

@@ -460,7 +460,7 @@ def set_verificationcode():
     #Create verification code
     created_code = ''.join(random.choices(string.digits, k=6))
     update_data = {'verifyKey': f'{created_code}'}
-    database.update_user(user_email = email, new_verify_Key = created_code)
+    database.update_user(user_email = email, new_verify_key = created_code)
     #Save code locally if Local is true
     if LOCAL:
         obj_path = f"./verificationCode"

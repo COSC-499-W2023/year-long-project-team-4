@@ -8,6 +8,10 @@ import {useNavigate} from 'react-router-dom';
 import {
     MessagingPath
   } from "../Path";
+import io from 'socket.io-client';
+
+
+const socket = io('http://localhost:8080');
 
 const ViewSentVideoPage = () => {
   
@@ -29,6 +33,20 @@ const ViewSentVideoPage = () => {
           .catch(error => {
               console.error('There was an error fetching the videos!', error);
           });
+
+          socket.on('chat_response', (response) => {
+            console.log("any response?");
+            if (response.status === 'success') {
+                console.log('Chat created successfully with ID:', response.chat_id);
+                // You might want to navigate to the chat page or perform another action here
+            } else {
+                console.log(response.error);
+                setErrorMessage(response.error);
+            }
+        });
+
+        // Cleanup on component unmount
+        return () => socket.off('chat_response');
   }, []);
   
   // Handles video selection and retrieves video URL
@@ -55,6 +73,14 @@ const ViewSentVideoPage = () => {
       setSelectedVideo(null);
   };
 
+  const handleStartChat = (e, videoName) => {
+    e.preventDefault();
+    console.log(`Attempting to start chat for video: ${videoName}`);
+    socket.emit('create_chat', { video_name: videoName });
+    navigate(MessagingPath, { state: { videoName: videoName } });
+};
+
+  {/*
   // Handles the creation of a chat associated with a video
   const handleStartChat = (e, videoName) => {
     e.preventDefault();
@@ -86,7 +112,7 @@ const ViewSentVideoPage = () => {
             setErrorMessage('Error creating chat');
         }
     });
-};
+};*/}
 
   return (
      <Fade cascade>

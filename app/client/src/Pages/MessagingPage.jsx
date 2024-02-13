@@ -21,7 +21,7 @@ function MessageSender() {
 
     // Retreive video from location state
     const videoName = location.state?.videoName;
-    console.log(videoName);
+    //console.log(videoName);
 
     // Fetch existing chat messages on component mount or when videoName changes
     useEffect(() => {
@@ -36,8 +36,7 @@ function MessageSender() {
                 withCredentials: true
             })
             .then(response => {
-                console.log("checking");
-                console.log(response.data);
+                //console.log(response.data);
                 setChatMessages(response.data.messages);
             })
             .catch(error => {

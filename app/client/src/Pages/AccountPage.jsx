@@ -5,11 +5,17 @@ import {Fade} from 'react-reveal';
 import axios from 'axios';
 import see from '../Assets/eye.svg';
 import unSee from '../Assets/eye-slash.svg';
+import {useNavigate} from 'react-router-dom';
+import {
+    MessagingPath,
+    IP_ADDRESS,
+  } from "../Path";
 import PasswordCheckList from "react-password-checklist";
 
 const AccountPage = () => {
 const [type, setType] = useState(false)
 const [currentUser, setCurrentUser] = useState(null);
+const [errorMessage, setErrorMessage] = useState("");
 const [key, setKey] = useState('videos');
 const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,6 +26,9 @@ const handleSubmit = (e) => {
 const handleDelete = () =>{
 
 }
+
+const navigate = useNavigate();
+
 const firstName = "firstname123";
 const lastName = "lastname123";
 const email = currentUser;
@@ -31,7 +40,7 @@ const [showVideoModal, setShowVideoModal] = useState(false);
 
 useEffect(() => {
     // Replace with the correct URL of your backend
-    axios.get('http://localhost:8080/bucket/getvideos', {
+    axios.get(`${IP_ADDRESS}/bucket/getvideos`, {
         withCredentials: true})
         .then(response => {
             setVideos(response.data);
@@ -46,7 +55,7 @@ const handleVideoClick = (videoName) => {
     const formData = new FormData();
     formData.append('video_name', videoName);
 
-    axios.post('http://localhost:8080/bucket/retrieve', formData, {
+    axios.post(`${IP_ADDRESS}/bucket/retrieve`, formData, {
         withCredentials: true,
         responseType: 'blob' // Sets the expected response type to 'blob' since a video file is binary data
     })
@@ -68,7 +77,7 @@ const handleCloseVideoModal = () => {
 useEffect(() => {
         const fetchCurrentUser = async () => {
             try {
-              const response = await axios.get('http://localhost:8080/auth/currentuser', {
+              const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
                 withCredentials: true
               });
         
@@ -86,6 +95,11 @@ useEffect(() => {
           fetchCurrentUser();
 }});
 
+const handleStartChat = (e, videoName) => {
+  e.preventDefault();
+  navigate(MessagingPath, { state: { videoName: videoName } });
+};
+
 return (
    <div className="container p-4">
     <Fade>
@@ -102,12 +116,15 @@ return (
               <Col className="p-3">
                   <div className="display-6"> Videos Viewable</div>
                   {videos.map((video, index) => (
-                      <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                      <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                      <p>Video{index + 1}</p>
-                      </Button>
-                      </div>
-                  ))}
+                            <>
+                          <div key={index} onClick={() => handleVideoClick(video.videoName)}>
+                              <Button className='text-center mb-2' style={{minWidth: '150px'}}>
+                              <p>Video{index + 1}</p>
+                              </Button>
+                          </div>
+                          <Button variant="info" onClick={(e) => handleStartChat(e, video.videoName)}>Start Chat</Button>
+                          </>
+                      ))}
               </Col>   
             </Row>      
             <Modal show={showVideoModal} onHide={handleCloseVideoModal}>

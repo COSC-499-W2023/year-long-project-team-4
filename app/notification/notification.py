@@ -7,6 +7,7 @@ import sys
 
 sys.path.append(os.path.abspath('../app'))
 load_dotenv()
+SSH = os.getenv("SSH") == 'True'
 SSHUSER = os.getenv("SSHUSER")
 KPATH = os.getenv("KEYPATH")
 ADDRESS = os.getenv("ADDRESS")
@@ -58,32 +59,51 @@ def get_email(videoName):
         str: The receiver's email address
         int: -1 if function fails
     """
+    result = 0  # Initialize result to 0
+    db = None
+
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
-                ssh_username=SSHUSER,
-                ssh_pkey=KPATH, 
-                remote_bind_address=(ADDRESS,PORT)
-        )as tunnel:
-            print("SSH Tunnel Established")
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
-            if db:
+        if SSH:
+            with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'),
+                                    ssh_username=SSHUSER,
+                                    ssh_pkey=KPATH,
+                                    remote_bind_address=(ADDRESS, PORT)
+                                    ) as tunnel:
+                print("SSH Tunnel Established")
+                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
                 cur = db.cursor()
-                # Retrieve userID based on the videName
+            # Retrieve receiverEmail based on the videoName
                 cur.execute("SELECT receiverEmail FROM videos WHERE videoName = %s", (videoName,))
-                receiverID = cur.fetchone()
-                result = receiverID[0] 
-                # # Retrieve email based on the user's ID
-                # cur.execute("SELECT email FROM userprofile WHERE id = %s", (receiverID,))
-                # result = cur.fetchone()
-                # result = result[0]     
-                cur.close()      
+                receiverEmail = cur.fetchone()
+
+                if receiverEmail:
+                    result = receiverEmail[0]  # Get the first column of the result
+                else:
+                    # Handle the case where the videoName is not found
+                    result = None
+            cur.close()
+        else:
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
+            cur = db.cursor()
+            # Retrieve receiverEmail based on the videoName
+            cur.execute("SELECT receiverEmail FROM videos WHERE videoName = %s", (videoName,))
+            receiverEmail = cur.fetchone()
+
+            if receiverEmail:
+                result = receiverEmail[0]  # Get the first column of the result
+            else:
+                # Handle the case where the videoName is not found
+                result = None
+
+            cur.close()
+
     except Exception as e:
         print(e)
         result = -1
     finally:
         if db:
             db.close()
-        return result
+    return result
 
 def send_email(user_email):
     """

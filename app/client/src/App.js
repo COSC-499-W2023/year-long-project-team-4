@@ -26,6 +26,7 @@ import {
   viewSentVideoPath,
   changePasswordPath,
   passwordCodePath,
+  IP_ADDRESS,
 } from "./Path";
 import AccountPage from "./Pages/AccountPage";
 import PageNotFound from "./Pages/PageNotFound";
@@ -37,12 +38,9 @@ function App() {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/auth/currentuser",
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
+          withCredentials: true,
+        });
 
         if (response.data.email) {
           setCurrentUser(response.data.email);

@@ -3,6 +3,7 @@ import { Button, Form, InputGroup} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom'
 import {
     loginPath,
+    IP_ADDRESS,
   } from "../Path";
 import axios from 'axios'
 import {Fade} from 'react-reveal';
@@ -21,11 +22,11 @@ const handleSignup = async (firstname, lastname, email, password) => {
   formData.append('lastname', lastname);
   formData.append('email', email);
   formData.append('password', password); // Add other form details as needed.
-
+  
 try {
   const response = await axios({
     method: 'post',
-    url: 'http://localhost:8080/auth/signup',
+    url: `${IP_ADDRESS}/auth/signup`,
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }
   });
@@ -55,8 +56,8 @@ const handleSubmit = (e) => {
     const firstname = e.target.elements[0].value; 
     const lastname = e.target.elements[1].value;
     const email = e.target.elements[2].value;
-    const pass= password;
-    handleSignup(firstname,lastname, email, pass);
+    const password = e.target.elements[3].value;  // Assuming the second input is the password
+    handleSignup(firstname,lastname, email, password);
 };
 
   return (

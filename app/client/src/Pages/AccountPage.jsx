@@ -35,14 +35,14 @@ const handleUpdate = async(firstname,lastname,email) => {
     const response = await axios(
       {
         method: 'post',
-        url:'http://localhost:8080/auth/updateinfo',
+        url:`${IP_ADDRESS}/auth/updateinfo`,
         data: formData,
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
       const passwordUpdate = await axios({
         method: 'post',
-        url: 'http://localhost:8080/bucket/change_password_reencrypt',
+        url: `${IP_ADDRESS}/bucket/change_password_reencrypt`,
         data: password,
         headers: { 'Content-Type': 'multipart/form-data' }
       }

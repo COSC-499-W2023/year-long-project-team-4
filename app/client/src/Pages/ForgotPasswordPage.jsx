@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Alert, Button, CloseButton, Container, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
-import {passwordCodePath} from "../Path";
+import {IP_ADDRESS, passwordCodePath} from "../Path";
 import {Fade} from "react-reveal";
 const ForgotPasswordPage = () => {
     const [errorMessage,setErrorMessage] = useState('');
@@ -17,7 +17,7 @@ const ForgotPasswordPage = () => {
     
     const handleReset = async(email) =>{
         try {
-            await axios.post('http://localhost:8080/bucket/set_verificationcode', {
+            await axios.post(`${IP_ADDRESS}/bucket/set_verificationcode`, {
              email: email
            }, {
              headers: {

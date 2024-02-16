@@ -2,7 +2,7 @@ import React from 'react'
 import {useState} from "react";
 import { Container,Form,InputGroup,Button,Alert, CloseButton } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-import { loginPath } from '../Path'
+import { IP_ADDRESS, loginPath } from '../Path'
 import see from '../Assets/eye.svg';
 import unSee from '../Assets/eye-slash.svg';
 import axios from "axios";
@@ -26,7 +26,7 @@ const PasswordCodePage = () => {
 
   const handleReset = async(passcode, email, passwordUpdated) => {
   try {
-    await axios.post('http://localhost:8080/bucket/change_password_forgot', {
+    await axios.post(`${IP_ADDRESS}/bucket/change_password_forgot`, {
          passcode: passcode,
          email: email,
          passwordUpdated: passwordUpdated,

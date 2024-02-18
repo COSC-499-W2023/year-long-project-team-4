@@ -10,6 +10,7 @@ import random
 import boto3
 import time
 import string
+import threading
 
 from flask import Blueprint, request, session, jsonify, current_app, send_file, Flask
 from rsa import generate_key
@@ -480,19 +481,39 @@ def processVideo():
     if file is None:
         return jsonify({'error': 'No file found'}), 400
     
+    # Check if the temp folder is made or not - create it if not 
     upload_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'faceBlurring', 'temp'))    
     if not os.path.exists(upload_directory):
         os.makedirs(upload_directory)
         
+    # Generate random string uuid to avoid clashing with names - Save video locally 
     video_name = str(uuid.uuid4())+".mp4"
     upload_path = os.path.join(upload_directory,video_name)
     file.save(upload_path)
-    print(f'upload_directory: {upload_directory}')
-    print(f'upload_path: {upload_path}')
-    print(f'File received: {file.filename}')
 
+    # Initiate the blurring process
     faceBlurring.process_video(upload_path)
+    # Get the new video & send it back to the front-end 
+    blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)
     
-    blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)  
-    print(f'blurred_upload_path: {blurred_upload_path}')
+    threading.Thread(target=delayedFileRemoval, args=(blurred_upload_path, 300)).start()
+    threading.Thread(target=delayedFileRemoval, args=(upload_path, 360)).start()  
+  
     return send_file(blurred_upload_path, as_attachment=True, mimetype='video/mp4')
+
+
+def delayedFileRemoval(file_path, delay, num_retries=3,retry_delay=180):
+    # Function to remove the file after a specified delay, with retries if removal fails
+    time.sleep(delay)
+    try:
+        os.remove(file_path)
+        print("File removed successfully.")
+    except Exception as e:
+        print(f"Error occurred while removing file: {e}")
+        # Attempt 3 times before giving up 
+        if num_retries > 0:
+            print("Retrying...")
+            time.sleep(retry_delay)
+            delayedFileRemoval(file_path, delay, num_retries - 1)
+        else:
+            print("Max retries reached. File could not be removed.")

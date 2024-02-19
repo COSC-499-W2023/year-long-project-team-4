@@ -224,3 +224,17 @@ Things I worked on:
   
 Tasks from the project board relevant to things I worked on:
 - Meta data Tagging
+
+
+# Term 2 Week (3): Feb 11 - Feb 18
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/f760d6cd-101b-4c64-be81-798a5c862535)
+
+## Goal Recap:
+Things I worked on:
+- As noted in my peer eval this week, I am instead doing work during reading week
+- Was not able to complete capstone stuff this last week due to travel arrangements
+  
+Tasks from the project board relevant to things I worked on:
+- None

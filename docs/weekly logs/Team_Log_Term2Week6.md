@@ -11,6 +11,7 @@
 * Continued work on cleaning up frontend based off Peer Eval
 * Redesigning the chat feature on backend
 * Updating UI for frontend Chat feature
+* websockets implementation for chats
 * Code clean up
 
 **Milestone Recap:** 

@@ -152,5 +152,16 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 # In progress: 
 - Focusing on implementing all feedback from peer testing.
 
+  # Term 2 Week 6:  Feb 12th - Feb 25th
+
+## Tasks Completed: 
+![term2_week6](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/07293639-e6a6-4aa0-b41a-f24cf40294e3)
+
+- Finishing up implementing all feedback from peer testing
+
+# In progress: 
+- Focusing on implementing all feedback from peer testing.
+
+
 
   

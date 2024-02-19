@@ -210,7 +210,7 @@ Tasks from the project board relevant to things I worked on:
 - Creating chats
 
 
-# Term 2 Week (4): Feb 4 - Feb 11
+# Term 2 Week (5): Feb 4 - Feb 11
 
 ## Tasks Completed:
 ![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/f5c64b5e-cbf7-4e07-8055-a542e5b4bbee)
@@ -226,7 +226,7 @@ Tasks from the project board relevant to things I worked on:
 - Meta data Tagging
 
 
-# Term 2 Week (3): Feb 11 - Feb 18
+# Term 2 Week (6): Feb 11 - Feb 18
 
 ## Tasks Completed:
 ![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/f760d6cd-101b-4c64-be81-798a5c862535)

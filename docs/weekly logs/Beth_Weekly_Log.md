@@ -231,7 +231,7 @@ Completed:
 - Created a verify email function thatt creates code and send email
 - Wrote tests for both, but only tested positive input so far
 
-# Week 4: Feb 5 - Feb 11
+# Week 5: Feb 5 - Feb 11
 
 ## Tasks Completed:
 
@@ -249,3 +249,22 @@ Completed:
 - Adjusted the functions so the user is created upon signup, but verifiedAcc is set to false. This is changed after user is verified and is checked upon login now
 - Completed testing, including negative input
 - Had to get verifiedAcc added to database, so I adjusted update_user and insert_user to align with this
+
+# Week 6: Feb 5 - Feb 11
+
+## Tasks Completed:
+
+![2Week6act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/5dd64992-6d5f-4479-84da-79179fd44492)
+
+
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Fixing notifications
+
+Completed:
+- Moved notifications to upload_video function
+- Wrote new tests to accomodate this
+- Ran into errors doing this, some times the tests pass, but I haven't been able to fix the bug yet

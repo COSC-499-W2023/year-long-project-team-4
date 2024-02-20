@@ -284,7 +284,7 @@ Tasks from the Project Board:
 
 Completed:
 - Got face blurring integrated with the front-end live recording. 
-- Added more .env variables to make EC2 running easier, and setup EC2 to be available to the web
+- Added more .env variables to make EC2 running easier, and set EC2 to be available to the web
 
 Additional Context:
 - N/A
@@ -310,3 +310,24 @@ Completed:
 Additional Context:
 I did not complete as much as I wanted since getting the code to work on the EC2 proved to be a bit more tricky than I anticipated
 - I had a few midterms in the next week that required me not to work as much. 
+
+# Term 2 Week 6: Feb 11 - Feb 18 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![mydone](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/b6c5dd51-bf73-4565-88ed-7433c7726072)
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Cleaning up my backend code - adding more comments & removing print statements
+- Adding automatic file removal on blurred videos 
+
+Tasks from the Project Board:
+- Code Clean up 
+
+Completed:
+- Added an automatic removal function for blurred videos once sent 
+- Cleanup face blurring code - Need to work on other chunks 
+
+Additional Context:
+- Our backend feels mostly complete, I have some work to do maybe looking at ways to better host the project, but nothing much more to do codewise I believe. Unless I start taking jobs from the frontend. 

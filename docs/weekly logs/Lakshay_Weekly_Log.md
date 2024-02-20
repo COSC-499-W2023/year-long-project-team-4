@@ -306,3 +306,21 @@ Completed:
 Additional Context:
 I did not complete as much as I wanted since getting web sockets implemented was a bit challenging considering i have not implemented it before
 
+# Term 2 Week 6: Feb 11 - Feb 18 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="809" alt="Screenshot 2024-02-18 at 8 38 50 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/adc921af-078d-4e34-83ac-be90ded7ad74">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Complete websocket implementation
+
+Tasks from the Project Board:
+- Creating Chats
+
+Completed:
+- Research for socket.io fix
+
+Additional Context:
+- This was a busy week in terms of assignments and midterm. Had two midterms and project assignments in other classes. I am stuck on the socket.io implementation, so was only able to do some research due to the busy week.
+

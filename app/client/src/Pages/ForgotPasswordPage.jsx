@@ -52,9 +52,9 @@ const ForgotPasswordPage = () => {
                     <CloseButton onClick={() => setShowWarning(false)}/>
                 </div>
                 <Alert.Heading>Are you sure you want to reset password?</Alert.Heading> 
-                Note that you will no longer have
-                access to the videos saved on your
-                account if you change your password.
+                  Note that you will no longer have
+                  access to the videos saved on your
+                  account if you change your password.
         </Alert>
         <Form onSubmit={handleSubmit} className="text-center">
           <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">

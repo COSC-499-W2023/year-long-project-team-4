@@ -10,7 +10,7 @@ import PasswordCheckList from "react-password-checklist";
 
 const PasswordCodePage = () => {
   const navigate = useNavigate();
-  const [password, setPassword] = useState('');
+  const [pass, setPass] = useState('');
   const [type, setType] = useState(false);
   const [show,setShow] = useState(true);
   const [errorMessage,setErrorMessage] = useState('');
@@ -19,17 +19,17 @@ const PasswordCodePage = () => {
     e.preventDefault();
     const passcode = e.target.elements[0].value;
     const email = e.target.elements[1].value;  
-    const passwordUpdated = password; 
-
-    handleReset(passcode, email, passwordUpdated);
+    const password = pass; 
+   
+    handleReset(passcode, email, password);
   }
 
-  const handleReset = async(passcode, email, passwordUpdated) => {
+  const handleReset = async(passcode, email, password) => {
   try {
     await axios.post(`${IP_ADDRESS}/bucket/change_password_forgot`, {
          passcode: passcode,
          email: email,
-         passwordUpdated: passwordUpdated,
+         password: password,
        }, {
          headers: {
            'Content-Type': 'application/x-www-form-urlencoded'
@@ -62,16 +62,15 @@ const PasswordCodePage = () => {
             <div className="text-white text-center display-4"> Enter new Password</div>
             <div className="text-white"> Enter passcode</div>
             <InputGroup className="mt-2">
-                <InputGroup.Text id="inputGroup-sizing-lg">Passcode</InputGroup.Text>
-                <Form.Control
-                    aria-label="Large"
-                    aria-describedby="inputGroup-sizing-sm"
-                    required
-                />
+              <InputGroup.Text id="inputGroup-sizing-lg">Passcode</InputGroup.Text>
+              <Form.Control
+                aria-label="Large"
+                aria-describedby="inputGroup-sizing-sm"
+                required
+              />
             </InputGroup>
             <div className="mt-2"> Enter current email </div>
             <Form.Control
-              id='email'
               type="email"
               required
             />
@@ -80,8 +79,8 @@ const PasswordCodePage = () => {
                 <Form.Control
                 type={type ? "text" : "password"}
                 required
-                value={password}
-                onChange={(e)=>{setPassword(e.target.value)}}
+                value={pass}
+                onChange={(e)=>{setPass(e.target.value)}}
                 />
                 <Button 
                 variant="primary" 
@@ -95,7 +94,7 @@ const PasswordCodePage = () => {
                 rules={["capital", "specialChar", "minLength","maxLength", "number"]}
                 minLength={8}
                 maxLength={25}
-                value={password}
+                value={pass}
                 messages={{
                   minLength: "Password requires at least 8 characters.",
                   maxLength: "Password requires at most 25 characters.",

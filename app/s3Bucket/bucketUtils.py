@@ -16,7 +16,7 @@ DBUSER = os.getenv("DBUSER")
 DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
-SSH = os.getenv("SSH")
+SSH = os.getenv("SSH") == "True"
 EC2 = os.getenv("EC2_ADDRESS")
 
 ACCESS_KEY = os.getenv("ACCESSKEY")
@@ -176,7 +176,6 @@ def get_object_content(obj_path):
 
             content = response['Body'].read().decode('utf-8')
 
-            print(f'Content of {obj_path}:\n{content}')
             return content
         except Exception as e:
             print(f"Error retrieving content from {obj_path}: {e}")

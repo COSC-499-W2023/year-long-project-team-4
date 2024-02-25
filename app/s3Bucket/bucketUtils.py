@@ -16,7 +16,7 @@ DBUSER = os.getenv("DBUSER")
 DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
-SSH = os.getenv("SSH")
+SSH = os.getenv("SSH") == "True"
 EC2 = os.getenv("EC2_ADDRESS")
 
 ACCESS_KEY = os.getenv("ACCESSKEY")

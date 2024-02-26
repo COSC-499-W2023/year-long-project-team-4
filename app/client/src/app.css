@@ -9,3 +9,7 @@ video {
     object-fit: cover !important;
     border-radius: 10px !important;
 }
+
+.text-primary:hover {
+    color:white !important;
+}

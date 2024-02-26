@@ -89,13 +89,13 @@ const LoginHomePage = () => {
       <Fade big cascade>
         <div className="row">
           <div className="col"> 
-            <a href={guestPath}>Use as guest</a>
-          </div>    
+            <p><a className="text-primary" href={guestPath}>Use as guest</a></p>
+         </div>    
           <div className="col"> 
-            <a href={registerPath}>No account?</a>
+            <p><a className="text-primary" href={registerPath}>No account?</a></p>
           </div>
           <div className="col"> 
-            <a href={changePasswordPath}>Forgot password?</a>
+            <p><a className="text-primary" href={changePasswordPath}>Forgot password?</a></p>
           </div>
         </div>
       </Fade>

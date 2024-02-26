@@ -106,7 +106,7 @@ const handleSubmit = (e) => {
           </div>
         </Form.Group>  
         </Form>
-        <a href={loginPath}>Have an account?</a>
+        <a className="text-primary"href={loginPath}>Have an account?</a>
       </Fade>
   </div>
   )

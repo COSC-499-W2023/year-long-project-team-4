@@ -7,7 +7,8 @@ import see from '../Assets/eye.svg';
 import unSee from '../Assets/eye-slash.svg';
 import {useNavigate} from 'react-router-dom';
 import {
-    MessagingPath
+    MessagingPath,
+    IP_ADDRESS,
   } from "../Path";
 
 const AccountPage = () => {
@@ -37,7 +38,7 @@ const [showVideoModal, setShowVideoModal] = useState(false);
 
 useEffect(() => {
     // Replace with the correct URL of your backend
-    axios.get('http://localhost:8080/bucket/getvideos', {
+    axios.get(`${IP_ADDRESS}/bucket/getvideos`, {
         withCredentials: true})
         .then(response => {
             setVideos(response.data);
@@ -52,7 +53,7 @@ const handleVideoClick = (videoName) => {
     const formData = new FormData();
     formData.append('video_name', videoName);
 
-    axios.post('http://localhost:8080/bucket/retrieve', formData, {
+    axios.post(`${IP_ADDRESS}/bucket/retrieve`, formData, {
         withCredentials: true,
         responseType: 'blob' // Sets the expected response type to 'blob' since a video file is binary data
     })
@@ -74,7 +75,7 @@ const handleCloseVideoModal = () => {
 useEffect(() => {
         const fetchCurrentUser = async () => {
             try {
-              const response = await axios.get('http://localhost:8080/auth/currentuser', {
+              const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
                 withCredentials: true
               });
         
@@ -94,36 +95,7 @@ useEffect(() => {
 
 const handleStartChat = (e, videoName) => {
   e.preventDefault();
-
-  const formData = new FormData();
-  formData.append('video_name', videoName); // Append the video name to the FormData
-
-  //POST request to create a new chat room
-  axios.post('http://localhost:8080/bucket/create_chat', formData, { 
-      withCredentials: true,
-      headers: {
-          'Content-Type': 'multipart/form-data'
-      }
-  })
-  //redirect to Messaging Page after creating the chat
-  .then(response => {
-      console.log('Chat created:', response.data);
-      navigate(MessagingPath, { state: { videoName: videoName } });
-  })
-  .catch(error => {
-      if (error.response) {
-          console.error('Error response:', error.response.data);
-          // Check if the error is because the chat already exists
-          if (error.response.data.error === "Associated chat already exists") {
-              navigate(MessagingPath, { state: { videoName: videoName } }); // Navigate to messaging page if chat already exists
-          } else {
-              setErrorMessage(error.response.data.error || 'Error creating chat');
-          }
-      } else {
-          console.error('Error creating chat:', error);
-          setErrorMessage('Error creating chat');
-      }
-  });
+  navigate(MessagingPath, { state: { videoName: videoName } });
 };
 
 return (

@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 
 sys.path.append(os.path.abspath('../app'))
 load_dotenv()
+SSH = os.getenv("SSH") == 'True'
 SSHUSER = os.getenv("SSHUSER")
 KPATH = os.getenv("KEYPATH")
 ADDRESS = os.getenv("ADDRESS")
@@ -16,7 +17,7 @@ DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
 TEST = os.getenv("TEST")
-SSH_TUNNEL_ADDRESS = os.getenv("EC2_ADDRESS")
+EC2 = os.getenv("EC2_ADDRESS")
 
 if(TEST.lower() == "true"):
     DBNAME = 'Team4dbTest'
@@ -43,24 +44,38 @@ def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, 
     db = None
     result = None
     try:
+        if SSH:
+            # Creates the SSH tunnel to connect to the DB
+            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
         # Creates the SSH tunnel to connect to the DB
-            with SSHTunnelForwarder((SSH_TUNNEL_ADDRESS), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
                 print("SSH Tunnel Established")
-                #Db connection string
+                # Db connection string using SSH tunnel
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
-                if db:
-                    cur = db.cursor()
-                    #Insert String
-                    query = "INSERT INTO userprofile (email, password_hash, firstname, lastname,salthash, publickey, verifyKey, verifiedAcc) values (%s,%s,%s,%s,%s,%s,%s,%s)"
-                    #Creates list of the insertations
-                    data = (email,password,firstname,lastname, salthash, pubKey, verifyKey, verifiedAcc)
-                    #Executes the query w/ the corrosponding data
-                    cur.execute(query,data)
-                    print("Insertation Complete")
-                    db.commit()
-                    #Returns 1 if successful
-                    result = 1
-    #except pymysql.Error as e:
+                cur = db.cursor()
+                # Insert String
+                query = "INSERT INTO userprofile (email, password_hash, firstname, lastname, salthash, publickey, verifyKey, verifiedAcc) values (%s,%s,%s,%s,%s,%s,%s,%s)"
+                # Creates list of the insertations
+                data = (email, password, firstname, lastname, salthash, pubKey, verifyKey, verifiedAcc)
+                # Executes the query w/ the corresponding data
+                cur.execute(query, data)
+                print("Insertation Complete")
+                db.commit()
+                # Returns 1 if successful
+                result = 1
+        else:
+            # Db connection string without SSH tunnel
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
+            cur = db.cursor()
+            # Insert String
+            query = "INSERT INTO userprofile (email, password_hash, firstname, lastname, salthash, publickey, verifyKey, verifiedAcc) values (%s,%s,%s,%s,%s,%s,%s,%s)"
+            # Creates list of the insertations
+            data = (email, password, firstname, lastname, salthash, pubKey, verifyKey, verifiedAcc)
+            # Executes the query w/ the corresponding data
+            cur.execute(query, data)
+            print("Insertation Complete")
+            db.commit()
+            # Returns 1 if successful
+            result = 1
     except Exception as e:
         print(e)
         # Returns 1 if errors

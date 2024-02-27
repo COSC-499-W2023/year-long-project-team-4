@@ -73,19 +73,19 @@ const ViewSentVideoPage = () => {
       setSelectedVideo(null);
   };
 
-  const handleStartChat = (e, videoName) => {
+  /* const handleStartChat = (e, videoName) => {
     e.preventDefault();
     console.log(`Attempting to start chat for video: ${videoName}`);
     socket.emit('create_chat', { video_name: videoName });
-    navigate(MessagingPath, { state: { videoName: videoName } });
-};
+  navigate(MessagingPath, { state: { videoName: videoName } });
+};*/
 
-  {/*
+  
   // Handles the creation of a chat associated with a video
   const handleStartChat = (e, videoName) => {
-    e.preventDefault();
+    //e.preventDefault();
     // Create a new FormData instance
-    const formData = new FormData();
+    /*const formData = new FormData();
     formData.append('video_name', videoName); 
 
     axios.post('http://localhost:8080/bucket/create_chat', formData, { 
@@ -111,8 +111,11 @@ const ViewSentVideoPage = () => {
             console.error('Error creating chat:', error);
             setErrorMessage('Error creating chat');
         }
-    });
-};*/}
+    });*/
+    console.log("inside handleStartChat()")
+    console.log(videoName);
+    navigate(MessagingPath, { state: { videoName: videoName } });
+};
 
   return (
      <Fade cascade>
@@ -122,9 +125,10 @@ const ViewSentVideoPage = () => {
                <div className="display-6 text-light"> Videos</div>
                {videos.map((video, index) => (
                             <>
-                          <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                              <Button className='text-center mb-2' style={{minWidth: '150px'}}>
+                          <div key={index}>
+                              <Button className='text-center mb-2' style={{minWidth: '150px'}} onClick={(e) => handleStartChat(e, video.videoName)}>
                               <p>Video{index + 1}</p>
+                              <p>{video.videoName}</p>
                               </Button>
                           </div>
                           <Button variant="info" onClick={(e) => handleStartChat(e, video.videoName)}>Start Chat</Button>

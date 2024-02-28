@@ -61,15 +61,17 @@ def blur_faces_opencv(frame, face_details):
 def integrate_audio(original_video, output_video, audio_path=os.path.dirname(__file__)+'/temp/audio.mp4'):
     try:
         # Extract audio
-        my_clip = VideoFileClip(original_video)
-        my_clip.audio.write_audiofile(audio_path,codec='libmp3lame')
+        with VideoFileClip(original_video) as my_clip:
+            my_clip.audio.write_audiofile(audio_path, codec='libmp3lame')
+        
         temp_location = os.path.join(os.path.dirname(__file__), 'temp', 'output_video.mp4')
         
         # Join output video with extracted audio
-        videoclip = VideoFileClip(output_video)
-        videoclip.write_videofile(temp_location, codec='libx264', audio=audio_path, audio_codec='libmp4lame')
+        with VideoFileClip(output_video) as videoclip:
+            videoclip.write_videofile(temp_location, codec='libx264', audio=audio_path, audio_codec='libmp4lame')
+        
         videoLoc = os.path.basename(original_video)
-        os.rename(temp_location, os.path.dirname(__file__)+'/temp/blurred_'+videoLoc)
+        os.rename(temp_location, os.path.join(os.path.dirname(__file__), 'temp', 'blurred_' + videoLoc))
         
         # Delete audio
         os.remove(audio_path)

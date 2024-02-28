@@ -10,7 +10,6 @@ import random
 import boto3
 import time
 import string
-import threading
 
 from flask import Blueprint, request, session, jsonify, current_app, send_file, Flask
 from rsa import generate_key
@@ -495,25 +494,14 @@ def processVideo():
     faceBlurring.process_video(upload_path)
     # Get the new video & send it back to the front-end 
     blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)
-    
-    threading.Thread(target=delayedFileRemoval, args=(blurred_upload_path, 300)).start()
-    threading.Thread(target=delayedFileRemoval, args=(upload_path, 360)).start()  
-  
-    return send_file(blurred_upload_path, as_attachment=True, mimetype='video/mp4')
+    video_data = io.BytesIO()
+    with open(blurred_upload_path, "rb") as video_file:
+        video_data = io.BytesIO(video_file.read())
 
-
-def delayedFileRemoval(file_path, delay, num_retries=3,retry_delay=180):
-    # Function to remove the file after a specified delay, with retries if removal fails
-    time.sleep(delay)
-    try:
-        os.remove(file_path)
-        print("File removed successfully.")
-    except Exception as e:
-        print(f"Error occurred while removing file: {e}")
-        # Attempt 3 times before giving up 
-        if num_retries > 0:
-            print("Retrying...")
-            time.sleep(retry_delay)
-            delayedFileRemoval(file_path, delay, num_retries - 1)
-        else:
-            print("Max retries reached. File could not be removed.")
+    # Set buffer cursor to 0 again since it is by default at the last byte
+    video_data.seek(0)
+    # threading.Thread(target=delayedFileRemoval, args=(blurred_upload_path, 300)).start()
+    # threading.Thread(target=delayedFileRemoval, args=(upload_path, 360)).start()  
+    os.remove(blurred_upload_path)
+    os.remove(upload_path)
+    return send_file(video_data, mimetype='video/mp4')

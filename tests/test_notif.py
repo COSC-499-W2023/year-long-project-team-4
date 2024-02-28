@@ -42,7 +42,28 @@ def test_send_email(client):
     print(upload_response)
     assert not 'error' in upload_response
     
+def test_fail_send_email(client):
+    post_object = {'email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    file = 'test_video.mp4'
+    # Video with no real recipient
+    data = {
+        'recipient': '',
+        'file': (open(file, 'rb'), file)
+    }
+
+    # Reset tables and signup
+    assert database.resetTable(tableName="userprofile")
+    assert database.resetTable(tableName="videos")
+    response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+
+    # Fail to upload our test video and no email is sent
+    upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
+    print(upload_response)
+    assert 'error' in upload_response
+    
 if __name__ == "__main__":
     app = flaskapp.create_app()
     app.config['TESTING'] = True
-    test_send_email(app.test_client())   
+    test_send_email(app.test_client()) 
+    test_fail_send_email(app.test_client()) 

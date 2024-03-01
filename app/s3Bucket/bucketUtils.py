@@ -291,10 +291,10 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
                             recID = recInfo[0][0]
                             recFname = recInfo[0][1]
                             recLname = recInfo[0][2]
-                            obj_path = f"/{file_flag}/{receiverEmail}/{file_name}"
+                            obj_path = f"/{file_flag}/{file_name}"
                             if LOCAL:
-                                if not os.path.isdir(f"{file_flag}/{receiverEmail}"):
-                                    os.mkdir(f"{file_flag}/{receiverEmail}")
+                                if not os.path.isdir(f"{file_flag}"):
+                                    os.mkdir(f"{file_flag}")
                         else:
                             raise ValueError("That email was not found.")
                         

@@ -26,26 +26,21 @@ import {
   viewSentVideoPath,
   changePasswordPath,
   passwordCodePath,
-  resetPasswordPath,
   IP_ADDRESS,
 } from "./Path";
 import AccountPage from "./Pages/AccountPage";
 import PageNotFound from "./Pages/PageNotFound";
 import AlertGuestPage from "./Pages/AlertGuestPage";
-import ViewSentVideoPage from "./Pages/ViewSentVideoPage"
-import ResetPasswordPage from "./Pages/ResetPasswordPage";
+import ViewSentVideoPage from "./Pages/ViewSentVideoPage";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await axios.get(
-          `${IP_ADDRESS}/auth/currentuser`,
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
+          withCredentials: true,
+        });
 
         if (response.data.email) {
           setCurrentUser(response.data.email);
@@ -95,7 +90,6 @@ function App() {
         <Route path={accountPath} element={<AccountPage />} />
         <Route path={changePasswordPath} element={<ForgotPasswordPage />} />
         <Route path={passwordCodePath} element={<PasswordCodePage />} />
-        <Route path={resetPasswordPath} element={<ResetPasswordPage />} />
         {/*Creating a Route element if no Route Path matches*/}
         <Route path="*" element={<PageNotFound />} />
       </Routes>

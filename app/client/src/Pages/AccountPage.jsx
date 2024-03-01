@@ -10,6 +10,7 @@ import {
     MessagingPath,
     IP_ADDRESS,
   } from "../Path";
+import PasswordCheckList from "react-password-checklist";
 
 const AccountPage = () => {
 const [type, setType] = useState(false)
@@ -78,6 +79,7 @@ const navigate = useNavigate();
 //const lastName = "lastname123";
 const email = currentUser;
 
+const [password, setPassword] = useState('');
 const [videos, setVideos] = useState([]);
 const [selectedVideo, setSelectedVideo] = useState(null);
 const [showVideoModal, setShowVideoModal] = useState(false);
@@ -193,29 +195,31 @@ return (
           </Tab>
           <Tab eventKey="update" title="Update profile">
             <Form onSubmit={handleSubmit}>
-              <Form.Group className="p-3">
-              <div className="display-6 text-center"> Update Profile Info </div>
-                <div className="row m-2">
-                  <div className="col">
-                    <Form.Label>First Name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      required
-                    />
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control
-                      type="email"
-                      required
-                    />
-                  </div>
-                  <div className="col">
-                    <Form.Label>Last Name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      required
-                    />
-                    <Form.Label>Password</Form.Label>
-                    <InputGroup>
+              <Form.Group>
+                <div className="display-6 text-center mb-2"> Update Profile Info </div>
+                    <InputGroup className="p-2">
+                      <InputGroup.Text id="inputGroup-sizing-sm">First Name</InputGroup.Text>
+                      <Form.Control
+                        type="text"
+                        required
+                      />
+                    </InputGroup>
+                    <InputGroup className="p-2">
+                      <InputGroup.Text id="inputGroup-sizing-sm">Last Name</InputGroup.Text>
+                      <Form.Control
+                        type="email"
+                        required
+                      />
+                     </InputGroup> 
+                    <InputGroup className="p-2">
+                      <InputGroup.Text id="inputGroup-sizing-sm">Email</InputGroup.Text>
+                      <Form.Control
+                        type="text"
+                        required
+                      />
+                    </InputGroup>
+                    <InputGroup className="p-2">
+                      <InputGroup.Text id="inputGroup-sizing-sm">Password</InputGroup.Text>
                       <Form.Control
                         type={type ? "text" : "password"}
                         required
@@ -227,9 +231,21 @@ return (
                         {!type? <img src={see}/> :<img src={unSee}/>}
                       </Button>
                     </InputGroup>
-                  </div>     
+                    <PasswordCheckList
+                      className='p-2'
+                      rules={["capital", "specialChar", "minLength","maxLength", "number"]}
+                      minLength={8}
+                      maxLength={25}
+                      value={password}
+                      messages={{
+                        minLength: "Password requires at least 8 characters.",
+                        maxLength: "Password requires at most 25 characters.",
+                        number: "Password must contain at least 1 number.",
+                        capital: "Password must contain at least 1 capital letter.",
+                        specialChar: "Password must contain at least 1 special character",
+                      }}
+                    />    
                   <Button className="m-2" variant="primary" type="submit"> Update Account</Button>
-                  </div>
               </Form.Group>  
             </Form>
           </Tab>
@@ -243,7 +259,7 @@ return (
         </Tabs>
       </Card>
       <div className="text-center">
-        <Button className="m-4" href={receiveAndSendPath}> Return to Home </Button>
+        <Button className="mt-2" href={receiveAndSendPath}> Return to Home </Button>
       </div>
     </Fade>   
    </div>

@@ -185,11 +185,11 @@ def upload_video():
                 }
             )
 
-            return jsonify({'video_id': f'/videos/{recipient_email}/{video_name}'}), 200
+            return jsonify({'video_id': f'{video_name}'}), 200
         except Exception as e:
             print(e)
     elif insert_result and (LOCAL == True):
-        return jsonify({'video_id': f'/videos/{recipient_email}/{video_name}'}), 200
+        return jsonify({'video_id': f'{video_name}'}), 200
     else:
         return jsonify({'error': 'Video insertion failed'}), 502
 

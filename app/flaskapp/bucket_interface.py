@@ -494,7 +494,6 @@ def processVideo():
     faceBlurring.process_video(upload_path)
     # Get the new video & send it back to the front-end 
     blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)
-    video_data = io.BytesIO()
     with open(blurred_upload_path, "rb") as video_file:
         video_data = io.BytesIO(video_file.read())
 

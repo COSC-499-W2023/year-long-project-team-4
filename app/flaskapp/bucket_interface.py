@@ -122,7 +122,7 @@ def upload_video():
             return jsonify({'error': 'Failed to create chat'}), 502
 
     insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, dummy_retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
-    if insert_result & (LOCAL == False):
+    if insert_result and (LOCAL == False):
         sender_email = 'safemovnow@gmail.com'
     
         # Compose the email message
@@ -188,7 +188,7 @@ def upload_video():
             return jsonify({'video_id': f'/videos/{recipient_email}/{video_name}'}), 200
         except Exception as e:
             print(e)
-    elif insert_result & (LOCAL == True):
+    elif insert_result and (LOCAL == True):
         return jsonify({'video_id': f'/videos/{recipient_email}/{video_name}'}), 200
     else:
         return jsonify({'error': 'Video insertion failed'}), 502

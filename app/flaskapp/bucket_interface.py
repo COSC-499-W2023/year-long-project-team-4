@@ -499,8 +499,7 @@ def processVideo():
 
     # Set buffer cursor to 0 again since it is by default at the last byte
     video_data.seek(0)
-    # threading.Thread(target=delayedFileRemoval, args=(blurred_upload_path, 300)).start()
-    # threading.Thread(target=delayedFileRemoval, args=(upload_path, 360)).start()  
+    # Remove files to keep folder clean and size down 
     os.remove(blurred_upload_path)
     os.remove(upload_path)
     return send_file(video_data, mimetype='video/mp4')

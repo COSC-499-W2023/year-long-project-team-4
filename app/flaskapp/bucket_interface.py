@@ -37,6 +37,7 @@ if not LOCAL:
     aws_secret_access_key=SECRET_KEY,
     aws_session_token=SESSION_TOKEN
     )
+    # boto3.setup_default_session(profile_name='team4-dev')
 else:
     if not os.path.isdir('verificationCode'):
         os.mkdir('verificationCode')

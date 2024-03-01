@@ -22,7 +22,7 @@ EC2 = os.getenv("EC2_ADDRESS")
 if(TEST.lower() == "true"):
     DBNAME = 'Team4dbTest'
 
-def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, pubKey, verifyKey, verifiedAcc) -> int:
+def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, pubKey, verifyKey, verifiedAcc: bool =False) -> int:
     '''
     Insert a new user into the database.
 

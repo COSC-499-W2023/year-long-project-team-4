@@ -156,11 +156,11 @@ const UploadVideoPage = () => {
   return (
   <>
     <Fade>
-      <Button className="m-2 float-end" variant="light" onClick={handleShow}>
+      <Button className="m-2 float-end" variant="outline-dark" onClick={handleShow}>
         <img src={info}></img>
       </Button>
     </Fade>
-    <Button className="m-2 float-start" variant="light" onClick={sendMain}>
+    <Button className="m-2 float-start" variant="outline-dark" onClick={sendMain}>
         <img src={back}></img>
     </Button>
     <Offcanvas show={show} onHide={handleClose} backdrop="static">
@@ -243,7 +243,7 @@ const UploadVideoPage = () => {
         (
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="formFileLg" className="d-grid gap-2">
-            <Form.Label className="display-4 text-white">Upload Video</Form.Label>
+            <Form.Label className="display-4">Upload Video</Form.Label>
             <Form.Control 
               type="file" 
               required 

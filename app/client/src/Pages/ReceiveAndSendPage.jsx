@@ -98,13 +98,13 @@ const ReceiveAndSendPage = () => {
         </div>
         <div className="tab-content" id="v-pills-tabContent">
           <div 
-            className="tab-pane fade show active text-white" 
+            className="tab-pane fade show active" 
             id="uploadedVideos" 
             role="tabpanel">
               <ViewSentVideoPage />
           </div>
           <div 
-            className="tab-pane fade text-white" 
+            className="tab-pane fade" 
             id="viewVideos" 
             role="tabpanel">
               <ViewVideoPage />

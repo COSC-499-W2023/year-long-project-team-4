@@ -17,7 +17,7 @@ const ResetPasswordPage = () => {
     <Fade big cascade>
         <Form onSubmit={handleSubmit}>
         <Form.Group className="p-3">
-            <Form.Label className="text-white display-6"> Enter New Password</Form.Label>
+            <Form.Label className="display-6"> Enter New Password</Form.Label>
             <InputGroup>
                 <Form.Control
                 type={type ? "text" : "password"}

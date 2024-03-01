@@ -11,7 +11,6 @@ LOCAL = os.getenv('LOCAL') == 'True'
 if not LOCAL: # Flag for local or not
     # RUN "AWS CONFIGURE SSO" before running code - this one included if local is not set to True 
     boto3.setup_default_session(profile_name='team4-dev')
-    s3_client = boto3.client('s3')
 
 
 def detect_faces(VideoFrame):

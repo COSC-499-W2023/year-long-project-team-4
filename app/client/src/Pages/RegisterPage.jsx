@@ -61,7 +61,7 @@ const handleSubmit = (e) => {
 };
 
   return (
-  <div className="position-absolute top-50 start-50 translate-middle text-white text-center">          
+  <div className="position-absolute top-50 start-50 translate-middle text-center">          
     {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
       <Fade cascade>
         <Form onSubmit={handleSubmit}>

@@ -75,8 +75,8 @@ const handleDelete = () =>{
 
 const navigate = useNavigate();
 
-//const firstName = "firstname123";
-//const lastName = "lastname123";
+const firstName = "firstname123";
+const lastName = "lastname123";
 const email = currentUser;
 
 const [password, setPassword] = useState('');

@@ -23,6 +23,7 @@ const UploadVideoPage = () => {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [show, setShow] = useState(false);
   const [load, setLoad] = useState(false);
+  const [retentionPeriod, setRetentionPeriod] = useState(90);
 
   let startTime;
   var duration;
@@ -255,6 +256,17 @@ const UploadVideoPage = () => {
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
           </Form.Group>
+          <Form.Group controlId="formRetentionPeriod" className="mb-3">
+            <Form.Label className="text-white">Retention Period (90-365 days)</Form.Label>
+            <Form.Control 
+              type="number" 
+              required 
+              min="90" max="365" 
+              placeholder="Enter retention period in days" 
+              value={retentionPeriod} 
+              onChange={(e) => setRetentionPeriod(e.target.value)} 
+            />
+          </Form.Group>
           <Button onClick={()=>{handleBlur()}} disabled={file? false : true}>Blur video</Button> {' '}
           <Button type="submit">Send video</Button>
         </Form>
@@ -307,6 +319,17 @@ const UploadVideoPage = () => {
                 value={recipientEmail} 
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
+          </Form.Group>
+          <Form.Group controlId="formRetentionPeriod" className="mb-3">
+            <Form.Label className="text-white">Retention Period (90-365 days)</Form.Label>
+            <Form.Control 
+              type="number" 
+              required 
+              min="90" max="365" 
+              placeholder="Enter retention period in days" 
+              value={retentionPeriod} 
+              onChange={(e) => setRetentionPeriod(e.target.value)} 
+            />
           </Form.Group>
           <div className="mb-2">
             <Button className="mt-2" onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}

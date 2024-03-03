@@ -480,19 +480,26 @@ def processVideo():
     if file is None:
         return jsonify({'error': 'No file found'}), 400
     
+    # Check if the temp folder is made or not - create it if not 
     upload_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'faceBlurring', 'temp'))    
     if not os.path.exists(upload_directory):
         os.makedirs(upload_directory)
         
+    # Generate random string uuid to avoid clashing with names - Save video locally 
     video_name = str(uuid.uuid4())+".mp4"
     upload_path = os.path.join(upload_directory,video_name)
     file.save(upload_path)
-    print(f'upload_directory: {upload_directory}')
-    print(f'upload_path: {upload_path}')
-    print(f'File received: {file.filename}')
 
+    # Initiate the blurring process
     faceBlurring.process_video(upload_path)
-    
-    blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)  
-    print(f'blurred_upload_path: {blurred_upload_path}')
-    return send_file(blurred_upload_path, as_attachment=True, mimetype='video/mp4')
+    # Get the new video & send it back to the front-end 
+    blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)
+    with open(blurred_upload_path, "rb") as video_file:
+        video_data = io.BytesIO(video_file.read())
+
+    # Set buffer cursor to 0 again since it is by default at the last byte
+    video_data.seek(0)
+    # Remove files to keep folder clean and size down 
+    os.remove(blurred_upload_path)
+    os.remove(upload_path)
+    return send_file(video_data, mimetype='video/mp4')

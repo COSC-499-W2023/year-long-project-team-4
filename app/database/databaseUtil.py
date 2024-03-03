@@ -152,8 +152,8 @@ def insert_tags(video_name: str, tags: list[str]) -> int:
 
     query_data = []
     for tag in tags:
-        query_data.append(video_name)
         query_data.append(tag)
+        query_data.append(video_name)
 
     try:
         if SSH:

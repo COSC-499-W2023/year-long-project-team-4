@@ -89,7 +89,10 @@ def upload_video():
     # Read the file and email from post
     file = request.files.get('file')
     recipient_email = request.form.get('recipient')
-    tags = request.form.get('tags')
+    tags = None
+    json_data = request.files.get('json')
+    if json_data:
+        tags = json.loads(json_data.read())['tags']
 
     # Get the public key corresponding to the recipient
     recipient_public_key = get_public_key(recipient_email)
@@ -168,30 +171,37 @@ def retrieve_video():
 
 @bucket.route('/getvideos', methods=['GET'])
 def get_available_videos():
-    tags = request.form.get('tags')
+    # Get videos
     available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
+
+    tags = None
+    json_data = request.files.get('json')
+    if json_data:
+        tags = json.loads(json_data.read())['tags']
 
     if tags:
         condition_statement = 'tagName = %s OR ' * len(tags)
         condition_statement = condition_statement[:-4]
-        for tag in tags:
-            condition_statement
         available_by_tags = database.query_records(table_name='tags', fields='videoName', condition=condition_statement, condition_values=tags)
+        available_by_tags = [video['videoName'] for video in available_by_tags]
         available_videos = [video for video in available_videos if video['videoName'] in available_by_tags]
 
     return json.dumps(available_videos), 200
     
 @bucket.route('/get_sent_videos', methods=['GET'])
 def get_sent_videos():
-    tags = request.form.get('tags')
     available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
+
+    tags = None
+    json_data = request.files.get('json')
+    if json_data:
+        tags = json.loads(json_data.read())['tags']
 
     if tags:
         condition_statement = 'tagName = %s OR ' * len(tags)
         condition_statement = condition_statement[:-4]
-        for tag in tags:
-            condition_statement
         available_by_tags = database.query_records(table_name='tags', fields='videoName', condition=condition_statement, condition_values=tags)
+        available_by_tags = [video['videoName'] for video in available_by_tags]
         available_videos = [video for video in available_videos if video['videoName'] in available_by_tags]
 
     return json.dumps(available_videos), 200

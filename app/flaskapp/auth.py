@@ -52,7 +52,7 @@ def signup():
         return jsonify({"error": "Password has no numbers"}), 502
     elif re.search('[A-Z]',password) is None: 
         return jsonify({"error": "Password has no capital letters"}), 502
-    specialchars = '@_!#$%^&*()<>?/\|}{~:'
+    specialchars = '@_!#$%^&*()<>?/\\|}{~:'
     howmany = 0
     for i in range(len(specialchars)):
         char = specialchars[i]

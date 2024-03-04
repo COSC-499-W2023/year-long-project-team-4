@@ -11,8 +11,8 @@ def test_reset():
     assert database.resetTable("videos") is True
 
 def test_insert_user():
-    result1 = database.insert_user("updated@example.com", "password123", "John", "Doe","","")
-    result2 = database.insert_user("Test@example.com", "password12233", "John", "Doe","","")
+    result1 = database.insert_user("updated@example.com", "password123", "John", "Doe","","","")
+    result2 = database.insert_user("Test@example.com", "password12233", "John", "Doe","","","")
 
     assert result1 == 1  # Assuming insertion was successful
     assert result2 == 1  # Assuming insertion was successful
@@ -25,10 +25,7 @@ def test_insert_video():
     assert resultGuest == 1
 
 def test_update():
-    update_data = {
-        "email": "Testingupdate@example.com"
-    }
-    result = database.update_user(1, update_data)  # Assuming user_id 1 exists
+    result = database.update_user(user_email = "Test@example.com", new_email = 'Testingupdate@example.com')  # Assuming user_id 1 exists
     assert result == 1  # Assuming the update was successful
 
 def test_delete():

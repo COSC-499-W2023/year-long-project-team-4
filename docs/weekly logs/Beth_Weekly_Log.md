@@ -268,3 +268,22 @@ Completed:
 - Moved notifications to upload_video function
 - Wrote new tests to accomodate this
 - Ran into errors doing this, some times the tests pass, but I haven't been able to fix the bug yet
+
+# Week 7: Feb 26 - March 3
+
+## Tasks Completed:
+
+![2Week6act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/81b008d2-339e-4f10-afca-189867a13ce7)
+
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Fix expiring aws credetials
+
+Completed:
+- Minor fixes on both of my pull requests
+- Had to write tests for notifications and create that pull request
+- testing/approving pull requests
+- (Have not figured out expiring credentials yet)

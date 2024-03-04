@@ -215,3 +215,82 @@ def test_video_upload_download(client):
     # Check that retrieved video matches test file
     with open(file, 'rb') as test_file:
         assert test_file.read() == retrieve_response.data
+
+def test_video_tags_valid(client):
+    # Setup some test data
+    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    file = 'test_video.mp4'
+    data = {
+        'recipient': post_object['email'],
+        'file': (open(file, 'rb'), file),
+        'json': (open('test_json.json', 'rb'), 'test_json.json')
+    }
+
+    # Reset tables and signup
+    assert database.resetTable(tableName="userprofile")
+    assert database.resetTable(tableName="videos")
+    response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+
+    # Upload our test video with the tags ['one', 'two']
+    upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
+
+    # Define our valid tag jsons
+    # Tags ['one', two]
+    video_tag_search_valid = {'json': (open('test_json.json', 'rb'), 'test_json.json')}
+    # Tags ['one']
+    video_tag_search_valid_2 = {'json': (open('test_json_3.json', 'rb'), 'test_json_3.json')}
+    # Tags ['two']
+    video_tag_search_valid_3 = {'json': (open('test_json_4.json', 'rb'), 'test_json_4.json')}
+
+
+    # There should now be 1 video returned when searching with valid tags
+    response = json.loads(client.get('/bucket/getvideos', data=video_tag_search_valid).data.decode('utf-8'))
+    assert len(response) == 1
+
+    # Check with two more valid sets of tags to make sure it works with every valid combo, helps ensure no edge cases
+    response = json.loads(client.get('/bucket/getvideos', data=video_tag_search_valid_2).data.decode('utf-8'))
+    assert len(response) == 1
+
+    response = json.loads(client.get('/bucket/getvideos', data=video_tag_search_valid_3).data.decode('utf-8'))
+    assert len(response) == 1
+
+    # Check that they also work for /get_sent_videos
+    # Reopen this file since we use it twice and it got closed the first time it was used
+    video_tag_search_valid = {'json': (open('test_json.json', 'rb'), 'test_json.json')}
+    response = json.loads(client.get('/bucket/get_sent_videos', data=video_tag_search_valid).data.decode('utf-8'))
+    assert len(response) == 1
+
+def test_video_tags_invalid(client):
+    # Setup some test data
+    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    file = 'test_video.mp4'
+    data = {
+        'recipient': post_object['email'],
+        'file': (open(file, 'rb'), file),
+        'json': (open('test_json.json', 'rb'), 'test_json.json')
+    }
+
+    # Reset tables and signup
+    assert database.resetTable(tableName="userprofile")
+    assert database.resetTable(tableName="videos")
+    response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+
+    # Upload our test video with the tags ['one', 'two']
+    upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
+
+
+    # Define an invalid tag json
+    # Tags ['three']
+    video_tag_search_invalid = {'json': (open('test_json_2.json', 'rb'), 'test_json_2.json')}
+
+    # Check with different tag than either of the used tags, should return no video
+    response = json.loads(client.get('/bucket/getvideos', data=video_tag_search_invalid).data.decode('utf-8'))
+    assert len(response) == 0
+
+    # Check that they also don't work for /get_sent_videos
+    # Reopen this file since we use it twice and it got closed the first time it was used
+    video_tag_search_invalid = {'json': (open('test_json_2.json', 'rb'), 'test_json_2.json')}
+    response = json.loads(client.get('/bucket/get_sent_videos', data=video_tag_search_invalid).data.decode('utf-8'))
+    assert len(response) == 0

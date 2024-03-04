@@ -9,6 +9,11 @@ import {
     MessagingPath,
     IP_ADDRESS,
   } from "../Path";
+import io from 'socket.io-client';
+
+const socket = io(`${IP_ADDRESS}`,  {
+    withCredentials: true,
+  });
 
 const ViewSentVideoPage = () => {
   
@@ -21,6 +26,11 @@ const ViewSentVideoPage = () => {
   
   // Fetch sent videos on component mount
   useEffect(() => {
+    socket.on('connect', () => {
+        console.log('Connected to the server');
+      });
+  
+
       axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, {
           withCredentials: true})
           .then(response => {
@@ -30,6 +40,16 @@ const ViewSentVideoPage = () => {
           .catch(error => {
               console.error('There was an error fetching the videos!', error);
           });
+
+    socket.on('disconnect', (reason) => {
+        console.log(`Disconnected from the server due to ${reason}`);
+    });
+
+    return () => {
+        socket.off('connect');
+        socket.off('disconnect');
+      };
+      
   }, []);
   
   // Handles video selection and retrieves video URL
@@ -59,6 +79,9 @@ const ViewSentVideoPage = () => {
   // Handles the creation of a chat associated with a video
   const handleOpenChat = (e, videoName) => {
     e.preventDefault();
+
+    socket.emit('join_chat', { chat_name: videoName });
+
     navigate(MessagingPath, { state: { videoName: videoName } });
 };
 

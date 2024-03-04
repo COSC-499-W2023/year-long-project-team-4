@@ -172,7 +172,7 @@ def insert_tags(video_name: str, tags: list[str]) -> int:
                 result = 1
         else:
             # Db connection string without SSH tunnel
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
             cur = db.cursor()
             set_clause = "(%s,%s)," * len(tags)
             set_clause = set_clause[:-1] # Get rid of last comma

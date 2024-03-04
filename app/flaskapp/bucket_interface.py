@@ -37,7 +37,7 @@ if not LOCAL:
     aws_secret_access_key=SECRET_KEY,
     aws_session_token=SESSION_TOKEN
     )
-    boto3.setup_default_session(profile_name='team4-dev')
+    # boto3.setup_default_session(profile_name='team4-dev')
 else:
     if not os.path.isdir('verificationCode'):
         os.mkdir('verificationCode')
@@ -127,11 +127,78 @@ def upload_video():
 
     insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, dummy_retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
 
-    if insert_result:
-        if tags:
-            tag_result = database.insert_tags(video_name, tags)
-            if tag_result == -1:
-                return jsonify({'video_id': f'{video_name}', 'error': 'Tag upload failed'}), 503
+    if insert_result and tags:
+        tag_result = database.insert_tags(video_name, tags)
+        if tag_result == -1:
+            return jsonify({'video_id': f'{video_name}', 'error': 'Tag upload failed'}), 503
+
+    if insert_result and (LOCAL == False):
+        sender_email = 'safemovnow@gmail.com'
+    
+        # Compose the email message
+        subject = "You've Recieved a Video"
+        html_body = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Video Received Notification</title>
+            <style>
+                <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+        
+            h1 {
+                color: #007bff;
+            }
+        
+            p {
+                margin-bottom: 20px;
+            }
+        </style>
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>A New Video!</h1>
+                <p>We are pleased to inform you that you have a new video ready for viewing.</p>
+                <p>Thank you for choosing SafeMov!</p>
+                <p>Best regards,<br>SafeMov</p>
+            </div>
+        </body>
+        </html>
+        """
+
+        try:
+            # Send the email
+            email = ses_client.send_email(
+                Source=sender_email,
+                Destination={'ToAddresses': [recipient_email]},
+                Message={
+                    'Subject': {'Data': subject},
+                    'Body': {'Html': {'Data': html_body}}
+                }
+            )
+
+            return jsonify({'video_id': f'{video_name}'}), 200
+        except Exception as e:
+            print(e)
+    elif insert_result and (LOCAL == True):
         return jsonify({'video_id': f'{video_name}'}), 200
     else:
         return jsonify({'error': 'Video insertion failed'}), 502
@@ -343,7 +410,7 @@ def change_password_reencrypt():
         public_key = private_key.publickey().export_key('PEM')
         hashed_password = bcrypt.generate_password_hash(new_password).decode()
         #Insert new info into database
-        database.update_user(user_email = user_email, new_password = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+        database.update_user(user_email = user_email, new_password_hash = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
 
         #Loop through videos to reencrypt and insert back to database and s3Bucket
         for videos1 in videos_to_decrypt2:        
@@ -432,7 +499,7 @@ def set_verificationcode():
     #Create verification code
     created_code = ''.join(random.choices(string.digits, k=6))
     update_data = {'verifyKey': f'{created_code}'}
-    database.update_user(user_email = email, new_verifyKey = created_code)
+    database.update_user(user_email = email, new_verify_key = created_code)
     #Save code locally if Local is true
     if LOCAL:
         obj_path = f"./verificationCode"
@@ -484,7 +551,7 @@ def change_password_forgot():
         public_key = private_key.publickey().export_key('PEM')
         hashed_password = bcrypt.generate_password_hash(new_password).decode()
         #Insert new info into database
-        database.update_user(user_email = email, new_password = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+        database.update_user(user_email = email, new_password_hash = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
         
         #Get recieved videos that need key deleted
         videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'receiverEmail = %s', condition_values=(email,))
@@ -516,19 +583,26 @@ def processVideo():
     if file is None:
         return jsonify({'error': 'No file found'}), 400
     
+    # Check if the temp folder is made or not - create it if not 
     upload_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'faceBlurring', 'temp'))    
     if not os.path.exists(upload_directory):
         os.makedirs(upload_directory)
         
+    # Generate random string uuid to avoid clashing with names - Save video locally 
     video_name = str(uuid.uuid4())+".mp4"
     upload_path = os.path.join(upload_directory,video_name)
     file.save(upload_path)
-    print(f'upload_directory: {upload_directory}')
-    print(f'upload_path: {upload_path}')
-    print(f'File received: {file.filename}')
 
+    # Initiate the blurring process
     faceBlurring.process_video(upload_path)
-    
-    blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)  
-    print(f'blurred_upload_path: {blurred_upload_path}')
-    return send_file(blurred_upload_path, as_attachment=True, mimetype='video/mp4')
+    # Get the new video & send it back to the front-end 
+    blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)
+    with open(blurred_upload_path, "rb") as video_file:
+        video_data = io.BytesIO(video_file.read())
+
+    # Set buffer cursor to 0 again since it is by default at the last byte
+    video_data.seek(0)
+    # Remove files to keep folder clean and size down 
+    os.remove(blurred_upload_path)
+    os.remove(upload_path)
+    return send_file(video_data, mimetype='video/mp4')

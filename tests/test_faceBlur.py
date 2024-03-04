@@ -57,7 +57,7 @@ def test_process_video():
     faceBlurring.process_video(file_path)  # If this function works, you should expect to see a file in your /app/faceDection/temp/ named blurred_{videoName}.mp4
     assert os.path.exists(video_path)
     
-def test_file_upload(client):
+def test_file_removal(client):
     if os.path.exists('../app/faceBlurring/temp/blurred_AudioTest.mp4'):
         os.remove('../app/faceBlurring/temp/blurred_AudioTest.mp4')
     
@@ -68,5 +68,5 @@ def test_file_upload(client):
     response = client.post('bucket/blurRequest', data=data)
 
     assert response.status_code == 200
-    assert os.path.exists('../app/faceBlurring/temp/blurred_AudioTest.mp4')
+    assert not os.path.exists('../app/faceBlurring/temp/blurred_AudioTest.mp4')
     

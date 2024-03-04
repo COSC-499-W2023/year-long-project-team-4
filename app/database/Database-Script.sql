@@ -6,15 +6,16 @@ CREATE DATABASE Team4db;
 USE Team4db;
 
 CREATE TABLE userprofile (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE,
-    email VARCHAR (100) UNIQUE,
-    password_hash VARCHAR (255),
-    firstname VARCHAR (50),
-    lastname VARCHAR (50),
-    salthash VARBINARY(128),
-    publickey VARCHAR(500),
-    verifyKey VARCHAR(10)
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	username VARCHAR(50) UNIQUE,
+	email VARCHAR (100) UNIQUE,
+	password_hash VARCHAR (255),
+	firstname VARCHAR (50),
+	lastname VARCHAR (50),
+	salthash VARBINARY(128),
+	publickey VARCHAR(500),
+	verifyKey VARCHAR(10),
+	verifiedAcc BOOLEAN
 );
 
 CREATE TABLE videos (

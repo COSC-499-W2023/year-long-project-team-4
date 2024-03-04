@@ -238,3 +238,21 @@ Things I worked on:
   
 Tasks from the project board relevant to things I worked on:
 - None
+
+
+# Term 2 Week (7): Feb 25 - Mar 3
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/363b8fcf-f4d9-47ed-b3db-780c87eac2b4)
+
+## Goal Recap:
+Things I worked on:
+- Finished video tagging on video uploads. Needs frontend implementation to work.
+- Added ability to filter by tags when requesting lists of videos for a given user. Can be used to construct searches on frontend. Needs frontend implementation to work.
+- Added backend input for retention dates for videos. User specifies a number of days, clamped to (1, 365), with default 90 days. Still needs frontend implementation.
+  
+Tasks from the project board relevant to things I worked on:
+- Meta data tagging
+
+Currently working on:
+- Fully finished the two things on my list for this week before peer testing, so nothing here.

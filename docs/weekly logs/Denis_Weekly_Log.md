@@ -330,4 +330,25 @@ Completed:
 - Cleanup face blurring code - Need to work on other chunks 
 
 Additional Context:
-- Our backend feels mostly complete, I have some work to do maybe looking at ways to better host the project, but nothing much more to do codewise I believe. Unless I start taking jobs from the frontend. 
+- Our backend feels mostly complete, I have some work to do maybe looking at ways to better host the project, but nothing much more to do codewise I believe. Unless I start taking jobs from the frontend.
+  
+# Term 2 Week 8: Feb 26 - March 3 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![WhatIdid](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/d7de0fbb-2be1-43c7-9bf0-82e83afbc0ce)
+
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Fixing face blurring auto delete & code clean up
+- Adding SSL to our EC2 for secure connection
+
+Tasks from the Project Board:
+- Code Clean up 
+
+Completed:
+- Cleaned up code 
+
+Additional Context:
+- Currently struggling to get the SSL working/ec2 functioning with the SSL certification. Hopefully will have it figured out by Tuesday's peer testing. 

@@ -324,3 +324,31 @@ Completed:
 Additional Context:
 - This was a busy week in terms of assignments and midterm. Had two midterms and project assignments in other classes. I am stuck on the socket.io implementation, so was only able to do some research due to the busy week.
 
+# Term 2 Week 8: Feb 26 - March 3 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/290b1d89-cab2-4dfe-a9a7-5564d2f2c3b4)
+
+
+## Goal Recap:
+The features that were mine to complete this week:
+- complete websocket implementation using socket.io
+- add real time chat updates feature
+- add retention field to frontend
+- integrate tags implementation
+
+Tasks from the Project Board:
+- Code Clean up
+- Creating chats
+- tags on videos
+- video retention
+
+Completed:
+- Code Clean up
+- Creating chats
+- tags on videos
+- video retention
+
+Additional Context:
+- finally got the websocket implementation for real time chat updates after a log of debugging and research. Big progress this week
+

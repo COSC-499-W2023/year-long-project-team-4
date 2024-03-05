@@ -14,6 +14,7 @@ import see from '../Assets/eye.svg';
 import unSee from '../Assets/eye-slash.svg';
 
 const LoginHomePage = () => {
+  const navigate = useNavigate();
   const [type, setType] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
@@ -30,6 +31,7 @@ const LoginHomePage = () => {
       });
       if (response.data.email) {
         setCurrentUser(response.data.email);
+        navigate(receiveAndSendPath);
       } else {
         setErrorMessage(response.data.error);
       }
@@ -80,7 +82,7 @@ const LoginHomePage = () => {
                 </Button>
               </InputGroup>
             </Form.Group>   
-          <Button type="submit" className="mb-2" variant="primary" href={receiveAndSendPath}> Login </Button>
+          <Button type="submit" className="mb-2" variant="primary"> Login </Button>
         </Form>
       </Fade>
       <Fade big cascade>

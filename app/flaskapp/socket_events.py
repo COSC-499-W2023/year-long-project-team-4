@@ -10,7 +10,6 @@ users = {}
 @socketio.on('connect')
 def handle_connect():
     user_email = session.get('email')
-    print(user_email)
     if user_email:
         users[request.sid] = user_email
         emit('connected', {'email': user_email})

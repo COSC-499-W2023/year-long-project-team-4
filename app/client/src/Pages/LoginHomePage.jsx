@@ -17,8 +17,6 @@ const LoginHomePage = () => {
   const [type, setType] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
-  const navigate = useNavigate();
-
   const handleLogin = async (email, password) => {
     try {
       const response = await axios.post(`${IP_ADDRESS}/auth/login`, {
@@ -32,7 +30,6 @@ const LoginHomePage = () => {
       });
       if (response.data.email) {
         setCurrentUser(response.data.email);
-        navigate(receiveAndSendPath);
       } else {
         setErrorMessage(response.data.error);
       }
@@ -61,7 +58,7 @@ const LoginHomePage = () => {
       </Fade>
       {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
       <Fade big cascade>
-        <Form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit} href={receiveAndSendPath}>
           <Form.Group className="p-3">
             <Form.Label>Email</Form.Label>
             <Form.Control

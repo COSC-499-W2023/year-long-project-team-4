@@ -27,7 +27,6 @@ const ReceiveAndSendPage = () => {
         // Handle successful logout
         console.log("Logged out successfully");
         setCurrentUser(null);
-        navigate(loginPath);
       } else {
         console.error('Logout error:', response.data.error);
       }
@@ -73,7 +72,7 @@ const ReceiveAndSendPage = () => {
           <>
           {currentUser?
           (
-            <Button size="lg" onClick={handleLogout}>Logout</Button> 
+            <Button size="lg" onClick={handleLogout} href={loginPath}>Logout</Button> 
           ):
           (<></>)
           }

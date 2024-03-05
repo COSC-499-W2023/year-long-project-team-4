@@ -15,55 +15,50 @@ import PasswordCheckList from "react-password-checklist";
 const AccountPage = () => {
 const [type, setType] = useState(false)
 const [currentUser, setCurrentUser] = useState(null);
+const [currentFirstName, setCurrentFirstName] = useState(null);
+const [currentLastName, setCurrentLastName] = useState(null);
 const [errorMessage, setErrorMessage] = useState("");
 const [key, setKey] = useState('videos');
+const [pass, setPass] = useState('');
 
 const handleSubmit = (e) => {
     e.preventDefault();
     const firstname = e.target.elements[0].value;
     const lastname = e.target.elements[1].value;
     const email = e.target.elements[2].value;
-    const password = e.target.elements[3].value;
+    const password = pass;
     handleUpdate(firstname,lastname,email, password);
   }
-const handleUpdate = async(firstname,lastname,email) => {
+const handleUpdate =(firstname,lastname,email,password) => {
   const formData = new FormData();
-  formData.append('firstname',firstName);
-  formData.append('lastname',lastName);
+  formData.append('firstname',firstname);
+  formData.append('lastname',lastname);
   formData.append('email', email);
   
+  const passwordFormData = new FormData();
+  passwordFormData.append('password', password);
   try {
-    const response = await axios(
+    const response = axios.post(
+    `${IP_ADDRESS}/auth/updateinfo`, 
+      formData,
       {
-        method: 'post',
-        url:`${IP_ADDRESS}/auth/updateinfo`,
-        data: formData,
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      withCredentials: true,
+      headers: {
+          'Content-Type': 
+          'multipart/form-data'
+        }
+      },
+      ).then(response=>{
+        response.data.email? setKey('account'): setErrorMessage(response.data.error)
+      })
 
-      const passwordUpdate = await axios({
-        method: 'post',
-        url: `${IP_ADDRESS}/bucket/change_password_reencrypt`,
-        data: password,
-        headers: { 'Content-Type': 'multipart/form-data' }
-      }
-      );
-
-      const data = response.data;
-      const passwordData = passwordUpdate.data;
-
-  if (data.email&&passwordData.json()) {
-    console.log('update successful');
-    setKey('account');
-  
-  } else {
-    setErrorMessage(data.error);
-  }
   } catch (error) {
     if (error.response && error.response.data && error.response.data.error) {
+      console.log(error)
       setErrorMessage(error.response.data.error);
     } else {
       // Set a generic error message for other types of errors
+      console.log(error)
       setErrorMessage('There was an error signing up');
     }
   }
@@ -75,11 +70,10 @@ const handleDelete = () =>{
 
 const navigate = useNavigate();
 
-const firstName = "firstname123";
-const lastName = "lastname123";
+const first = "firstname123";
+const last = "lastname123";
 const email = currentUser;
 
-const [password, setPassword] = useState('');
 const [videos, setVideos] = useState([]);
 const [selectedVideo, setSelectedVideo] = useState(null);
 const [showVideoModal, setShowVideoModal] = useState(false);
@@ -126,8 +120,8 @@ useEffect(() => {
               const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
                 withCredentials: true
               });
-        
               if (response.data.email) {
+                
                 setCurrentUser(response.data.email);
               if (response.data.email) {
                 setCurrentUser(response.data.email);
@@ -137,14 +131,35 @@ useEffect(() => {
             }
             } catch (error) {
               console.error('There was an error fetching the current user', error);
-            }
+            }      
+          } 
           fetchCurrentUser();
-}});
+        }, []);
 
-const handleStartChat = (e, videoName) => {
-  e.preventDefault();
-  navigate(MessagingPath, { state: { videoName: videoName } });
-};
+  useEffect(()=>{
+  const fetchCurrent =async()=> {
+    try {
+      const response = await axios.get(`${IP_ADDRESS}/auth/userdetails`, {
+        withCredentials: true
+      });
+      console.log(response);
+      if (response.data.email) {
+        setCurrentUser(response.data.email);
+        setCurrentFirstName(response.data.firstname);
+        setCurrentLastName(response.data.lastname);
+      } else {
+        console.error('No user currently logged in');
+      }
+    } catch (error) {
+      console.error('There was an error fetching the current user', error);
+    }
+  };
+  fetchCurrent();}, [])
+
+  const handleStartChat = (e, videoName) => {
+      e.preventDefault();
+      navigate(MessagingPath, { state: { videoName: videoName } });
+  };
 
 return (
    <div className="container p-4">
@@ -188,8 +203,8 @@ return (
             <Col className="p-4 fs-5">
               <ListGroup variant="flush">
                 <ListGroup.Item> Email: {email}</ListGroup.Item>
-                <ListGroup.Item> First Name: {firstName}</ListGroup.Item>
-                <ListGroup.Item> Last Name: {lastName}</ListGroup.Item>
+                <ListGroup.Item> First Name: {currentFirstName}</ListGroup.Item>
+                <ListGroup.Item> Last Name: {currentLastName}</ListGroup.Item>
               </ListGroup>
             </Col>
           </Tab>
@@ -207,14 +222,14 @@ return (
                     <InputGroup className="p-2">
                       <InputGroup.Text id="inputGroup-sizing-sm">Last Name</InputGroup.Text>
                       <Form.Control
-                        type="email"
+                        type="text"
                         required
                       />
                      </InputGroup> 
                     <InputGroup className="p-2">
                       <InputGroup.Text id="inputGroup-sizing-sm">Email</InputGroup.Text>
                       <Form.Control
-                        type="text"
+                        type="email"
                         required
                       />
                     </InputGroup>
@@ -223,6 +238,8 @@ return (
                       <Form.Control
                         type={type ? "text" : "password"}
                         required
+                        value={pass}
+                        onChange={(e)=>{setPass(e.target.value)}}
                       />
                       <Button 
                         variant="outline-secondary" 
@@ -236,7 +253,7 @@ return (
                       rules={["capital", "specialChar", "minLength","maxLength", "number"]}
                       minLength={8}
                       maxLength={25}
-                      value={password}
+                      value={pass}
                       messages={{
                         minLength: "Password requires at least 8 characters.",
                         maxLength: "Password requires at most 25 characters.",

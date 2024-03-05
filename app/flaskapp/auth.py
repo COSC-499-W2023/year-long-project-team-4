@@ -186,12 +186,12 @@ def confirm_user():
     # Check if input code is same as emailed
     if input_code == created_code:
         # Set verified to True
-        result = database.update_user(user_email = email, new_verifiedAcc = 'True')
+        result = database.update_user(user_email=email, new_verifiedAcc=True)
         
         if result == 1:
             return jsonify({'status': 'success', 'message': 'Email verified'}), 200
         else:
-            return jsonify({'error': 'Unknown error verifying email'})
+            return jsonify({'error': 'Unknown error verifying email'}), 503
     elif input_code != created_code:
         return (jsonify({"status": "error", "message": "codes do not match"}),502)
     else:

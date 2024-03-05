@@ -291,7 +291,7 @@ const UploadVideoPage = () => {
             <Form.Control 
               type="number" 
               required 
-              min="90" max="365" 
+              min="1" max="365" 
               placeholder="Enter retention period in days" 
               value={retentionPeriod} 
               onChange={(e) => setRetentionPeriod(e.target.value)} 

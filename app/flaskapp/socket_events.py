@@ -1,7 +1,6 @@
 from flask import request
 from . import socketio
 from flask_socketio import join_room, emit
-#from . import bucket_interface
 from .bucket_interface import send_chat, retrieve_chat
 from flask import session
 

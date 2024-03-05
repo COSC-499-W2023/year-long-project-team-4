@@ -72,9 +72,6 @@ const ViewSentVideoPage = () => {
                       ))}
           </Col>   
       </Row>      
-          <div className="text-center p-4">
-              <Button href={receiveAndSendPath}> Return to Home</Button>
-          </div>
           {errorMessage && <div className="error-message">{errorMessage}</div>}
      </Fade>
     )

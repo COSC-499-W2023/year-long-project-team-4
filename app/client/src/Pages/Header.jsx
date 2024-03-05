@@ -55,12 +55,20 @@ const Header = () => {
         }
       }
     };
+
+    const handleLink = () => {
+      if (currentUser) {
+        navigate(receiveAndSendPath);
+      } else {
+        navigate(loginPath);
+      }
+    }
   
   return (
    <> 
     <Navbar className="bg-primary">
-    <Navbar.Brand href={currentUser ? receiveAndSendPath : homePath}>
-      <div className=" m-2 display-6 text-white">SafeMov</div>
+    <Navbar.Brand onClick={handleLink}>
+      <div className="display-6 text-white">SafeMov</div>
     </Navbar.Brand>
     <>
       {currentUser ? (

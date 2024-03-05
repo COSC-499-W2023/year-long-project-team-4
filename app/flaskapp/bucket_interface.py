@@ -21,6 +21,7 @@ import database
 import s3Bucket
 import faceBlurring
 from . import bcrypt
+from . import socketio
 
 bucket = Blueprint('bucket', __name__)
 
@@ -37,7 +38,7 @@ if not LOCAL:
     aws_secret_access_key=SECRET_KEY,
     aws_session_token=SESSION_TOKEN
     )
-    boto3.setup_default_session(profile_name='team4-dev')
+    # boto3.setup_default_session(profile_name='team4-dev')
 else:
     if not os.path.isdir('verificationCode'):
         os.mkdir('verificationCode')
@@ -89,12 +90,26 @@ def upload_video():
     # Read the file and email from post
     file = request.files.get('file')
     recipient_email = request.form.get('recipient')
+    retention_days = request.form.get('retention_days')
+    tags = None
+    json_data = request.files.get('json')
+    if json_data:
+        tags = json.loads(json_data.read())['tags']
 
     # Get the public key corresponding to the recipient
     recipient_public_key = get_public_key(recipient_email)
 
-    # Should read retention date from post, but for now just set it to 7 days in future
-    dummy_retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
+    # Figure out retention date
+    if retention_days is None:
+        # Default 90 days retention
+        retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=90)
+    else:
+        # Max 1 year of retention
+        retention_days = min(retention_days, 365)
+        # Min 1 day of retention
+        retention_days = max(retention_days, 1)
+        retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=retention_days)
+
 
     # Video name is a uniquely generated uuid value
     video_name = uuid.uuid4()
@@ -118,11 +133,83 @@ def upload_video():
         sender_email = session['email']
         sender_public_key = get_public_key(session['email'])
         sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
-        if not create_chat(video_name, dummy_retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):
+        if not create_chat(video_name, retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):
             return jsonify({'error': 'Failed to create chat'}), 502
 
-    insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, dummy_retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
-    if insert_result:
+    insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
+
+    if insert_result and tags:
+        tag_result = database.insert_tags(video_name, tags)
+        if tag_result == -1:
+            return jsonify({'video_id': f'{video_name}', 'error': 'Tag upload failed'}), 503
+
+    if insert_result and (LOCAL == False):
+        sender_email = 'safemovnow@gmail.com'
+    
+        # Compose the email message
+        subject = "You've Recieved a Video"
+        html_body = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Video Received Notification</title>
+            <style>
+                <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+        
+            h1 {
+                color: #007bff;
+            }
+        
+            p {
+                margin-bottom: 20px;
+            }
+        </style>
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>A New Video!</h1>
+                <p>We are pleased to inform you that you have a new video ready for viewing.</p>
+                <p>Thank you for choosing SafeMov!</p>
+                <p>Best regards,<br>SafeMov</p>
+            </div>
+        </body>
+        </html>
+        """
+
+        try:
+            # Send the email
+            email = ses_client.send_email(
+                Source=sender_email,
+                Destination={'ToAddresses': [recipient_email]},
+                Message={
+                    'Subject': {'Data': subject},
+                    'Body': {'Html': {'Data': html_body}}
+                }
+            )
+
+            return jsonify({'video_id': f'{video_name}'}), 200
+        except Exception as e:
+            print(e)
+    elif insert_result and (LOCAL == True):
         return jsonify({'video_id': f'{video_name}'}), 200
     else:
         return jsonify({'error': 'Video insertion failed'}), 502
@@ -162,12 +249,39 @@ def retrieve_video():
 
 @bucket.route('/getvideos', methods=['GET'])
 def get_available_videos():
-    available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
+    # Get videos
+    available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
+
+    tags = None
+    json_data = request.files.get('json')
+    if json_data:
+        tags = json.loads(json_data.read())['tags']
+
+    if tags:
+        condition_statement = 'tagName = %s OR ' * len(tags)
+        condition_statement = condition_statement[:-4]
+        available_by_tags = database.query_records(table_name='tags', fields='videoName', condition=condition_statement, condition_values=tags)
+        available_by_tags = [video['videoName'] for video in available_by_tags]
+        available_videos = [video for video in available_videos if video['videoName'] in available_by_tags]
+
     return json.dumps(available_videos), 200
     
 @bucket.route('/get_sent_videos', methods=['GET'])
 def get_sent_videos():
-    available_videos = database.query_records(table_name='videos', fields='videoName, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
+    available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
+
+    tags = None
+    json_data = request.files.get('json')
+    if json_data:
+        tags = json.loads(json_data.read())['tags']
+
+    if tags:
+        condition_statement = 'tagName = %s OR ' * len(tags)
+        condition_statement = condition_statement[:-4]
+        available_by_tags = database.query_records(table_name='tags', fields='videoName', condition=condition_statement, condition_values=tags)
+        available_by_tags = [video['videoName'] for video in available_by_tags]
+        available_videos = [video for video in available_videos if video['videoName'] in available_by_tags]
+
     return json.dumps(available_videos), 200
 
 def create_chat(video_name, retention_date, sender_email, receiver_email, sender_key, receiver_key):
@@ -197,7 +311,6 @@ def create_chat(video_name, retention_date, sender_email, receiver_email, sender
 def send_chat():
     chat_name = request.form.get('video_name')
     chat_text = request.form.get('chat_text')
-    dummy_retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
 
     try:
         chat_info = database.query_records(table_name='chats', fields='senderEmail, senderEncryption, receiverEmail, receiverEncryption', condition=f'chatName = %s', condition_values=(chat_name,))[0]
@@ -248,6 +361,70 @@ def send_chat():
         return jsonify({'chat_id': path}), 200
     else:
         return jsonify({'error': 'Chat insertion failed'}), 502
+    
+def send_chat(name, text):
+    chat_name = name
+    chat_text = text
+    dummy_retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
+
+    try:
+        chat_info = database.query_records(table_name='chats', fields='senderEmail, senderEncryption, receiverEmail, receiverEncryption', condition=f'chatName = %s', condition_values=(chat_name,))[0]
+    except IndexError:
+        return jsonify({'error': 'Chat does not exist'}), 400
+
+
+    # Figure out which participant the current user is and load the correct encrypted key
+    encrypted_aes_key = None
+    if session['email'] == chat_info['senderEmail']:
+        encrypted_aes_key = chat_info['senderEncryption']
+    elif session['email'] == chat_info['receiverEmail']:
+        encrypted_aes_key = chat_info['receiverEncryption']
+
+    # Decrypt the AES key
+    aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
+
+    # Decrypt the file and write the data to an IO buffer
+    chat_data = io.BytesIO()
+    object_content = s3Bucket.get_object_content(f"/chats/{chat_name}")
+    decrypted_chat = aes_decrypt_video(object_content, aes_key)
+    chat_data.write(decrypted_chat)
+    chat_data.seek(0)
+
+    # Load chat data into json to be worked with
+    chat_json = json.load(chat_data)
+
+    # Create the dict that gets appended to the chat log
+    timestamp = time.time()
+    sender = session['email']
+    msg_bundle = {
+        'sender': sender,
+        'timestamp': timestamp,
+        'message': chat_text
+    }
+
+    # Add our message to the chat log
+    chat_json['messages'].append(msg_bundle)
+
+    # Encrypt the chat log using same AES key as before - this avoid having to update the keys in the database every time the chat is appended to
+    encrypted_chat, _ = aes_encrypt_video(json.dumps(chat_json).encode('utf-8'), aes_key)
+
+    # Directly upload to S3 since no DB changes are made
+    path = f'/chats/{chat_name}'
+    upload_result = s3Bucket.upload_file(encrypted_chat, path)
+
+    if upload_result:
+        # Instead of returning jsonify, return a dictionary directly
+        return {
+            'success': True,
+            'chat_id': path,
+            'message': {
+                'sender': sender,  # Assuming sender's email is available
+                'timestamp': timestamp,
+                'message': chat_text
+            }
+        }
+    else:
+        return {'success': False, 'error': 'Chat insertion failed'}
 
 
 @bucket.route('/retrieve_chat', methods=['POST'])
@@ -282,6 +459,43 @@ def retrieve_chat():
 
     return send_file(chat_data, mimetype='application/json'), 200
 
+def retrieve_chat(name):
+    chat_name = name
+
+    try:
+        # Retrieve info for requested chat
+        chat_info = database.query_records(table_name='chats', fields='senderEmail, senderEncryption, receiverEmail, receiverEncryption', condition=f'chatName = %s', condition_values=(chat_name,))[0]
+    except IndexError:
+        return jsonify({'error': 'Chat does not exist'}), 400
+
+    # Figure out which participant the current user is and load the correct encrypted key
+    encrypted_aes_key = None
+    if session['email'] == chat_info['senderEmail']:
+        encrypted_aes_key = chat_info['senderEncryption']
+    elif session['email'] == chat_info['receiverEmail']:
+        encrypted_aes_key = chat_info['receiverEncryption']
+
+    if encrypted_aes_key is None:
+        return jsonify({'error': 'Current user not participant in requested chat'}), 400
+
+    # Decrypt the AES key
+    aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
+
+    # Decrypt the file and write the data to an IO buffer
+    chat_data = io.BytesIO()
+    object_content = s3Bucket.get_object_content(f"/chats/{chat_name}")
+    decrypted_chat = aes_decrypt_video(object_content, aes_key)
+    chat_data.write(decrypted_chat)
+    chat_data.seek(0)
+
+    chat_json = json.load(chat_data)
+    
+    if chat_json:  # Assuming the chat_json contains the messages
+        return {'success': True, 'messages': chat_json.get('messages', [])}
+    else:
+        return {'success': False, 'error': 'Failed to load chat data'}
+
+
 @bucket.route('/change_password_reencrypt', methods=['POST'])
 def change_password_reencrypt():
 
@@ -309,7 +523,7 @@ def change_password_reencrypt():
         public_key = private_key.publickey().export_key('PEM')
         hashed_password = bcrypt.generate_password_hash(new_password).decode()
         #Insert new info into database
-        database.update_user(user_email = user_email, new_password = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+        database.update_user(user_email = user_email, new_password_hash = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
 
         #Loop through videos to reencrypt and insert back to database and s3Bucket
         for videos1 in videos_to_decrypt2:        
@@ -398,7 +612,7 @@ def set_verificationcode():
     #Create verification code
     created_code = ''.join(random.choices(string.digits, k=6))
     update_data = {'verifyKey': f'{created_code}'}
-    database.update_user(user_email = email, new_verifyKey = created_code)
+    database.update_user(user_email = email, new_verify_key = created_code)
     #Save code locally if Local is true
     if LOCAL:
         obj_path = f"./verificationCode"
@@ -450,7 +664,7 @@ def change_password_forgot():
         public_key = private_key.publickey().export_key('PEM')
         hashed_password = bcrypt.generate_password_hash(new_password).decode()
         #Insert new info into database
-        database.update_user(user_email = email, new_password = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+        database.update_user(user_email = email, new_password_hash = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
         
         #Get recieved videos that need key deleted
         videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'receiverEmail = %s', condition_values=(email,))
@@ -482,19 +696,26 @@ def processVideo():
     if file is None:
         return jsonify({'error': 'No file found'}), 400
     
+    # Check if the temp folder is made or not - create it if not 
     upload_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'faceBlurring', 'temp'))    
     if not os.path.exists(upload_directory):
         os.makedirs(upload_directory)
         
+    # Generate random string uuid to avoid clashing with names - Save video locally 
     video_name = str(uuid.uuid4())+".mp4"
     upload_path = os.path.join(upload_directory,video_name)
     file.save(upload_path)
-    print(f'upload_directory: {upload_directory}')
-    print(f'upload_path: {upload_path}')
-    print(f'File received: {file.filename}')
 
+    # Initiate the blurring process
     faceBlurring.process_video(upload_path)
-    
-    blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)  
-    print(f'blurred_upload_path: {blurred_upload_path}')
-    return send_file(blurred_upload_path, as_attachment=True, mimetype='video/mp4')
+    # Get the new video & send it back to the front-end 
+    blurred_upload_path = os.path.join(upload_directory, 'blurred_' + video_name)
+    with open(blurred_upload_path, "rb") as video_file:
+        video_data = io.BytesIO(video_file.read())
+
+    # Set buffer cursor to 0 again since it is by default at the last byte
+    video_data.seek(0)
+    # Remove files to keep folder clean and size down 
+    os.remove(blurred_upload_path)
+    os.remove(upload_path)
+    return send_file(video_data, mimetype='video/mp4')

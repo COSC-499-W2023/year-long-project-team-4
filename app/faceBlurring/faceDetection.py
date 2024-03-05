@@ -13,7 +13,6 @@ if not os.path.isdir('faceBlurring/temp'):
 if not LOCAL: # Flag for local or not
     # RUN "AWS CONFIGURE SSO" before running code - this one included if local is not set to True 
     boto3.setup_default_session(profile_name='team4-dev')
-    s3_client = boto3.client('s3')
 
 
 def detect_faces(VideoFrame):
@@ -34,8 +33,8 @@ def detect_faces(VideoFrame):
         print(f'Failed to do the rekognition call: {e}')
 
 def blur_faces_opencv(frame, face_details):
-    #Copy frame into new variable
     try:
+        # Copy frame into new variable
         image = frame.copy()
         h, w, _ = image.shape
         
@@ -47,7 +46,7 @@ def blur_faces_opencv(frame, face_details):
             width = int((face_detail['Width'] * w)*1.2)
             height = int(face_detail['Height'] * h)
 
-                # Extract the face region            
+            # Extract the face region            
             face_region = image[y:y+height, x:x+width]
             if not face_region.size == 0:
                 # Apply blur to the face region
@@ -62,16 +61,18 @@ def blur_faces_opencv(frame, face_details):
 # Code snippet from: https://github.com/aws-samples/rekognition-video-people-blurring-cdk/blob/bf7c1625ec2571c19889c141aef5615bcec30d6d/stack/lambdas/rekopoc-apply-faces-to-video-docker/video_processor.py#L91
 def integrate_audio(original_video, output_video, audio_path=os.path.dirname(__file__)+'/temp/audio.mp4'):
     try:
-    # Extract audio
-        my_clip = VideoFileClip(original_video)
-        my_clip.audio.write_audiofile(audio_path,codec='libmp3lame')
+        # Extract audio
+        with VideoFileClip(original_video) as my_clip:
+            my_clip.audio.write_audiofile(audio_path, codec='libmp3lame')
+        
         temp_location = os.path.join(os.path.dirname(__file__), 'temp', 'output_video.mp4')
         
         # Join output video with extracted audio
-        videoclip = VideoFileClip(output_video)
-        videoclip.write_videofile(temp_location, codec='libx264', audio=audio_path, audio_codec='libmp4lame')
+        with VideoFileClip(output_video) as videoclip:
+            videoclip.write_videofile(temp_location, codec='libx264', audio=audio_path, audio_codec='libmp4lame')
+        
         videoLoc = os.path.basename(original_video)
-        os.rename(temp_location, os.path.dirname(__file__)+'/temp/blurred_'+videoLoc)
+        os.rename(temp_location, os.path.join(os.path.dirname(__file__), 'temp', 'blurred_' + videoLoc))
         
         # Delete audio
         os.remove(audio_path)
@@ -149,11 +150,10 @@ def process_video(upload_path):
     # Generate the video_out_path using the video name
     base = os.path.basename(upload_path)
     video_out_path = os.path.join(os.path.dirname(__file__), 'temp', 'processed_' + base)
-    print(video_out_path)
     
     # Start handling video - Parallel call for face detection
     parallel_detect_faces(upload_path,frame_skip,video_out_path)
-    # Intregrate original video audio to new blurred
+    # Integrate original video audio to new blurred
     integrate_audio(upload_path, video_out_path)
     end = time.time()
     print(f"TOTAL TIME FOR PROCESSING: {end - start} seconds \n") # printing the speed 

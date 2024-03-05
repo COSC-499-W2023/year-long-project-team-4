@@ -102,21 +102,7 @@ useEffect(() => {
 }, []);
 
 const handleVideoClick = (videoName) => {
-    const formData = new FormData();
-    formData.append('video_name', videoName);
-
-    axios.post(`${IP_ADDRESS}/bucket/retrieve`, formData, {
-        withCredentials: true,
-        responseType: 'blob' // Sets the expected response type to 'blob' since a video file is binary data
-    })
-    .then(response => {
-        const videoURL = URL.createObjectURL(response.data);
-        setSelectedVideo(videoURL);
-        setShowVideoModal(true);
-    })
-    .catch(error => {
-        console.error('There was an error retrieving the video!', error);
-    });
+  navigate(MessagingPath, { state: { videoName: videoName } });
 };
 
 const handleCloseVideoModal = () => {
@@ -194,7 +180,6 @@ return (
                               <p>Video{index + 1}</p>
                               </Button>
                           </div>
-                          <Button variant="info" onClick={(e) => handleStartChat(e, video.videoName)}>Start Chat</Button>
                           </>
                       ))}
               </Col>   

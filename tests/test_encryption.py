@@ -2,16 +2,17 @@ import pytest
 import sys
 import os
 import json
+from base64 import b64encode, b64decode
 sys.path.append(os.path.abspath('../app'))
 sys.path.append(os.path.abspath('../app/flaskapp'))
 
 from Crypto import Random
+from Crypto.Cipher import AES, PKCS1_v1_5
 from Crypto.PublicKey import RSA
 from rsa import generate_key
 
 import database
 import flaskapp
-import bucket_interface
 
 
 @pytest.fixture
@@ -23,6 +24,38 @@ def app():
 @pytest.fixture
 def client(app):
     return app.test_client()
+
+def aes_encrypt_video(data, aes256_key=None):
+    if aes256_key is None:
+        aes256_key = Random.get_random_bytes(32)
+    cipher = AES.new(aes256_key, AES.MODE_GCM)
+    ciphertext, tag = cipher.encrypt_and_digest(data)
+    result_json = {
+        'nonce': b64encode(cipher.nonce).decode('utf-8'),
+        'ciphertext': b64encode(ciphertext).decode('utf-8'),
+        'tag': b64encode(tag).decode('utf-8')
+    }
+    return json.dumps(result_json), aes256_key
+
+def aes_decrypt_video(data_json, aes256_key):
+    b64 = json.loads(data_json)
+    nonce = b64decode(b64['nonce'])
+    ciphertext = b64decode(b64['ciphertext'])
+    tag = b64decode(b64['tag'])
+
+    cipher = AES.new(aes256_key, AES.MODE_GCM, nonce=nonce)
+    plaintext = cipher.decrypt_and_verify(ciphertext, tag)
+    return plaintext
+
+def rsa_encrypt_aes256_key(aes256_key, rsa_public_key):
+    cipher = PKCS1_v1_5.new(rsa_public_key)
+    cipher_text = cipher.encrypt(aes256_key)
+    return b64encode(cipher_text)
+
+def rsa_decrypt_aes256_key(encrypted_aes256_key, rsa_private_key):
+    decipher = PKCS1_v1_5.new(rsa_private_key)
+    aes256_key = decipher.decrypt(b64decode(encrypted_aes256_key), None)
+    return aes256_key
 
 
 # Test that you can reconsctruct the private key that generates a user's public key
@@ -71,8 +104,8 @@ def test_encrypt_decrypt_key_success(client):
 
     # Generate AES key, encrypt it, decrypt it, check output matches initial key
     aes256_key = Random.get_random_bytes(32)
-    encrypted_aes_key = bucket_interface.rsa_encrypt_aes256_key(aes256_key, public_key)
-    decrypted_aes_key = bucket_interface.rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
+    encrypted_aes_key = rsa_encrypt_aes256_key(aes256_key, public_key)
+    decrypted_aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
     assert aes256_key == decrypted_aes_key
 
 # Encrypt an AES key then try to decrypt it with the wrong private key
@@ -96,28 +129,28 @@ def test_encrypt_decrypt_key_fail(client):
 
     # Generate AES key, encrypt it, decrypt it, check output does not match initial key
     aes256_key = Random.get_random_bytes(32)
-    encrypted_aes_key = bucket_interface.rsa_encrypt_aes256_key(aes256_key, public_key)
-    decrypted_aes_key = bucket_interface.rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
+    encrypted_aes_key = rsa_encrypt_aes256_key(aes256_key, public_key)
+    decrypted_aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
     assert aes256_key != decrypted_aes_key
 
 # Encrypt a message then decrypt it with correct AES key
 def test_encrypt_decrypt_message_success(client):
     test_message = Random.get_random_bytes(512)
-    encrypted_message, aes_key = bucket_interface.aes_encrypt_video(test_message)
-    decrypted_message = bucket_interface.aes_decrypt_video(encrypted_message, aes_key)
+    encrypted_message, aes_key = aes_encrypt_video(test_message)
+    decrypted_message = aes_decrypt_video(encrypted_message, aes_key)
     assert test_message == decrypted_message
 
 # Encrypt a video file then try to decrypt it with the wrong AES key
 def test_encrypt_decrypt_message_fail(client):
     test_message = Random.get_random_bytes(512)
-    encrypted_message, aes_key = bucket_interface.aes_encrypt_video(test_message)
+    encrypted_message, aes_key = aes_encrypt_video(test_message)
 
     # Generate new AES key that we will attempt to use
     wrong_key = Random.get_random_bytes(32)
 
     # We should expect a ValueError when using the wrong key
     try:
-        decrypted_message = bucket_interface.aes_decrypt_video(encrypted_message, wrong_key)
+        decrypted_message = aes_decrypt_video(encrypted_message, wrong_key)
         assert False
     except ValueError:
         assert True
@@ -144,14 +177,14 @@ def test_end_to_end(client):
     private_key = generate_key(private_key_seed)
 
     # Encrypt our message
-    encrypted_message, aes_key = bucket_interface.aes_encrypt_video(test_message)
+    encrypted_message, aes_key = aes_encrypt_video(test_message)
 
     # Encrypt then decrypt the AES key
-    encrypted_aes_key = bucket_interface.rsa_encrypt_aes256_key(aes_key, public_key)
-    decrypted_aes_key = bucket_interface.rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
+    encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, public_key)
+    decrypted_aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
 
     # Use decrypted AES key to decrypt message
-    decrypted_message = bucket_interface.aes_decrypt_video(encrypted_message, decrypted_aes_key)
+    decrypted_message = aes_decrypt_video(encrypted_message, decrypted_aes_key)
 
     # Compare decrypted message to input
     assert test_message == decrypted_message
@@ -182,3 +215,82 @@ def test_video_upload_download(client):
     # Check that retrieved video matches test file
     with open(file, 'rb') as test_file:
         assert test_file.read() == retrieve_response.data
+
+def test_video_tags_valid(client):
+    # Setup some test data
+    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    file = 'test_video.mp4'
+    data = {
+        'recipient': post_object['email'],
+        'file': (open(file, 'rb'), file),
+        'json': (open('test_json.json', 'rb'), 'test_json.json')
+    }
+
+    # Reset tables and signup
+    assert database.resetTable(tableName="userprofile")
+    assert database.resetTable(tableName="videos")
+    response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+
+    # Upload our test video with the tags ['one', 'two']
+    upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
+
+    # Define our valid tag jsons
+    # Tags ['one', two]
+    video_tag_search_valid = {'json': (open('test_json.json', 'rb'), 'test_json.json')}
+    # Tags ['one']
+    video_tag_search_valid_2 = {'json': (open('test_json_3.json', 'rb'), 'test_json_3.json')}
+    # Tags ['two']
+    video_tag_search_valid_3 = {'json': (open('test_json_4.json', 'rb'), 'test_json_4.json')}
+
+
+    # There should now be 1 video returned when searching with valid tags
+    response = json.loads(client.get('/bucket/getvideos', data=video_tag_search_valid).data.decode('utf-8'))
+    assert len(response) == 1
+
+    # Check with two more valid sets of tags to make sure it works with every valid combo, helps ensure no edge cases
+    response = json.loads(client.get('/bucket/getvideos', data=video_tag_search_valid_2).data.decode('utf-8'))
+    assert len(response) == 1
+
+    response = json.loads(client.get('/bucket/getvideos', data=video_tag_search_valid_3).data.decode('utf-8'))
+    assert len(response) == 1
+
+    # Check that they also work for /get_sent_videos
+    # Reopen this file since we use it twice and it got closed the first time it was used
+    video_tag_search_valid = {'json': (open('test_json.json', 'rb'), 'test_json.json')}
+    response = json.loads(client.get('/bucket/get_sent_videos', data=video_tag_search_valid).data.decode('utf-8'))
+    assert len(response) == 1
+
+def test_video_tags_invalid(client):
+    # Setup some test data
+    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    file = 'test_video.mp4'
+    data = {
+        'recipient': post_object['email'],
+        'file': (open(file, 'rb'), file),
+        'json': (open('test_json.json', 'rb'), 'test_json.json')
+    }
+
+    # Reset tables and signup
+    assert database.resetTable(tableName="userprofile")
+    assert database.resetTable(tableName="videos")
+    response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+
+    # Upload our test video with the tags ['one', 'two']
+    upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
+
+
+    # Define an invalid tag json
+    # Tags ['three']
+    video_tag_search_invalid = {'json': (open('test_json_2.json', 'rb'), 'test_json_2.json')}
+
+    # Check with different tag than either of the used tags, should return no video
+    response = json.loads(client.get('/bucket/getvideos', data=video_tag_search_invalid).data.decode('utf-8'))
+    assert len(response) == 0
+
+    # Check that they also don't work for /get_sent_videos
+    # Reopen this file since we use it twice and it got closed the first time it was used
+    video_tag_search_invalid = {'json': (open('test_json_2.json', 'rb'), 'test_json_2.json')}
+    response = json.loads(client.get('/bucket/get_sent_videos', data=video_tag_search_invalid).data.decode('utf-8'))
+    assert len(response) == 0

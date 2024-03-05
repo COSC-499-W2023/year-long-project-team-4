@@ -220,7 +220,7 @@ def login():
     
     # Check email verified
     email_verified = database.query_records(table_name='userprofile', fields='verifiedAcc', condition=f'email = %s', condition_values=(email,))[0]
-    if not email_verified:
+    if not email_verified['verifiedAcc']:
         return jsonify({'error': 'User email is not verified'}), 404
 
     query_results = database.query_records(table_name='userprofile', fields='salthash, email', condition=f'email = %s', condition_values=(email,))[0]

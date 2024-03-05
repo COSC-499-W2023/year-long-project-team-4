@@ -85,11 +85,6 @@ def rsa_decrypt_aes256_key(encrypted_aes256_key, rsa_private_key):
     aes256_key = decipher.decrypt(b64decode(encrypted_aes256_key), None)
     return aes256_key
 
-'''@socketio.on('message')
-def handle_message(data):
-    print('received message: ' + data)
-    socketio.emit('message', data)'''
-
 @bucket.route('/upload', methods=['POST'])
 def upload_video():
     # Read the file and email from post

@@ -287,7 +287,7 @@ const UploadVideoPage = () => {
               />
           </Form.Group>
           <Form.Group controlId="formRetentionPeriod" className="mb-3">
-            <Form.Label className="text-black">Retention Period in days (90-365)</Form.Label>
+            <Form.Label className="text-black">Retention Period in days (1-365)</Form.Label>
             <Form.Control 
               type="number" 
               required 

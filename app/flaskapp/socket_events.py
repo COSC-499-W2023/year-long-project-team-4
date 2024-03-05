@@ -28,7 +28,6 @@ def handle_message(data):
 def handle_join_chat(data):
     chat_name = data['chat_name']
     join_room(chat_name)
-    print(f"User joined chat: {chat_name}")
 
     chat_history = retrieve_chat(chat_name)
     if chat_history['success']:
@@ -42,11 +41,9 @@ def handle_send_chat_message(data):
     chat_text = data['message']
 
     result = send_chat(chat_name, chat_text)
-    print(result)
 
     if result['success']:
         # Broadcast the new message to all clients in the room
-        print("i am here")
         emit('new_chat_message', result['message'], room=chat_name)
     else:
         # Send an error message back to the sender

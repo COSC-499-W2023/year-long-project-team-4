@@ -1,21 +1,24 @@
-import React, { useState, useEffect } from 'react';
-// import io, {Socket} from 'socket.io-client';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Container, Row, Col, Button, Form, Card, InputGroup, Spinner } from 'react-bootstrap';
 import { viewVideoPath,
     IP_ADDRESS,
  } from '../Path';
+import io from 'socket.io-client';
 import axios from 'axios';
 
+const socket = io(`${IP_ADDRESS}`,  {
+    withCredentials: true,
+  });
 
 function MessageSender() {
-    const [name, setName] = useState('');
     const [message, setMessage] = useState('');
-    const [sentMessage, setSentMessage] = useState('');
-    const [serverResponse, setServerResponse] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [videoURL, setVideoURL] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     // Use the useLocation hook to access the location object
     const location = useLocation();
@@ -23,30 +26,87 @@ function MessageSender() {
 
     // Retreive video from location state
     const videoName = location.state?.videoName;
-    console.log(videoName);
+
+    const messagesEndRef = useRef(null); // Ref for auto-scrolling
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        // Auto-scroll to the bottom whenever messages change
+        scrollToBottom();
+    }, [chatMessages]);
 
     // Fetch existing chat messages on component mount or when videoName changes
     useEffect(() => {
         if (videoName) {
+            setIsLoading(true);
+
             const formData = new FormData();
             formData.append('video_name', videoName);
-
-            axios.post(`${IP_ADDRESS}/bucket/retrieve_chat`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
-                withCredentials: true
+        
+            axios.post(`${IP_ADDRESS}/bucket/retrieve`, formData, {
+                withCredentials: true,
+                responseType: 'blob' // Sets the expected response type to 'blob' since a video file is binary data
             })
             .then(response => {
-                console.log("checking");
-                console.log(response.data);
-                setChatMessages(response.data.messages);
+                const videoURL = URL.createObjectURL(response.data);
+                setVideoURL(videoURL);
+                setIsLoading(false);
             })
             .catch(error => {
-                setErrorMessage(error.response?.data?.error || 'Error retrieving chat messages');
+                console.error('There was an error retrieving the video!', error);
+                setIsLoading(false);
             });
+
+            socket.emit('join_chat', { chat_name: videoName });
+      
+            socket.on('new_chat_message', (newMessage) => {
+                console.log("kinda working");
+                setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+            });
+
+            socket.on('chat_history', (messages) => {
+                setChatMessages(messages);
+
+                /*const roomName = messages.find(message => message.sender !== currentUser);
+                console.log(roomName['sender']);
+                if (roomName && !chatRoomName) {
+                    setChatRoomName(`${roomName['sender']}'s Room`);
+                    console.log("hey")
+                    console.log(chatRoomName);
+                }*/
+            });
+
+            // Clean up on component unmount
+            return () => {
+                socket.off('new_chat_message');
+                socket.off('chat_history');
+            };
         }
     }, [videoName]);
+
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+          try {
+            const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
+              withCredentials: true
+            });
+      
+            if (response.data.email) {
+              setCurrentUser(response.data.email);
+            } else {
+              console.error('No user currently logged in');
+            }
+          } catch (error) {
+            console.error('There was an error fetching the current user', error);
+            setErrorMessage('There was an error fetching the current user');
+          }
+        };
+      
+        fetchCurrentUser();
+      }, []);  
 
     //Navigate back to view videos
     const handleBack = () => {
@@ -67,64 +127,82 @@ function MessageSender() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const formData = new FormData();
-        formData.append('video_name', videoName);
-        formData.append('chat_text', message);
-
-        try {
-            const response = await axios.post(`${IP_ADDRESS}/bucket/send_chat`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
-                withCredentials: true
-            });
-
-            if (response.data.chat_id) {
-                setSentMessage(`Message sent: ${message}`);
-                setMessage('');
-            } else {
-                setErrorMessage('Error sending message');
-            }
-        } catch (err) {
-            setErrorMessage(err.response?.data?.error || 'Error sending chat message');
+        if (message.trim()) {
+            socket.emit('send_chat_message', { chat_name: videoName, message: message });
+            setMessage(''); // Clear the input after sending
+        } else {
+            setErrorMessage('Please enter a message before sending.');
         }
     };
-            return (
-                <div style={{ color: 'white', padding: '20px' }}>
-                    {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-                    <h1>Chat Room: {videoName}</h1>
-        
-                    <div className="chat-messages" style={{ marginBottom: '20px', maxHeight: '400px', overflowY: 'auto' }}>
-                        {chatMessages.map((chatMessage, index) => (
-                            <div key={index} style={{ marginBottom: '10px', padding: '10px', backgroundColor: '#f4f4f4', borderRadius: '10px' }}>
-                                <div style={{ fontWeight: 'bold', color: '#333' }}>{chatMessage.sender}</div>
-                                <div style={{ fontSize: '12px', color: '#666' }}>{new Date(chatMessage.timestamp * 1000).toLocaleString()}</div>
-                                <div style={{ marginTop: '5px', color: '#000' }}>{chatMessage.message}</div>
-                            </div>
-                        ))}
-                    </div>
-        
-                    <form onSubmit={handleSubmit}>
-                        <div>
-                            <label htmlFor="message">Message:</label>
-                            <textarea 
-                                id="message" 
-                                value={message} 
-                                onChange={(e) => setMessage(e.target.value)}
-                                style={{ width: '100%', padding: '10px', height: '100px' }} 
-                            />
+    return (
+        <>
+          <Container fluid style={{ marginTop: '20px', padding: '0 20px' }}>
+            <Row noGutters={true}>
+              {/* Video playback column (60% width) */}
+              <Col md={7} style={{ paddingRight: '15px' }}>
+                <div className="video-wrapper" style={{ width: '100%', height: 'auto', padding: '10px', backgroundColor: '#f8f9fa' }}>
+                    {isLoading ? (
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                        <Spinner animation="border" role="status"/>
                         </div>
-                        <button type="submit" style={{ backgroundColor: '#007bff', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px' }}>Send</button>
-                    </form>
-        
-                    {sentMessage && (
-                        <div style={{ marginTop: '10px', color: 'green' }}>
-                            <h3>Sent Message:</h3>
-                            <p>{sentMessage}</p>
-                        </div>
+                    ) : videoURL ? (
+                        <video src={videoURL} controls autoPlay style={{ width: '100%', height: 'auto' }} />
+                    ) : (
+                        <p>No video to display</p>
                     )}
                 </div>
-            );
+              </Col>
+              {/* Messages column (40% width) */}
+              <Col md={5} style={{ paddingLeft: '15px' }}>
+                <Card style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <Card.Header style={{ padding: '10px 20px' }}>
+                    <Card.Title>Messages</Card.Title>
+                  </Card.Header>
+                  <Card.Body style={{ flexGrow: 1, overflowY: 'auto', padding: '10px 20px' }}>
+                    {chatMessages.map((chatMessage, index) => (
+                      <div key={index} className="mb-2">
+                        <Card.Text>
+                          <strong>{chatMessage.sender}</strong>
+                          <small>{new Date(chatMessage.timestamp * 1000).toLocaleString()}</small>
+                        </Card.Text>
+                        <Card.Text>{chatMessage.message}</Card.Text>
+                      </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </Card.Body>
+                  <Card.Footer style={{ padding: '10px 20px' }}>
+                    <Form onSubmit={handleSubmit}>
+                      <InputGroup>
+                        <Form.Control
+                          as="textarea"
+                          id="message"
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          placeholder="Type a message..."
+                          style={{ marginRight: '10px' }}
+                        />
+                        <Button variant="primary" type="submit">Send</Button>
+                      </InputGroup>
+                    </Form>
+                  </Card.Footer>
+                </Card>
+              </Col>
+            </Row>
+            <Row className="mt-3">
+              <Col className="text-center">
+                <Button variant="secondary" onClick={handleBack} style={{ margin: '20px' }}>Go Back to Videos</Button>
+              </Col>
+            </Row>
+            {errorMessage && (
+              <Row className="mt-3">
+                <Col>
+                  <div className="alert alert-danger" style={{ margin: '20px' }}>{errorMessage}</div>
+                </Col>
+              </Row>
+            )}
+          </Container>
+        </>
+      );      
 }
 
 export default MessageSender;

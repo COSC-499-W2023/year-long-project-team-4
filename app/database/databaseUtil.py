@@ -19,11 +19,10 @@ DBNAME = os.getenv("MYDB")
 TEST = os.getenv("TEST")
 EC2 = os.getenv("EC2_ADDRESS")
 
-
 if(TEST.lower() == "true"):
     DBNAME = 'Team4dbTest'
 
-def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, pubKey) -> int:
+def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, pubKey, verifyKey, verifiedAcc: bool =False) -> int:
     '''
     Insert a new user into the database.
 
@@ -54,9 +53,9 @@ def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, 
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
                 cur = db.cursor()
                 # Insert String
-                query = "INSERT INTO userprofile (email, password_hash, firstname, lastname, salthash, publickey) values (%s,%s,%s,%s,%s,%s)"
+                query = "INSERT INTO userprofile (email, password_hash, firstname, lastname, salthash, publickey, verifyKey, verifiedAcc) values (%s,%s,%s,%s,%s,%s,%s,%s)"
                 # Creates list of the insertations
-                data = (email, password, firstname, lastname, salthash, pubKey)
+                data = (email, password, firstname, lastname, salthash, pubKey, verifyKey, verifiedAcc)
                 # Executes the query w/ the corresponding data
                 cur.execute(query, data)
                 print("Insertation Complete")
@@ -68,9 +67,9 @@ def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, 
             db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
             cur = db.cursor()
             # Insert String
-            query = "INSERT INTO userprofile (email, password_hash, firstname, lastname, salthash, publickey) values (%s,%s,%s,%s,%s,%s)"
+            query = "INSERT INTO userprofile (email, password_hash, firstname, lastname, salthash, publickey, verifyKey, verifiedAcc) values (%s,%s,%s,%s,%s,%s,%s,%s)"
             # Creates list of the insertations
-            data = (email, password, firstname, lastname, salthash, pubKey)
+            data = (email, password, firstname, lastname, salthash, pubKey, verifyKey, verifiedAcc)
             # Executes the query w/ the corresponding data
             cur.execute(query, data)
             print("Insertation Complete")
@@ -146,7 +145,53 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
             db.close()
     return result
 
-def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None, new_password_hash: str = None, new_salt_hash: bytes = None, new_public_key: str = None, new_verify_key: str = None) -> int:
+
+def insert_tags(video_name: str, tags: list[str]) -> int:
+    result = 0
+
+    query_data = []
+    for tag in tags:
+        query_data.append(tag)
+        query_data.append(video_name)
+
+    try:
+        if SSH:
+            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER, ssh_pkey=KPATH, remote_bind_address=(ADDRESS, PORT)) as tunnel:
+                print("SSH Tunnel Established")
+                # Db connection string using SSH tunnel
+                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+                cur = db.cursor()
+                set_clause = "(%s,%s)," * len(tags)
+                set_clause = set_clause[:-1] # Get rid of last comma
+                query = f"INSERT INTO tags (tagName, videoName) VALUES {set_clause}"
+                cur.execute(query, query_data)
+
+                db.commit()
+                cur.close()
+                result = 1
+        else:
+            # Db connection string without SSH tunnel
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
+            cur = db.cursor()
+            set_clause = "(%s,%s)," * len(tags)
+            set_clause = set_clause[:-1] # Get rid of last comma
+            query = f"INSERT INTO tags (tagName, videoName) VALUES {set_clause}"
+            cur.execute(query, query_data)
+
+            db.commit()
+            cur.close()
+            result = 1
+    except Exception as e:
+        print(e)
+        result = -1
+    finally:
+        if db:
+            db.close()
+
+    return result  # Return the result
+
+
+def update_user(user_email: str, new_email: str = None, new_fname: str = None, new_lname: str = None, new_password_hash: str = None, new_salt_hash: bytes = None, new_public_key: str = None, new_verify_key: str = None, new_verifiedAcc: bool = None) -> int:
     '''
     Update user information in the database.
 
@@ -188,6 +233,8 @@ def update_user(user_email: str, new_email: str = None, new_fname: str = None, n
         new_data['publickey'] = new_public_key
     if new_verify_key is not None:
         new_data['verifyKey'] = new_verify_key
+    if new_verifiedAcc is not None:
+        new_data['verifiedAcc'] = new_verifiedAcc
 
     
     try:

@@ -20,6 +20,7 @@ const [currentUser, setCurrentUser] = useState(null);
 const [currentFirstName, setCurrentFirstName] = useState(null);
 const [currentLastName, setCurrentLastName] = useState(null);
 const [errorMessage, setErrorMessage] = useState("");
+const [pass, setPass] = useState("");
 const [key, setKey] = useState('account');
 const navigate = useNavigate();
 

@@ -284,7 +284,9 @@ def retrieve_chat():
 
 @bucket.route('/change_password_reencrypt', methods=['POST'])
 def change_password_reencrypt():
+
     new_password = request.form.get('new_password')
+    print(new_password)
     if new_password is None:
         return jsonify({'error': 'Missing password'}), 400
     #Make sure user is logged in

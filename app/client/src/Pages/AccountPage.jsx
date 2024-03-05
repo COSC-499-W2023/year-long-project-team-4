@@ -36,7 +36,7 @@ const handleUpdate =(firstname,lastname,email,password) => {
   formData.append('email', email);
   
   const passwordFormData = new FormData();
-  passwordFormData.append('password', password);
+  passwordFormData.append('new_password', password);
   try {
     axios.post(
     `${IP_ADDRESS}/auth/updateinfo`, 

@@ -58,9 +58,9 @@ const ViewSentVideoPage = () => {
   return (
      <Fade cascade>
       <Row>
-          <div className="display-4 text-center text-light"> Sent Videos </div>
+          <div className="display-4 text-center"> Videos Uploaded </div>
            <Col className="p-3">
-               <div className="display-6 text-light"> Videos</div>
+               <div className="display-6"> Videos</div>
                {videos.map((video, index) => (
                             <>
                           <div key={index} onClick={() => handleVideoClick(video.videoName)}>

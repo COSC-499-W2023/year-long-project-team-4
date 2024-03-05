@@ -1,44 +1,24 @@
 import React, {useEffect, useState} from 'react'
-import {Button} from 'react-bootstrap'
+import {Button, Container,Modal} from 'react-bootstrap'
 import {useNavigate} from 'react-router-dom'
 import {
   uploadVideoPath,
   loginPath,
-  accountPath,
   viewSentVideoPath,
   IP_ADDRESS
 } from "../Path";
 import axios from 'axios';
 import {Fade} from 'react-reveal';
+import "./ReceiveAndSendPage.css";
+import ViewSentVideoPage from './ViewSentVideoPage';
+import ViewVideoPage from './ViewVideoPage';
 
 const ReceiveAndSendPage = () => {
 
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
-
-  const handleLogout = async () => {
-    try {
-      const response = await axios.get(`${IP_ADDRESS}/auth/logout`, {
-        withCredentials: true  // Important for handling sessions with cookies
-      });
-  
-      if (response.data.success) {
-        // Handle successful logout
-        console.log("Logged out successfully");
-        setCurrentUser(null);
-        navigate(loginPath);
-      } else {
-        console.error('Logout error:', response.data.error);
-      }
-    } catch (error) {
-      if (error.response && error.response.data.error) {
-        setErrorMessage(error.response.data.error);
-      } else {
-        setErrorMessage('There was an error Logging out');
-      }
-    }
-  };
+  const [modal, setModal] = useState(true);
   
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -62,25 +42,77 @@ const ReceiveAndSendPage = () => {
   }, []);  
 
   return (
-    <div className="position-absolute top-50 start-50 translate-middle">
-      {currentUser && <h3>Welcome, {currentUser}!</h3>}
-      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-      <Fade>
-        <div className="d-grid gap-2">
-          <Button size="lg" href={uploadVideoPath}> Send Videos</Button>
-          <Button size="lg" href={viewSentVideoPath}> Sent Videos</Button>
-          <Button size="lg" href={accountPath}> Receive Videos</Button>
-          <>
-          {currentUser?
-          (
-            <Button size="lg" onClick={handleLogout}>Logout</Button> 
-          ):
-          (<></>)
-          }
-          </>
+    <Fade>
+      <Container fluid>
+      {currentUser && <h3 className="text-center text-white p-2">Welcome, {currentUser}!</h3>}
+      {errorMessage &&
+        <Modal
+        show={modal}
+        onHide={()=>setModal(false)}
+        backdrop="static"
+        keyboard={false}
+        variant="Danger"
+        contentClassName="bg-danger text-white"
+        >
+          <Modal.Header closeButton>
+              <Modal.Title>Error!</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {errorMessage}
+          </Modal.Body>
+        </Modal>
+      }
+      <div className="d-flex align-items-start">
+        <div className="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+          <button 
+            className="nav-link active p-4 m-2"  
+            data-bs-toggle="pill" 
+            data-bs-target="#uploadedVideos" 
+            type="button" role="tab" 
+            aria-controls="uploadedVideos" 
+            aria-selected="true"
+          >
+              Videos uploaded
+          </button>
+          <button 
+            className="nav-link p-4 m-2" 
+            data-bs-toggle="pill" 
+            data-bs-target="#viewVideos" 
+            type="button" 
+            role="tab" 
+            aria-controls="viewVideos" 
+            aria-selected="false"
+          >
+            Videos Received
+          </button>
+          <button
+            className="nav-link p-4 m-2" 
+            data-bs-toggle="pill" 
+            type="button" 
+            role="tab" 
+            aria-selected="false"
+            onClick={()=>navigate(uploadVideoPath)}
+            >
+              Upload Video
+          </button>
         </div>
-      </Fade>
-    </div>
+        <div className="tab-content" id="v-pills-tabContent">
+          <div 
+            className="tab-pane fade show active" 
+            id="uploadedVideos" 
+            role="tabpanel">
+              <ViewSentVideoPage />
+          </div>
+          <div 
+            className="tab-pane fade" 
+            id="viewVideos" 
+            role="tabpanel">
+              <ViewVideoPage />
+          </div>
+        </div>
+      </div>
+      </Container>
+    </Fade>
   )
 }
 

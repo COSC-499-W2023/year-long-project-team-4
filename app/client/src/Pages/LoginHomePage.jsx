@@ -10,8 +10,8 @@ import {
   IP_ADDRESS,
 } from "../Path";
 import axios from 'axios'
-import see from '../Assets/eye.svg';
-import unSee from '../Assets/eye-slash.svg';
+import {ReactComponent as See} from '../Assets/eye.svg';
+import {ReactComponent as UnSee} from '../Assets/eye-slash.svg';
 
 const LoginHomePage = () => {
   const [type, setType] = useState(false);
@@ -55,7 +55,7 @@ const LoginHomePage = () => {
   
   
    return (
-    <div className="position-absolute top-50 start-50 translate-middle text-white text-center">          
+    <div className="position-absolute top-50 start-50 translate-middle text-center">          
       <Fade big cascade>
         <div className="display-3">Login</div>
       </Fade>
@@ -79,7 +79,7 @@ const LoginHomePage = () => {
                   variant="primary" 
                   onClick={()=> setType(!type)}
                 >
-                  {!type? <img src={see}/> :<img src={unSee}/>}
+                  {!type? <See fill={"white"}/> :<UnSee fill={"white"}/>}
                 </Button>
               </InputGroup>
             </Form.Group>   
@@ -89,13 +89,13 @@ const LoginHomePage = () => {
       <Fade big cascade>
         <div className="row">
           <div className="col"> 
-            <a href={guestPath}>Use as guest</a>
-          </div>    
+            <p><a className="text-primary" href={guestPath}>Use as guest</a></p>
+         </div>    
           <div className="col"> 
-            <a href={registerPath}>No account?</a>
+            <p><a className="text-primary" href={registerPath}>No account?</a></p>
           </div>
           <div className="col"> 
-            <a href={changePasswordPath}>Forgot password?</a>
+            <p><a className="text-primary" href={changePasswordPath}>Forgot password?</a></p>
           </div>
         </div>
       </Fade>

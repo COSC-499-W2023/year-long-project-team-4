@@ -89,6 +89,7 @@ def upload_video():
     # Read the file and email from post
     file = request.files.get('file')
     recipient_email = request.form.get('recipient')
+    retention_days = request.form.get('retention_days')
     tags = None
     json_data = request.files.get('json')
     if json_data:
@@ -97,8 +98,17 @@ def upload_video():
     # Get the public key corresponding to the recipient
     recipient_public_key = get_public_key(recipient_email)
 
-    # Should read retention date from post, but for now just set it to 7 days in future
-    dummy_retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
+    # Figure out retention date
+    if retention_days is None:
+        # Default 90 days retention
+        retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=90)
+    else:
+        # Max 1 year of retention
+        retention_days = min(retention_days, 365)
+        # Min 1 day of retention
+        retention_days = max(retention_days, 1)
+        retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=retention_days)
+
 
     # Video name is a uniquely generated uuid value
     video_name = uuid.uuid4()
@@ -122,10 +132,10 @@ def upload_video():
         sender_email = session['email']
         sender_public_key = get_public_key(session['email'])
         sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
-        if not create_chat(video_name, dummy_retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):
+        if not create_chat(video_name, retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):
             return jsonify({'error': 'Failed to create chat'}), 502
 
-    insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, dummy_retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
+    insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
 
     if insert_result and tags:
         tag_result = database.insert_tags(video_name, tags)
@@ -300,7 +310,6 @@ def create_chat(video_name, retention_date, sender_email, receiver_email, sender
 def send_chat():
     chat_name = request.form.get('video_name')
     chat_text = request.form.get('chat_text')
-    dummy_retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
 
     try:
         chat_info = database.query_records(table_name='chats', fields='senderEmail, senderEncryption, receiverEmail, receiverEncryption', condition=f'chatName = %s', condition_values=(chat_name,))[0]

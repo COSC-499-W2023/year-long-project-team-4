@@ -22,7 +22,6 @@ def create_app():
     from .auth import auth
     from .bucket_interface import bucket
     from . import socket_events
-    #from .bucket_interface import handle_message
 
     # Register the authentication blueprint
     app.register_blueprint(auth, url_prefix='/auth')

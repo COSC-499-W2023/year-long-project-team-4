@@ -24,18 +24,19 @@
 Before you begin, ensure you have met the following requirements:
 - Access to an AWS S3 bucket to store your images.
 - Ability to call AWS Rekognition APIs.
-- Nginx reverse proxy installed to serve your application.
-- Gunicorn installed to run your Flask application.
+- NodeJS installed
+- Nginx reverse proxy installed to serve your application. (not needed if running locally or preferred way of hosting)
+- Gunicorn installed to run your Flask application. (Similar to nginx)
 
 ### Installation 
 To start, clone our repo:
 ``` git clone https://github.com/COSC-499-W2023/year-long-project-team-4.git ```
 Then install the Python dependencies listed in the `requirements.txt` file.
         ``` pip install -r requirements.txt ```
-Then create a .env file in year-long-project-team4/app following this structure: 
+Then create a .env file in ```year-long-project-team4/app``` following this structure: 
 ```
 SSH = "True"
-SSHUSER=ubuntu
+SSHUSER=User name that your .pem was given - for us default was Ubuntu
 KEYPATH=Path to your .pem file for ssh'ing into ec2
 ADDRESS=Endpoint of your AWS RDS 
 PORT=3306
@@ -56,4 +57,8 @@ ACCESSKEY=''
 SECRETKEY=''
 SESSTOKEN=''
 ```
+We will then start the back end server up, while still in the ```year-long-project-team4/app``` directory, run ```py main.py``` or ```python3 main.py``` depending on your python environment.
+Next, we will download any dependencies for the front end. Navigate to  ```year-long-project-team4/app/client``` and run ```npm install``` to download anything required.
+Once installed we can start the front-end with ```npm run start``` which by default starts on ```localhost:3000```
+
 

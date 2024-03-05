@@ -58,7 +58,7 @@ const LoginHomePage = () => {
       </Fade>
       {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
       <Fade big cascade>
-        <Form onSubmit={handleSubmit} href={receiveAndSendPath}>
+        <Form onSubmit={handleSubmit}>
           <Form.Group className="p-3">
             <Form.Label>Email</Form.Label>
             <Form.Control
@@ -80,7 +80,7 @@ const LoginHomePage = () => {
                 </Button>
               </InputGroup>
             </Form.Group>   
-          <Button type="submit" className="mb-2" variant="primary"> Login </Button>
+          <Button type="submit" className="mb-2" variant="primary" href={receiveAndSendPath}> Login </Button>
         </Form>
       </Fade>
       <Fade big cascade>

@@ -22,7 +22,6 @@ def handle_disconnect():
 
 @socketio.on('message')
 def handle_message(data):
-    print('received message: ' + data)
     socketio.emit('message', data)
 
 @socketio.on('join_chat')

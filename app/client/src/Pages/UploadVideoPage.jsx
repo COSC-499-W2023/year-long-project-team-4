@@ -1,12 +1,15 @@
 import React, {useState} from 'react'
-import {Form, Offcanvas, Button, ToggleButtonGroup, Spinner, ToggleButton} from 'react-bootstrap'
+import {Alert, Form, Offcanvas, Modal, Button, ToggleButtonGroup, Spinner, ToggleButton} from 'react-bootstrap'
 import Webcam from 'react-webcam';
 import record from "../Assets/record-btn.svg"
 import axios from "axios";
 import info from "../Assets/info-circle.svg"
+import back from "../Assets/arrow-left.svg"
 import { Fade } from 'react-reveal';
 import { IP_ADDRESS } from '../Path';
 import ysfixWebmDuration from "fix-webm-duration";
+import { useNavigate } from 'react-router-dom';
+import { receiveAndSendPath } from '../Path';
 
 const UploadVideoPage = () => {
   const [type, setType] = useState(1);
@@ -23,9 +26,11 @@ const UploadVideoPage = () => {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [show, setShow] = useState(false);
   const [load, setLoad] = useState(false);
+  const [modal, setModal] = useState(true);
 
   let startTime;
   var duration;
+  const navigate = useNavigate()
 
   const handleClose = () => setShow(false);
   
@@ -95,6 +100,10 @@ const UploadVideoPage = () => {
   });
    };
 
+   const sendMain = () => {
+    navigate(receiveAndSendPath);
+  }
+
    const handleChange = (event) => {
     try {
     setBackend(event.target.files[0]);
@@ -147,10 +156,13 @@ const UploadVideoPage = () => {
   return (
   <>
     <Fade>
-      <Button className="m-2 float-end" variant="light" onClick={handleShow}>
+      <Button className="m-2 float-end" variant="outline-dark" onClick={handleShow}>
         <img src={info}></img>
       </Button>
     </Fade>
+    <Button className="m-2 float-start" variant="outline-dark" onClick={sendMain}>
+        <img src={back}></img>
+    </Button>
     <Offcanvas show={show} onHide={handleClose} backdrop="static">
       <Offcanvas.Header closeButton>
             <Offcanvas.Title>How Uploading Videos Works</Offcanvas.Title>
@@ -201,7 +213,21 @@ const UploadVideoPage = () => {
         </p>
       </Offcanvas.Body>
     </Offcanvas>
-    {uploadSuccess && <div className="alert alert-success" role="alert">Video sent successfully!</div>}
+    {uploadSuccess && 
+    <Modal 
+      show={modal}
+      onHide={()=>setModal(false)}
+      backdrop="static"
+      keyboard={false}
+    >
+      <Modal.Header closeButton>
+          <Modal.Title>Success!</Modal.Title>
+      </Modal.Header>
+        <Modal.Body>
+          Your video has been sent to your recipient!
+        </Modal.Body>
+    </Modal>
+    }
     <Fade>
       <div className="position-absolute top-50 start-50 translate-middle text-center">
         <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>
@@ -217,7 +243,7 @@ const UploadVideoPage = () => {
         (
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="formFileLg" className="d-grid gap-2">
-            <Form.Label className="display-4 text-white">Upload Video</Form.Label>
+            <Form.Label className="display-4">Upload Video</Form.Label>
             <Form.Control 
               type="file" 
               required 
@@ -235,6 +261,10 @@ const UploadVideoPage = () => {
                 <Fade>
                   {load? (
                   <>
+                    <Alert className="bg-primary text-white"> 
+                      Your video is in the process of blurring. 
+                      Please wait a until it is finished.
+                    </Alert>
                     <Spinner variant="primary" animation="grow" />
                   </>
                   ):(
@@ -289,6 +319,10 @@ const UploadVideoPage = () => {
             <Fade>
               {load? (
               <>
+                <Alert className="bg-primary text-white"> 
+                  Your video is in the process of blurring. 
+                  Please wait a until it is finished.
+                </Alert>
                 <Spinner variant="primary" animation="grow" />
               </>
               ):(

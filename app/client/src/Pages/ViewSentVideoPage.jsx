@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Row, Col, Button, Modal} from 'react-bootstrap';
+import {Row, Col, Button} from 'react-bootstrap';
 import { receiveAndSendPath } from '../Path';
 import axios from 'axios';
 // Animation library for smooth transitions
@@ -18,8 +18,6 @@ const socket = io(`${IP_ADDRESS}`,  {
 const ViewSentVideoPage = () => {
   
   const [videos, setVideos] = useState([]);
-  const [selectedVideo, setSelectedVideo] = useState(null);
-  const [showVideoModal, setShowVideoModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
@@ -54,36 +52,8 @@ const ViewSentVideoPage = () => {
   
   // Handles video selection and retrieves video URL
   const handleVideoClick = (videoName) => {
-      const formData = new FormData();
-      formData.append('video_name', videoName);
-  
-      axios.post(`${IP_ADDRESS}/bucket/retrieve`, formData, {
-          withCredentials: true,
-          responseType: 'blob' // Sets the expected response type to 'blob' since a video file is binary data
-      })
-      .then(response => {
-          const videoURL = URL.createObjectURL(response.data);
-          setSelectedVideo(videoURL);
-          setShowVideoModal(true);
-      })
-      .catch(error => {
-          console.error('There was an error retrieving the video!', error);
-      });
-  };
-  
-  const handleCloseVideoModal = () => {
-      setShowVideoModal(false);
-      setSelectedVideo(null);
-  };
-
-  // Handles the creation of a chat associated with a video
-  const handleOpenChat = (e, videoName) => {
-    e.preventDefault();
-
-    socket.emit('join_chat', { chat_name: videoName });
-
     navigate(MessagingPath, { state: { videoName: videoName } });
-};
+  };
 
   return (
      <Fade cascade>
@@ -98,7 +68,6 @@ const ViewSentVideoPage = () => {
                               <p>Video{index + 1}</p>
                               </Button>
                           </div>
-                          <Button variant="info" onClick={(e) => handleOpenChat(e, video.videoName)}>Start Chat</Button>
                           </>
                       ))}
           </Col>   
@@ -106,15 +75,6 @@ const ViewSentVideoPage = () => {
           <div className="text-center p-4">
               <Button href={receiveAndSendPath}> Return to Home</Button>
           </div>
-  
-          <Modal show={showVideoModal} onHide={handleCloseVideoModal}>
-                  <Modal.Header closeButton>
-                      <Modal.Title>Video Playback</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                      {selectedVideo && <video src={selectedVideo} width="100%" controls autoPlay />}
-                  </Modal.Body>
-          </Modal>
           {errorMessage && <div className="error-message">{errorMessage}</div>}
      </Fade>
     )

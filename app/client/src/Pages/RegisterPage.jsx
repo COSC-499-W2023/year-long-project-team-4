@@ -60,7 +60,6 @@ const handleSignup = async (firstname, lastname, email, password) => {
   if (email) {
     setShowVerification(true); // Show verification input
     console.log('Signup successful');
-    //navigate(loginPath); // navigate to login after successful registration.
   } else {
     // Set the error message from the response
     setErrorMessage(data.error);

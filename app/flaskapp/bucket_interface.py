@@ -247,7 +247,7 @@ def retrieve_video():
     # Send the data in the buffer as mp4
     return send_file(video_data, mimetype='video/mp4'), 200
 
-@bucket.route('/getvideos', methods=['GET'])
+@bucket.route('/getvideos', methods=['GET', 'POST'])
 def get_available_videos():
     # Get videos
     available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
@@ -266,7 +266,7 @@ def get_available_videos():
 
     return json.dumps(available_videos), 200
     
-@bucket.route('/get_sent_videos', methods=['GET'])
+@bucket.route('/get_sent_videos', methods=['GET', 'POST'])
 def get_sent_videos():
     available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
 

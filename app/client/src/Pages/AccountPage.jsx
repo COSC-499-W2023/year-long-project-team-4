@@ -78,7 +78,6 @@ return (
             <Col className="p-4 fs-5">
               <ListGroup variant="flush">
                 <ListGroup.Item> Email: {email}</ListGroup.Item>
-                <ListGroup.Item> Email: {email}</ListGroup.Item>
                 <ListGroup.Item> First Name: {firstName}</ListGroup.Item>
                 <ListGroup.Item> Last Name: {lastName}</ListGroup.Item>
               </ListGroup>

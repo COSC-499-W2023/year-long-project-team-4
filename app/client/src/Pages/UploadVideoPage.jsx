@@ -286,7 +286,7 @@ const UploadVideoPage = () => {
               />
           </Form.Group>
           <Button onClick={()=>{handleBlur()}} disabled={file? false : true}>Blur video</Button> {' '}
-          <Button type="submit">Send video</Button>
+          <Button  variant="info" type="submit">Send video</Button>
         </Form>
         ):
         (
@@ -342,12 +342,14 @@ const UploadVideoPage = () => {
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
           </Form.Group>
-          <div className="mb-2">
-            <Button className="mt-2" onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}
-            <Button className="mt-2" onClick={()=>{handleRetake()}} disabled={disable}>Retake video</Button> {' '}
-            <Button className="mt-2" onClick={()=>{handleBlur()}} disabled={disable}>Blur video</Button> {' '}
-            <Button className="mt-2"type="submit" disabled={disable}>Send video</Button>
-          </div> 
+          <div className="mt-2">
+            <Button onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}
+            <Button onClick={()=>{handleRetake()}} disabled={disable}>Retake video</Button> {' '}
+            <Button onClick={()=>{handleBlur()}} disabled={disable}>Blur video</Button> {' '}
+          </div>
+          <div className="d-grid p-4 ">
+            <Button type="submit"  variant="info" disabled={disable}>Send video</Button>
+          </div>
         </Form>   
         </>
         )

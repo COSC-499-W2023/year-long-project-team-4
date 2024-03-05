@@ -7,8 +7,8 @@ import {
   } from "../Path";
 import axios from 'axios'
 import {Fade} from 'react-reveal';
-import see from '../Assets/eye.svg';
-import unSee from '../Assets/eye-slash.svg';
+import {ReactComponent as See} from '../Assets/eye.svg';
+import {ReactComponent as UnSee} from '../Assets/eye-slash.svg';
 
 
 const RegisterPage = () => {
@@ -98,7 +98,7 @@ const handleSubmit = (e) => {
                   variant="primary" 
                   onClick={()=> setType(!type)}
                 >
-                  {!type? <img src={see}/> :<img src={unSee}/>}
+                  {!type? <See fill={"white"}/> :<UnSee fill={"white"}/>}
                 </Button>
               </InputGroup>
           </div>     

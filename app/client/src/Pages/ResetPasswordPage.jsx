@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import Fade from 'react-reveal';
 import {Form,Button,InputGroup} from "react-bootstrap";
-import see from '../Assets/eye.svg';
-import unSee from '../Assets/eye-slash.svg';
 import { useNavigate } from 'react-router-dom';
 import { loginPath } from '../Path';
+import {ReactComponent as See} from '../Assets/eye.svg';
+import {ReactComponent as UnSee} from '../Assets/eye-slash.svg';
 
 const ResetPasswordPage = () => {
     const navigate = useNavigate();
@@ -27,7 +27,7 @@ const ResetPasswordPage = () => {
                 variant="primary" 
                 onClick={()=> setType(!type)}
                 >
-                {!type? <img src={see}/> :<img src={unSee}/>}
+                {!type? <See fill={"white"}/> : <UnSee fill={"white"}/>}
                 </Button>
             </InputGroup>
             </Form.Group>   

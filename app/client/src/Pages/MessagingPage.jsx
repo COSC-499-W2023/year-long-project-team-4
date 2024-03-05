@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, Card, InputGroup, Spinner } from 'react-bootstrap';
-import { viewVideoPath,
+import { receiveAndSendPath,
     IP_ADDRESS,
  } from '../Path';
 import io from 'socket.io-client';
@@ -110,7 +110,7 @@ function MessageSender() {
 
     //Navigate back to view videos
     const handleBack = () => {
-        navigate(viewVideoPath);
+        navigate(receiveAndSendPath);
     };
 
     // Display error if videoName is not available

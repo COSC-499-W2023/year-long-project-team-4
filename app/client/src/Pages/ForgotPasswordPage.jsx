@@ -58,7 +58,7 @@ const ForgotPasswordPage = () => {
         </Alert>
         <Form onSubmit={handleSubmit} className="text-center">
           <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-            <Form.Label className="text-white">Enter Email for send code to reset password:</Form.Label>
+            <Form.Label>Enter Email for send code to reset password:</Form.Label>
             <Form.Control type="email"/>
           </Form.Group>
           <Button type="submit">Enter</Button>

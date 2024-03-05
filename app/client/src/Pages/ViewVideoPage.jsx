@@ -94,34 +94,30 @@ const ViewVideoPage = () => {
   return (
      <Fade cascade>
       <Row>
-          <div className="display-4 text-center text-light"> Receive Videos </div>
+          <div className="display-4 text-center"> Videos Received </div>
            <Col className="p-3">
-               <div className="display-6 text-light"> Videos Viewable</div>
+               <div className="display-6"> Videos</div>
                {videos.map((video, index) => (
-                            <>
-                          <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                              <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                              <p>Video{index + 1}</p>
-                              </Button>
-                          </div>
-                          <Button variant="info" onClick={(e) => handleStartChat(e, video.videoName)}>Start Chat</Button>
-                          </>
-                      ))}
-          </Col>   
-      </Row>      
-          <div className="text-center p-4">
-              <Button href={receiveAndSendPath}> Return to Home</Button>
-          </div>
-  
-          <Modal show={showVideoModal} onHide={handleCloseVideoModal}>
-                  <Modal.Header closeButton>
-                      <Modal.Title>Video Playback</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                      {selectedVideo && <video src={selectedVideo} width="100%" controls autoPlay />}
-                  </Modal.Body>
-          </Modal>
-          {errorMessage && <div className="error-message">{errorMessage}</div>}
+                    <>
+                        <div key={index} onClick={() => handleVideoClick(video.videoName)}>
+                            <Button className='text-center mb-2' style={{minWidth: '150px'}}>
+                                <p>Video{index + 1}</p>
+                            </Button>
+                        </div>
+                        <Button variant="info" onClick={(e) => handleStartChat(e, video.videoName)}>Start Chat</Button>
+                    </>
+                ))}
+           </Col>   
+        </Row>      
+        <Modal show={showVideoModal} onHide={handleCloseVideoModal}>
+            <Modal.Header closeButton>
+                <Modal.Title>Video Playback</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {selectedVideo && <video src={selectedVideo} width="100%" controls autoPlay />}
+            </Modal.Body>
+        </Modal>
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
      </Fade>
     )
   }

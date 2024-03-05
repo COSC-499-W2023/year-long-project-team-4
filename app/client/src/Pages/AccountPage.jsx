@@ -10,6 +10,8 @@ import {
     MessagingPath,
     IP_ADDRESS,
   } from "../Path";
+import "./AccountPage.css";
+
 import PasswordCheckList from "react-password-checklist";
 
 const AccountPage = () => {
@@ -18,8 +20,8 @@ const [currentUser, setCurrentUser] = useState(null);
 const [currentFirstName, setCurrentFirstName] = useState(null);
 const [currentLastName, setCurrentLastName] = useState(null);
 const [errorMessage, setErrorMessage] = useState("");
-const [key, setKey] = useState('videos');
-const [pass, setPass] = useState('');
+const [key, setKey] = useState('account');
+const navigate = useNavigate();
 
 const handleSubmit = (e) => {
     e.preventDefault();
@@ -77,38 +79,14 @@ const handleUpdate =(firstname,lastname,email,password) => {
 }
 
 const handleDelete = () =>{
-
+  navigate(homePath);
 }
 
-const navigate = useNavigate();
+const sendMain = () => {
+  navigate(receiveAndSendPath);
+}
 
 const email = currentUser;
-
-const [videos, setVideos] = useState([]);
-const [selectedVideo, setSelectedVideo] = useState(null);
-const [showVideoModal, setShowVideoModal] = useState(false);
-
-useEffect(() => {
-    // Replace with the correct URL of your backend
-    axios.get(`${IP_ADDRESS}/bucket/getvideos`, {
-        withCredentials: true})
-        .then(response => {
-            setVideos(response.data);
-            console.log(response.data)
-        })
-        .catch(error => {
-            console.error('There was an error fetching the videos!', error);
-        });
-}, []);
-
-const handleVideoClick = (videoName) => {
-  navigate(MessagingPath, { state: { videoName: videoName } });
-};
-
-const handleCloseVideoModal = () => {
-    setShowVideoModal(false);
-    setSelectedVideo(null);
-};
 
 useEffect(() => {
         const fetchCurrentUser = async () => {
@@ -168,31 +146,6 @@ return (
         onSelect={(k) => setKey(k)}
         className="mb-3"
         >
-          <Tab eventKey="videos" title="Videos received">
-            <Row>
-              <div className="display-4 text-center"> Receive Videos </div>
-              <Col className="p-3">
-                  <div className="display-6"> Videos Viewable</div>
-                  {videos.map((video, index) => (
-                            <>
-                          <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                              <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                              <p>Video{index + 1}</p>
-                              </Button>
-                          </div>
-                          </>
-                      ))}
-              </Col>   
-            </Row>      
-            <Modal show={showVideoModal} onHide={handleCloseVideoModal}>
-              <Modal.Header closeButton>
-                  <Modal.Title>Video Playback</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                  {selectedVideo && <video src={selectedVideo} width="100%" controls autoPlay />}
-              </Modal.Body>
-            </Modal>
-          </Tab>
           <Tab eventKey="account" title="Account Info">
             <div className="display-6 text-center"> Account Info </div>
             <Col className="p-4 fs-5">
@@ -271,7 +224,7 @@ return (
         </Tabs>
       </Card>
       <div className="text-center">
-        <Button className="mt-2" href={receiveAndSendPath}> Return to Home </Button>
+        <Button className="m-4" onClick={sendMain}> Return to Home </Button>
       </div>
     </Fade>   
    </div>

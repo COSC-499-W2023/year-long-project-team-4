@@ -71,6 +71,8 @@ const ReceiveAndSendPage = () => {
             type="button" role="tab" 
             aria-controls="uploadedVideos" 
             aria-selected="true"
+            style={{border: '2px solid #2f237d'}}
+
           >
               Videos uploaded
           </button>
@@ -82,6 +84,8 @@ const ReceiveAndSendPage = () => {
             role="tab" 
             aria-controls="viewVideos" 
             aria-selected="false"
+            style={{border: '2px solid #2f237d'}}
+
           >
             Videos Received
           </button>
@@ -91,6 +95,7 @@ const ReceiveAndSendPage = () => {
             type="button" 
             role="tab" 
             aria-selected="false"
+            style={{border: '2px solid #2f237d'}}
             onClick={()=>navigate(uploadVideoPath)}
             >
               Upload Video

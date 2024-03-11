@@ -9,11 +9,6 @@ import {
     MessagingPath,
     IP_ADDRESS,
   } from "../Path";
-import io from 'socket.io-client';
-
-const socket = io(`${IP_ADDRESS}`,  {
-    withCredentials: true,
-  });
 
 const ViewSentVideoPage = () => {
   
@@ -24,11 +19,6 @@ const ViewSentVideoPage = () => {
   
   // Fetch sent videos on component mount
   useEffect(() => {
-    socket.on('connect', () => {
-        console.log('Connected to the server');
-      });
-  
-
       axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, {
           withCredentials: true})
           .then(response => {
@@ -39,14 +29,7 @@ const ViewSentVideoPage = () => {
               console.error('There was an error fetching the videos!', error);
           });
 
-    socket.on('disconnect', (reason) => {
-        console.log(`Disconnected from the server due to ${reason}`);
-    });
-
-    return () => {
-        socket.off('connect');
-        socket.off('disconnect');
-      };
+    return () => {};
       
   }, []);
   

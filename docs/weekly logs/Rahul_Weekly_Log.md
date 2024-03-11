@@ -173,6 +173,20 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 # In progress: 
 - Working on cleaning up integration and fixing bugs that appear on the website.
 - Updating mobile view to look more optimized
+
+# Term 2 Week 8:  March 4th - March 11th
+ 
+## Tasks Completed: 
+![term2_week8](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/35277509-70ed-4fed-8984-2a70cb0aa4cb)
+
+- Working on cleaning up integration. 
+- Working on updating the mobile view
+- Collecting data for the second peer testing.
+
+# In progress: 
+- Working on cleaning up integration. 
+- Working on updating the mobile view
+- Adding new changes based on peer testing 2
   
 
 

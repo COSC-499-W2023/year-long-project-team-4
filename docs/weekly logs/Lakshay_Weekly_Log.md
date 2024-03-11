@@ -349,3 +349,24 @@ Completed:
 Additional Context:
 - finally got the websocket implementation for real time chat updates after a log of debugging and research. Big progress this week
 
+# Term 2 Week 9: March 4 - March 10 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="767" alt="Screenshot 2024-03-11 at 1 34 16 AM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/c132463a-b7e0-4441-a590-a3ed6f571acd">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Integration for email verification upon signup
+- Peer Testing 2
+
+Tasks from the Project Board:
+- Peer testing 2
+- Front end to Back end Integration
+
+Completed:
+- Peer testing 2
+- Front end to Back end Integration
+
+Additional Context:
+- Fixing up errors that came up during peer testing 2
+

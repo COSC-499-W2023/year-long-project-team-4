@@ -351,4 +351,27 @@ Completed:
 - Cleaned up code 
 
 Additional Context:
-- Currently struggling to get the SSL working/ec2 functioning with the SSL certification. Hopefully will have it figured out by Tuesday's peer testing. 
+- Currently struggling to get the SSL working/ec2 functioning with the SSL certification. Hopefully will have it figured out by Tuesday's peer testing.
+
+# Term 2 Week 9: March 4 - March 10 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![MyTasks](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/b2e0c46e-202e-46d7-9104-39957cac7bac)
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Adding SSL to our EC2 for secure connection
+- Peer Testing 2
+- Documentation
+
+Tasks from the Project Board:
+- Documentation
+- Peer testing 2 
+
+Completed:
+- Peer testing 2 
+
+Additional Context:
+- Finally got the SSL certificate up and working just before the Peer Test! (Woohoo)
+- Started documentation/updating the ReadMe under the Documentation Branch.  
+

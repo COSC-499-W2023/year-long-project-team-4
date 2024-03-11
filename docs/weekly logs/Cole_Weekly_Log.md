@@ -256,3 +256,23 @@ Tasks from the project board relevant to things I worked on:
 
 Currently working on:
 - Fully finished the two things on my list for this week before peer testing, so nothing here.
+
+
+# Term 2 Week (8): Mar 3 - Mar 10
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/d55aa657-e0c0-4956-bc23-e06ba7d122a7)
+
+## Goal Recap:
+Things I worked on:
+- Learned how the websocket connections were being handled for chats
+- Fixed bug with the chats where session data was loaded prematurely when users don't refresh after logging in
+- Fixed socketio spamming connections and disconnects
+  
+Tasks from the project board relevant to things I worked on:
+- Creating chats
+- Encrypting and decrypting chats
+
+Currently working on:
+- Going to move to various frontend things that need cleanup
+- Also general cleanup on backend stuff as it is needed

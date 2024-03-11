@@ -287,3 +287,18 @@ Completed:
 - Had to write tests for notifications and create that pull request
 - testing/approving pull requests
 - (Have not figured out expiring credentials yet)
+
+# Week 8: March 4 - March 10
+
+## Tasks Completed:
+
+![2Week8act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/910f0db8-1682-46b8-b7ce-b0f0801f3483)
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Frontend cleanup
+
+Completed:
+- Started making a sidebar that will be constant throughout site

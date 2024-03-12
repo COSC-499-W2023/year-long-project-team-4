@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Row, Col, Button} from 'react-bootstrap';
 import { receiveAndSendPath } from '../Path';
+import { Container } from 'react-bootstrap';
 import axios from 'axios';
 // Animation library for smooth transitions
 import {Fade} from 'react-reveal';
@@ -10,6 +11,7 @@ import {
     IP_ADDRESS,
   } from "../Path";
 import io from 'socket.io-client';
+import Sidebar from './Sidebar';
 
 const socket = io(`${IP_ADDRESS}`,  {
     withCredentials: true,
@@ -56,25 +58,31 @@ const ViewSentVideoPage = () => {
   };
 
   return (
-     <Fade cascade>
       <Row>
-          <div className="display-4 text-center"> Videos Uploaded </div>
-           <Col className="p-3">
-               <div className="display-6"> Videos</div>
-               {videos.map((video, index) => (
-                            <>
-                          <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                              <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                              <p>Video{index + 1}</p>
-                              </Button>
-                          </div>
-                          </>
-                      ))}
-          </Col>   
-      </Row>      
-          {errorMessage && <div className="error-message">{errorMessage}</div>}
-     </Fade>
-    )
-  }
+        <Col xs={2}>
+          <Fade>
+          <Sidebar />
+          </Fade>
+        </Col>
+        <Col xs={10}>
+          <Fade cascade>
+            <div>
+              <div className="display-4 text-center">Videos Uploaded</div>
+              <div className="display-6">Videos</div>
+              {videos.map((video, index) => (
+                <div key={index} onClick={() => handleVideoClick(video.videoName)}>
+                  <Button className="text-center mb-2" style={{ minWidth: '150px' }}>
+                    <p>Video{index + 1}</p>
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </Fade>
+        </Col>
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
+      </Row>
   
-  export default ViewSentVideoPage
+  );
+};
+
+export default ViewSentVideoPage;

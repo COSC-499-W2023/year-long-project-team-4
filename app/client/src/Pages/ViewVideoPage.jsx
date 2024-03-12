@@ -1,8 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import {Row, Col, Button, Modal} from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { receiveAndSendPath } from '../Path';
 import axios from 'axios';
 import {Fade} from 'react-reveal';
+import Sidebar from './Sidebar';
 import {useNavigate} from 'react-router-dom';
 import {
     MessagingPath,
@@ -41,8 +43,14 @@ const ViewVideoPage = () => {
   return (
      <Fade cascade>
       <Row>
+            <Col xs={2}>
+                <Fade>
+                <Sidebar />
+                </Fade>
+            </Col>
+            <Col xs={10}>
           <div className="display-4 text-center"> Videos Received </div>
-           <Col className="p-3">
+           
                <div className="display-6"> Videos</div>
                {videos.map((video, index) => (
                     <>
@@ -54,7 +62,7 @@ const ViewVideoPage = () => {
                     </>
                 ))}
            </Col>   
-        </Row>      
+        </Row>    
         {errorMessage && <div className="error-message">{errorMessage}</div>}
      </Fade>
     )

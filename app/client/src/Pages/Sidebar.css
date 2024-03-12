@@ -1,23 +1,35 @@
-.sidebar {
-    color: white;
-    padding: 20px;
-    height: 20vh;
-    position: sticky;
-    top: 0;
-}
 
-.sidebar .nav-link {
-    color: #13056be0;
-    cursor: pointer;
-    padding: 8px 16px; /* Adjust padding as needed */
+/* Sidebar.css */
+  .sidebar {
+    width: 200px; /* Set the width of the sidebar */
+    height: 100vh; /* Set the height of the sidebar to fill the viewport */
+    background-color: #f8f9fa; /* Set the background color of the sidebar */
+    position: fixed; /* Set the position of the sidebar to fixed */
+    top: 0; /* Position the sidebar at the top of the viewport */
+    left: 0; /* Position the sidebar at the left of the viewport */
+    overflow-y: auto; /* Allow the sidebar to scroll vertically if needed */
+    padding-top: 2px; /* Add padding at the top to account for the header */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .sidebar .nav-link {
+    
+    text-align: center;
+    padding: 30px 30px; /* Adjust padding as needed */
     margin: 4px 0; /* Adjust margin as needed */
-    transition: background-color 0.3s; /* Add a smooth transition effect */
     border-radius: 5px; /* Add rounded edges */
     border-bottom: 1px solid #ccc;
 }
-
-.sidebar .nav-link:hover {
+  
+  .sidebar .nav-link:hover {
     color: #f0f0f0;
-    background-color: #13056be0; /* Add your desired highlight color here */
-}
+    background-color: #13056be0;
+  }
 
+  .sidebar .nav-link.active {
+    color: #f0f0f0;
+    background-color: #13056be0;
+  }

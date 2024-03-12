@@ -1,23 +1,12 @@
-.sidebar {
-    color: white;
-    padding: 20px;
-    height: 20vh;
-    position: sticky;
-    top: 0;
+.nav-pills .nav-link.active , .nav-pills .show > .nav-link{
+    background-color: #13056be0 !important;
 }
 
-.sidebar .nav-link {
-    color: #13056be0;
-    cursor: pointer;
-    padding: 8px 16px; /* Adjust padding as needed */
-    margin: 4px 0; /* Adjust margin as needed */
-    transition: background-color 0.3s; /* Add a smooth transition effect */
-    border-radius: 5px; /* Add rounded edges */
-    border-bottom: 1px solid #ccc;
+.nav-pills .nav-link {
+    color:#13056be0;
 }
 
-.sidebar .nav-link:hover {
-    color: #f0f0f0;
-    background-color: #13056be0; /* Add your desired highlight color here */
+.nav-pills .nav-link:hover {
+    color: black;
 }
 

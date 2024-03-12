@@ -7,6 +7,7 @@ import info from "../Assets/info-circle.svg"
 import back from "../Assets/arrow-left.svg"
 import { Fade } from 'react-reveal';
 import { IP_ADDRESS } from '../Path';
+import Sidebar from './Sidebar';
 import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
 import { receiveAndSendPath } from '../Path';
@@ -157,13 +158,14 @@ const UploadVideoPage = () => {
   return (
   <>
     <Fade>
+    <Sidebar />
+    
       <Button className="m-2 float-end" variant="outline-dark" onClick={handleShow}>
         <img src={info}></img>
       </Button>
+    
     </Fade>
-    <Button className="m-2 float-start" variant="outline-dark" onClick={sendMain}>
-        <img src={back}></img>
-    </Button>
+    
     <Offcanvas show={show} onHide={handleClose} backdrop="static">
       <Offcanvas.Header closeButton>
             <Offcanvas.Title>How Uploading Videos Works</Offcanvas.Title>
@@ -373,4 +375,4 @@ const UploadVideoPage = () => {
   )
 }
 
-export default UploadVideoPage
+export default UploadVideoPage;

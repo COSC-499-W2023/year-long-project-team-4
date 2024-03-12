@@ -8,6 +8,7 @@ import {
   IP_ADDRESS
 } from "../Path";
 import axios from 'axios';
+import Sidebar from './Sidebar';
 import {Fade} from 'react-reveal';
 import "./ReceiveAndSendPage.css";
 import ViewSentVideoPage from './ViewSentVideoPage';
@@ -17,15 +18,16 @@ const ReceiveAndSendPage = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
+  const [activeTab, setActiveTab] = useState("uploadedVideos"); // Default active tab
   const [modal, setModal] = useState(true);
-
+  
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
         const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
-          withCredentials: true,
+          withCredentials: true
         });
-
+  
         if (response.data.email) {
           setCurrentUser(response.data.email);
         } else {
@@ -36,9 +38,9 @@ const ReceiveAndSendPage = () => {
         setErrorMessage('There was an error fetching the current user');
       }
     };
-
+  
     fetchCurrentUser();
-  }, []);
+  }, []);  
 
   return (
     <Fade>
@@ -59,52 +61,14 @@ const ReceiveAndSendPage = () => {
             <Modal.Body>{errorMessage}</Modal.Body>
           </Modal>
         )}
-        <div className="sidebar d-flex flex-column justify-content-between">
-          <button
-            className="nav-link active p-4 m-2"
-          >
-            Videos uploaded
-          </button>
-          <button 
-            className="nav-link p-4 m-2" 
-            data-bs-toggle="pill" 
-            data-bs-target="#viewVideos" 
-            type="button" 
-            role="tab" 
-            aria-controls="viewVideos" 
-            aria-selected="false"
-
-          >
-           Videos Received
-          </button>
-          <button
-            className="nav-link p-4 m-2" 
-            data-bs-toggle="pill" 
-            type="button" 
-            role="tab" 
-            aria-selected="false"
-            onClick={()=>navigate(uploadVideoPath)}
-            >
-            Upload Video
-            </button>
-        </div>
-        <div className="tab-content" id="v-pills-tabContent">
-          <div 
-            className="tab-pane fade show active" 
-            id="uploadedVideos" 
-            role="tabpanel">
-              <ViewSentVideoPage />
-          </div>
-          <div 
-            className="tab-pane fade" 
-            id="viewVideos" 
-            role="tabpanel">
-              <ViewVideoPage />
-          </div>
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <div className="content" style={{ marginLeft: "250px", height: "calc(100vh - 56px)", overflowY: "scroll" }}> {/* Adjust 56px to match your header height */}
+          
+          
         </div>
       </Container>
     </Fade>
-  )
-}
+  );
+};
 
-export default ReceiveAndSendPage
+export default ReceiveAndSendPage;

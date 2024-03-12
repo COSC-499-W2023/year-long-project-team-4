@@ -4,12 +4,10 @@ import Webcam from 'react-webcam';
 import record from "../Assets/record-btn.svg"
 import axios from "axios";
 import info from "../Assets/info-circle.svg"
-import back from "../Assets/arrow-left.svg"
 import { Fade } from 'react-reveal';
 import { IP_ADDRESS } from '../Path';
 import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
-import { receiveAndSendPath } from '../Path';
 
 const UploadVideoPage = () => {
   const [type, setType] = useState(1);
@@ -66,7 +64,7 @@ const UploadVideoPage = () => {
       [setRecordedChunks]
     );
 
-    const handleStopRecord =  React.useCallback(() => {
+  const handleStopRecord =  React.useCallback(() => {
       duration = Date.now() - startTime;
       setDisableRecord(true);
       setTime(duration);
@@ -74,8 +72,7 @@ const UploadVideoPage = () => {
       
       setCapturing(false);
 
-
-    }, [mediaRecorderRef, webcamRef, setCapturing]);
+  }, [mediaRecorderRef, webcamRef, setCapturing]);
 
   const handleSubmit =(e)=>{
     e.preventDefault();
@@ -100,10 +97,6 @@ const UploadVideoPage = () => {
     console.error('Error uploading video', error);
   });
    };
-
-   const sendMain = () => {
-    navigate(receiveAndSendPath);
-  }
 
    const handleChange = (event) => {
     try {
@@ -138,6 +131,7 @@ const UploadVideoPage = () => {
       setDisable(true);
     }
   }
+
   const handleBlur = () => {
     const videoData = new FormData();
     setLoad(true);
@@ -156,15 +150,11 @@ const UploadVideoPage = () => {
 
   return (
   <>
-    <Fade>
-      <Button className="m-2 float-end" variant="outline-dark" onClick={handleShow}>
-        <img src={info}></img>
-      </Button>
-    </Fade>
-    <Button className="m-2 float-start" variant="outline-dark" onClick={sendMain}>
-        <img src={back}></img>
+    
+    <Button className="m-2" variant="outline-dark" onClick={handleShow}>
+      <img src={info}></img>
     </Button>
-    <Offcanvas show={show} onHide={handleClose} backdrop="static">
+    <Offcanvas show={show} onHide={handleClose} backdrop="static" placement="end">
       <Offcanvas.Header closeButton>
             <Offcanvas.Title>How Uploading Videos Works</Offcanvas.Title>
       </Offcanvas.Header>
@@ -230,7 +220,7 @@ const UploadVideoPage = () => {
     </Modal>
     }
     <Fade>
-      <div className="position-absolute top-50 start-50 translate-middle text-center">
+      <div className="p-2 text-center">
         <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>
           <ToggleButton id="tbg-radio-1" value={1} onClick={()=>{handleType(1)}}>
             Upload Video

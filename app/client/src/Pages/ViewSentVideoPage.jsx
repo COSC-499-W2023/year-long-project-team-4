@@ -62,14 +62,14 @@ const ViewSentVideoPage = () => {
            <Col className="p-3">
                <div className="display-6"> Videos</div>
                {videos.map((video, index) => (
-                            <>
-                          <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                              <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                              <p>Video{index + 1}</p>
-                              </Button>
-                          </div>
-                          </>
-                      ))}
+                  <>
+                    <div key={index} onClick={() => handleVideoClick(video.videoName)}>
+                                <Button className='text-center mb-2' style={{minWidth: '150px'}}>
+                                <p>Video{index + 1}</p>
+                                </Button>
+                    </div>
+                  </>
+                ))}
           </Col>   
       </Row>      
           {errorMessage && <div className="error-message">{errorMessage}</div>}

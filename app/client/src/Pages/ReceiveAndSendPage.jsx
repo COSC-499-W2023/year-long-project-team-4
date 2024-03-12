@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from 'react'
-import {Button, Container,Modal} from 'react-bootstrap'
+import {Container,Modal} from 'react-bootstrap'
 import {useNavigate} from 'react-router-dom'
 import {
-  uploadVideoPath,
-  loginPath,
-  viewSentVideoPath,
   IP_ADDRESS
 } from "../Path";
+import UploadVideoPage from './UploadVideoPage';
 import axios from 'axios';
 import {Fade} from 'react-reveal';
 import "./ReceiveAndSendPage.css";
@@ -87,11 +85,12 @@ const ReceiveAndSendPage = () => {
           </button>
           <button
             className="nav-link p-4 m-2" 
-            data-bs-toggle="pill" 
+            data-bs-toggle="pill"
+            data-bs-target="#uploadVideos"  
             type="button" 
             role="tab" 
             aria-selected="false"
-            onClick={()=>navigate(uploadVideoPath)}
+            aria-controls="uploadVideos" 
             >
               Upload Video
           </button>
@@ -108,6 +107,12 @@ const ReceiveAndSendPage = () => {
             id="viewVideos" 
             role="tabpanel">
               <ViewVideoPage />
+          </div>
+          <div 
+            className="tab-pane fade mb-2" 
+            id="uploadVideos" 
+            role="tabpanel">
+              <UploadVideoPage/>
           </div>
         </div>
       </div>

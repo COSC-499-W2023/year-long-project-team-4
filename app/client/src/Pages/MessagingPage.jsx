@@ -8,10 +8,6 @@ import { receiveAndSendPath,
 import io from 'socket.io-client';
 import axios from 'axios';
 
-const socket = io(`${IP_ADDRESS}`,  {
-    withCredentials: true,
-  });
-
 function MessageSender() {
     const [message, setMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -32,6 +28,10 @@ function MessageSender() {
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
+
+    const socket = io(`${IP_ADDRESS}`,  {
+        withCredentials: true,
+    });
 
     useEffect(() => {
         // Auto-scroll to the bottom whenever messages change

@@ -34,7 +34,7 @@ s3_client = boto3.client(
     )
 
 if not LOCAL:
-    boto3.setup_default_session(profile_name='team4-dev')
+    # boto3.setup_default_session(profile_name='team4-dev')
     s3_client = boto3.client('s3')
 else:
     if not os.path.isdir('videos'):

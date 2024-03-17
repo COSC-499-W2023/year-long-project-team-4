@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 
 LOCAL = os.getenv('LOCAL') == 'True'
 
-if not LOCAL: # Flag for local or not
-    # RUN "AWS CONFIGURE SSO" before running code - this one included if local is not set to True 
-    boto3.setup_default_session(profile_name='team4-dev')
+# if not LOCAL: # Flag for local or not
+#     # RUN "AWS CONFIGURE SSO" before running code - this one included if local is not set to True 
+#     # boto3.setup_default_session(profile_name='team4-dev')
 
 
 def detect_faces(VideoFrame):

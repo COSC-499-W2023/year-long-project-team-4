@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ReactComponent as Person } from "../Assets/person.svg";
-import { ReactComponent as Logout } from "../Assets/box-arrow-right.svg";
+import { ReactComponent as Logo } from "../Assets/thislogo1.svg";
 import { Navbar, Button, OverlayTrigger, Modal, Tooltip } from "react-bootstrap";
 import { IP_ADDRESS, accountPath, homePath, loginPath, receiveAndSendPath } from "../Path";
 import { useState, useEffect } from "react";
@@ -65,53 +65,30 @@ const Header = () => {
     }
   
   return (
-   <> 
-    <Navbar className="bg-primary">
-    <Navbar.Brand onClick={handleLink}>
-      <div className="display-6 text-white">SafeMov</div>
-    </Navbar.Brand>
-    <>
-      {currentUser ? (
-        <Navbar.Collapse className="justify-content-end">
-          <OverlayTrigger
-            placement="bottom"
-            overlay={<Tooltip>Account Page</Tooltip>}
-          >
-            <Button className="m-2" href={accountPath}>
-              <Person fill={"white"} height="50" width="50" />
-            </Button>
-          </OverlayTrigger>
-          <OverlayTrigger
-            placement="bottom"
-            overlay={<Tooltip>Logout</Tooltip>}
-          >
-            <Button className="m-2" onClick={handleLogout}>
-              <Logout fill={"white"} height="50" width="50" />
-            </Button>
-          </OverlayTrigger>
-        </Navbar.Collapse>
-      ) : (
-        <></>
-      )}
+    <> 
+    <Navbar className="bg-primary" style={{ height: "80px", padding: "0 20px" }}>
+        <Navbar.Brand onClick={handleLink} className="me-auto" style={{ marginRight: "20px" }}>
+            <Logo />
+        </Navbar.Brand>
+    </Navbar>
+    {errorMessage && (
+        <Modal
+        show={modal}
+        onHide={() => setModal(false)}
+        backdrop="static"
+        keyboard={false}
+        variant="Danger"
+        contentClassName="bg-danger text-white"
+        >
+        <Modal.Header closeButton>
+            <Modal.Title>Error!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{errorMessage}</Modal.Body>
+        </Modal>
+    )}
     </>
-  </Navbar>
-  {errorMessage && (
-    <Modal
-      show={modal}
-      onHide={() => setModal(false)}
-      backdrop="static"
-      keyboard={false}
-      variant="Danger"
-      contentClassName="bg-danger text-white"
-    >
-      <Modal.Header closeButton>
-        <Modal.Title>Error!</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>{errorMessage}</Modal.Body>
-    </Modal>
-  )}
-  </>
-  )
+);
 }
+
 
 export default Header;

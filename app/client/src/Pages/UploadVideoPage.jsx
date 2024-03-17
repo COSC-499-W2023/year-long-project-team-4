@@ -10,7 +10,7 @@ import { IP_ADDRESS } from '../Path';
 import Sidebar from './Sidebar';
 import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
-import { receiveAndSendPath } from '../Path';
+import { receiveAndSendPath, viewSentVideoPath } from '../Path';
 
 const UploadVideoPage = () => {
   const [type, setType] = useState(1);
@@ -219,7 +219,7 @@ const UploadVideoPage = () => {
     {uploadSuccess && 
     <Modal 
       show={modal}
-      onHide={()=>setModal(false)}
+      onHide={()=>navigate(viewSentVideoPath)}
       backdrop="static"
       keyboard={false}
     >

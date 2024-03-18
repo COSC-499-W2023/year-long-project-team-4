@@ -10,6 +10,7 @@ import MessagingPage from "./Pages/MessagingPage";
 import ForgotPasswordPage from "./Pages/ForgotPasswordPage";
 import PasswordCodePage from "./Pages/PasswordCodePage";
 import "./app.css";
+import PrivateRoute from "./PrivateRoute";
 import {
   homePath,
   loginPath,
@@ -45,7 +46,9 @@ function App() {
         <Route path={registerPath} element={<RegisterPage />} />
         <Route path={MessagingPath} element={<MessagingPage />} />
         <Route path={viewSentVideoPath} element={<ViewSentVideoPage />} />
-        <Route path={accountPath} element={<AccountPage />} />
+        <Route element={<PrivateRoute />}>
+          <Route path={accountPath} element={<AccountPage />} />
+        </Route>
         <Route path={changePasswordPath} element={<ForgotPasswordPage />} />
         <Route path={passwordCodePath} element={<PasswordCodePage />} />
         <Route path={resetPasswordPath} element={<ResetPasswordPage />} />

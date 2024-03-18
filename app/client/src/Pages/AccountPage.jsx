@@ -9,6 +9,7 @@ import {useNavigate} from 'react-router-dom';
 import {
     MessagingPath,
     IP_ADDRESS,
+    loginPath,
   } from "../Path";
 import "./AccountPage.css";
 
@@ -38,25 +39,23 @@ const lastName = "lastname123";
 const email = currentUser;
 
 useEffect(() => {
-        const fetchCurrentUser = async () => {
-            try {
-              const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
-                withCredentials: true
-              });
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
+          withCredentials: true
+        });
         
-              if (response.data.email) {
-                setCurrentUser(response.data.email);
-              if (response.data.email) {
-                setCurrentUser(response.data.email);
-              } else {
-                console.error('No user currently logged in');
-              }
-            }
-            } catch (error) {
-              console.error('There was an error fetching the current user', error);
-            }
-          fetchCurrentUser();
-}});
+        if (response.data.email) {
+          setCurrentUser(response.data.email);
+        } else {
+          console.error('No user currently logged in');
+        }
+      } catch (error) {
+        console.error('There was an error fetching the current user', error);
+      }
+      fetchCurrentUser();
+}
+},[currentUser]);
 
 const handleStartChat = (e, videoName) => {
   e.preventDefault();

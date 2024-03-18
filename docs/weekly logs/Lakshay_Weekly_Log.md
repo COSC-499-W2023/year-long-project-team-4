@@ -370,3 +370,22 @@ Completed:
 Additional Context:
 - Fixing up errors that came up during peer testing 2
 
+# Term 2 Week 10: March 11 - March 17 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="796" alt="Screenshot 2024-03-17 at 9 45 08 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/b71aa4ef-f454-4b10-80fb-7c9e95a262cc">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Design for displaying videos and video information
+- Understand backend implementation for video tags
+
+Tasks from the Project Board:
+- Webpage Creation
+
+Completed:
+- Design for displaying videos and video information
+- Understand backend implementation for video tags
+
+Additional Context:
+

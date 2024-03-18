@@ -228,14 +228,14 @@ def login():
     email = query_results['email']
 
     session['email'] = email
-    session['pkey_seed'] = password + salt_hash.hex()
+    session['private_key'] = generate_key(password + salt_hash.hex()).export_key()
 
     return jsonify({'email': email}), 200
 
 
 @auth.route('/logout')
 def logout():
-    session.pop('pkey_seed', None)
+    session.pop('private_key', None)
     session.pop('email', None)
     return jsonify({'success': 'Successful logout'}), 200
 

@@ -51,7 +51,7 @@ def get_public_key(email):
         return None
 
 def get_private_key():
-    return generate_key(session['pkey_seed'])
+    return RSA.import_key(session['private_key'])
 
 def aes_encrypt_video(data, aes256_key=None):
     if aes256_key is None:
@@ -537,7 +537,7 @@ def change_password_reencrypt():
             database.delete_record("videos", "videoName = %s", videos1["videoName"])
             #Reencrypt
             aes_key = bytes
-            session['pkey_seed'] = private_key_seed
+            session['private_key'] = private_key.export_key()
             encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
             #Insert into s3Bucket (sent videos first)
             video_name = videos1['videoName']
@@ -569,7 +569,7 @@ def change_password_reencrypt():
             s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
             database.delete_record("videos", "videoName = %s", videos2["videoName"])
             #Reencrypt
-            session['pkey_seed'] = private_key_seed
+            session['private_key'] = private_key.export_key()
             aes_key = bytes
             encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
             print(aes_key)

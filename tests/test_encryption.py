@@ -62,7 +62,7 @@ def rsa_decrypt_aes256_key(encrypted_aes256_key, rsa_private_key):
 def test_reconstruct_private_key(client):
     # Reset database and signup
     assert database.resetTable(tableName="userprofile")
-    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
 
@@ -86,7 +86,7 @@ def test_reconstruct_private_key(client):
 # Encrypt an AES key then decrypt it with correct private key
 def test_encrypt_decrypt_key_success(client):
     assert database.resetTable(tableName="userprofile")
-    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
 
@@ -111,7 +111,7 @@ def test_encrypt_decrypt_key_success(client):
 # Encrypt an AES key then try to decrypt it with the wrong private key
 def test_encrypt_decrypt_key_fail(client):
     assert database.resetTable(tableName="userprofile")
-    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
 
@@ -160,7 +160,7 @@ def test_end_to_end(client):
     test_message = Random.get_random_bytes(512)
 
     assert database.resetTable(tableName="userprofile")
-    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
 
@@ -192,7 +192,7 @@ def test_end_to_end(client):
 # Create an account, upload a video to self, retrieve the video, compare to original
 def test_video_upload_download(client):
     # Setup some test data
-    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     file = 'test_video.mp4'
     data = {
         'recipient': post_object['email'],
@@ -204,6 +204,14 @@ def test_video_upload_download(client):
     assert database.resetTable(tableName="videos")
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
+
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(post_object['email'],))[0]['verifyKey']
+    post_object2 = {'input_code': f'{inputcode}', 'email': post_object['email']}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object2).data.decode('utf-8'))
+    assert not 'error' in response
+
+    login_response = json.loads(client.post('/auth/login', data=post_object).data.decode('utf-8'))
+    assert login_response.get('email') == post_object['email'] # Ensure we are now logged in
 
     # Upload our test video
     upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
@@ -218,7 +226,7 @@ def test_video_upload_download(client):
 
 def test_video_tags_valid(client):
     # Setup some test data
-    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     file = 'test_video.mp4'
     data = {
         'recipient': post_object['email'],
@@ -231,6 +239,14 @@ def test_video_tags_valid(client):
     assert database.resetTable(tableName="videos")
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
+
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(post_object['email'],))[0]['verifyKey']
+    post_object2 = {'input_code': f'{inputcode}', 'email': post_object['email']}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object2).data.decode('utf-8'))
+    assert not 'error' in response
+
+    login_response = json.loads(client.post('/auth/login', data=post_object).data.decode('utf-8'))
+    assert login_response.get('email') == post_object['email'] # Ensure we are now logged in
 
     # Upload our test video with the tags ['one', 'two']
     upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
@@ -263,7 +279,7 @@ def test_video_tags_valid(client):
 
 def test_video_tags_invalid(client):
     # Setup some test data
-    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    post_object = {'username': 'test123','email': 'test123@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     file = 'test_video.mp4'
     data = {
         'recipient': post_object['email'],
@@ -276,6 +292,14 @@ def test_video_tags_invalid(client):
     assert database.resetTable(tableName="videos")
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
+
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(post_object['email'],))[0]['verifyKey']
+    post_object2 = {'input_code': f'{inputcode}', 'email': post_object['email']}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object2).data.decode('utf-8'))
+    assert not 'error' in response
+
+    login_response = json.loads(client.post('/auth/login', data=post_object).data.decode('utf-8'))
+    assert login_response.get('email') == post_object['email'] # Ensure we are now logged in
 
     # Upload our test video with the tags ['one', 'two']
     upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))

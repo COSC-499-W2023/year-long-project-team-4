@@ -31,6 +31,7 @@ function MessageSender() {
 
     const socket = io(`${IP_ADDRESS}`,  {
         withCredentials: true,
+        autoConnect: false
     });
 
     useEffect(() => {
@@ -41,6 +42,7 @@ function MessageSender() {
     // Fetch existing chat messages on component mount or when videoName changes
     useEffect(() => {
         if (videoName) {
+            socket.connect();
             setIsLoading(true);
 
             const formData = new FormData();
@@ -63,50 +65,23 @@ function MessageSender() {
             socket.emit('join_chat', { chat_name: videoName });
       
             socket.on('new_chat_message', (newMessage) => {
-                console.log("kinda working");
+                console.log("New chat message");
                 setChatMessages((prevMessages) => [...prevMessages, newMessage]);
             });
 
             socket.on('chat_history', (messages) => {
+                console.log("Chat history");
                 setChatMessages(messages);
-
-                /*const roomName = messages.find(message => message.sender !== currentUser);
-                console.log(roomName['sender']);
-                if (roomName && !chatRoomName) {
-                    setChatRoomName(`${roomName['sender']}'s Room`);
-                    console.log("hey")
-                    console.log(chatRoomName);
-                }*/
             });
 
             // Clean up on component unmount
             return () => {
                 socket.off('new_chat_message');
                 socket.off('chat_history');
+                socket.disconnect();
             };
         }
     }, [videoName]);
-
-    useEffect(() => {
-        const fetchCurrentUser = async () => {
-          try {
-            const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
-              withCredentials: true
-            });
-      
-            if (response.data.email) {
-              setCurrentUser(response.data.email);
-            } else {
-              console.error('No user currently logged in');
-            }
-          } catch (error) {
-            console.error('There was an error fetching the current user', error);
-            setErrorMessage('There was an error fetching the current user');
-          }
-        };
-      
-        fetchCurrentUser();
-      }, []);  
 
     //Navigate back to view videos
     const handleBack = () => {
@@ -128,6 +103,7 @@ function MessageSender() {
         e.preventDefault();
 
         if (message.trim()) {
+            socket.connect();
             socket.emit('send_chat_message', { chat_name: videoName, message: message });
             setMessage(''); // Clear the input after sending
         } else {

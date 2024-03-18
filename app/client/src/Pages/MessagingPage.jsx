@@ -81,7 +81,7 @@ function MessageSender() {
                 socket.disconnect();
             };
         }
-    }, [videoName]);
+    }, []);
 
     //Navigate back to view videos
     const handleBack = () => {

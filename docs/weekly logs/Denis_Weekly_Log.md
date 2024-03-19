@@ -373,5 +373,26 @@ Completed:
 
 Additional Context:
 - Finally got the SSL certificate up and working just before the Peer Test! (Woohoo)
-- Started documentation/updating the ReadMe under the Documentation Branch.  
+- Started documentation/updating the ReadMe under the Documentation Branch.
+
+# Term 2 Week 10: March 11 - March 17 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![WhatIDid](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/725654b2-df22-4342-9dc5-58618ac6c651)
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Documentation
+- Small front end edits
+
+Tasks from the Project Board:
+- Documentation
+- Peer testing 2 fixes
+
+Completed:
+- Nothing fully completed. Added more to the readme, pretty much done that. Now to start on the Individual project + small front end touches
+  
+Additional Context:
+
 

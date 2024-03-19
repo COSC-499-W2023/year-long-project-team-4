@@ -302,3 +302,19 @@ Tasks from project board:
 
 Completed:
 - Started making a sidebar that will be constant throughout site
+
+# Week 9: March 11 - March 17
+
+## Tasks Completed:
+
+![2Week9act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/7631d9c7-fed3-490e-b71e-3cce9d5bf630)
+
+## Goal Recap:
+
+Tasks from project board:
+- Frontend cleanup
+
+Completed:
+- Added the logout and account buttons to side bar
+- General tweaks to make the sidebar and header look nicer, sizing, different hover and clicked colours, etc
+- Added logo to header

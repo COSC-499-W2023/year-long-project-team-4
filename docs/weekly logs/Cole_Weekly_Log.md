@@ -276,3 +276,25 @@ Tasks from the project board relevant to things I worked on:
 Currently working on:
 - Going to move to various frontend things that need cleanup
 - Also general cleanup on backend stuff as it is needed
+
+
+# Term 2 Week (9): Mar 10 - Mar 17
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/1684dbb4-5bce-4a54-9654-c579692f364c)
+
+## Goal Recap:
+Things I worked on:
+- Learned how React components mount / dismount as well as specifics around mount behaviour with strict mode
+- Traced why repeat requests were being made
+- Fixed an issue where sockets wouldn't disconnect upon the component being dismounted
+- Traced backend bottleneck down to private key handling issue and fixed it, resulting in ~80% time reduction upon loading videos and chats
+- Fixed testcase unrelated to these issues (related to password requirements that changed a few weeks ago)
+  
+Tasks from the project board relevant to things I worked on:
+- Creating chats
+- Encrypting and decrypting chats
+- Public / private key generation
+
+Currently working on:
+- Need to figure this out at Tuesday class, since I finished everything that was on my list for this week.

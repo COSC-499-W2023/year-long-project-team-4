@@ -51,7 +51,7 @@ def get_public_key(email):
         return None
 
 def get_private_key():
-    return generate_key(session['pkey_seed'])
+    return RSA.import_key(session['private_key'])
 
 def aes_encrypt_video(data, aes256_key=None):
     if aes256_key is None:
@@ -247,7 +247,7 @@ def retrieve_video():
     # Send the data in the buffer as mp4
     return send_file(video_data, mimetype='video/mp4'), 200
 
-@bucket.route('/getvideos', methods=['GET'])
+@bucket.route('/getvideos', methods=['GET', 'POST'])
 def get_available_videos():
     # Get videos
     available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
@@ -266,7 +266,7 @@ def get_available_videos():
 
     return json.dumps(available_videos), 200
     
-@bucket.route('/get_sent_videos', methods=['GET'])
+@bucket.route('/get_sent_videos', methods=['GET', 'POST'])
 def get_sent_videos():
     available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
 
@@ -539,7 +539,7 @@ def change_password_reencrypt():
             database.delete_record("videos", "videoName = %s", videos1["videoName"])
             #Reencrypt
             aes_key = bytes
-            session['pkey_seed'] = private_key_seed
+            session['private_key'] = private_key.export_key()
             encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
             #Insert into s3Bucket (sent videos first)
             video_name = videos1['videoName']
@@ -571,7 +571,7 @@ def change_password_reencrypt():
             s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
             database.delete_record("videos", "videoName = %s", videos2["videoName"])
             #Reencrypt
-            session['pkey_seed'] = private_key_seed
+            session['private_key'] = private_key.export_key()
             aes_key = bytes
             encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
             print(aes_key)

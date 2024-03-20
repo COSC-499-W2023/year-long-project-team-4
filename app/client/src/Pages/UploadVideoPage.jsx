@@ -26,6 +26,7 @@ const UploadVideoPage = () => {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [show, setShow] = useState(false);
   const [load, setLoad] = useState(false);
+  const [retentionPeriod, setRetentionPeriod] = useState(90);
   const [modal, setModal] = useState(true);
 
   let startTime;
@@ -286,8 +287,19 @@ const UploadVideoPage = () => {
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
           </Form.Group>
+          <Form.Group controlId="formRetentionPeriod" className="mb-3">
+            <Form.Label className="text-black">Retention Period in days (1-365)</Form.Label>
+            <Form.Control 
+              type="number" 
+              required 
+              min="1" max="365" 
+              placeholder="Enter retention period in days" 
+              value={retentionPeriod} 
+              onChange={(e) => setRetentionPeriod(e.target.value)} 
+            />
+          </Form.Group>
           <Button onClick={()=>{handleBlur()}} disabled={file? false : true}>Blur video</Button> {' '}
-          <Button type="submit">Send video</Button>
+          <Button  variant="info" type="submit">Send video</Button>
         </Form>
         ):
         (
@@ -343,12 +355,14 @@ const UploadVideoPage = () => {
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
           </Form.Group>
-          <div className="mb-2">
-            <Button className="mt-2" onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}
-            <Button className="mt-2" onClick={()=>{handleRetake()}} disabled={disable}>Retake video</Button> {' '}
-            <Button className="mt-2" onClick={()=>{handleBlur()}} disabled={disable}>Blur video</Button> {' '}
-            <Button className="mt-2"type="submit" disabled={disable}>Send video</Button>
-          </div> 
+          <div className="mt-2">
+            <Button onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}
+            <Button onClick={()=>{handleRetake()}} disabled={disable}>Retake video</Button> {' '}
+            <Button onClick={()=>{handleBlur()}} disabled={disable}>Blur video</Button> {' '}
+          </div>
+          <div className="d-grid p-4 ">
+            <Button type="submit"  variant="info" disabled={disable}>Send video</Button>
+          </div>
         </Form>   
         </>
         )

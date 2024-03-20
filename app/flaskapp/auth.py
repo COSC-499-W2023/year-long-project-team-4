@@ -186,12 +186,12 @@ def confirm_user():
     # Check if input code is same as emailed
     if input_code == created_code:
         # Set verified to True
-        result = database.update_user(user_email = email, new_verifiedAcc = 'True')
+        result = database.update_user(user_email=email, new_verifiedAcc=True)
         
         if result == 1:
             return jsonify({'status': 'success', 'message': 'Email verified'}), 200
         else:
-            return jsonify({'error': 'Unknown error verifying email'})
+            return jsonify({'error': 'Unknown error verifying email'}), 503
     elif input_code != created_code:
         return (jsonify({"status": "error", "message": "codes do not match"}),502)
     else:
@@ -220,7 +220,7 @@ def login():
     
     # Check email verified
     email_verified = database.query_records(table_name='userprofile', fields='verifiedAcc', condition=f'email = %s', condition_values=(email,))[0]
-    if not email_verified:
+    if not email_verified['verifiedAcc']:
         return jsonify({'error': 'User email is not verified'}), 404
 
     query_results = database.query_records(table_name='userprofile', fields='salthash, email', condition=f'email = %s', condition_values=(email,))[0]
@@ -228,14 +228,14 @@ def login():
     email = query_results['email']
 
     session['email'] = email
-    session['pkey_seed'] = password + salt_hash.hex()
+    session['private_key'] = generate_key(password + salt_hash.hex()).export_key()
 
     return jsonify({'email': email}), 200
 
 
 @auth.route('/logout')
 def logout():
-    session.pop('pkey_seed', None)
+    session.pop('private_key', None)
     session.pop('email', None)
     return jsonify({'success': 'Successful logout'}), 200
 

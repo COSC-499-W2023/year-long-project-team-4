@@ -9,6 +9,8 @@ import axios from 'axios'
 import {Fade} from 'react-reveal';
 import {ReactComponent as See} from '../Assets/eye.svg';
 import {ReactComponent as UnSee} from '../Assets/eye-slash.svg';
+import PasswordCheckList from "react-password-checklist"; 
+
 
 
 const RegisterPage = () => {

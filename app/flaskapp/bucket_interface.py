@@ -523,7 +523,7 @@ def change_password_reencrypt():
         public_key = private_key.publickey().export_key('PEM')
         hashed_password = bcrypt.generate_password_hash(new_password).decode()
         #Insert new info into database
-        database.update_user(user_email = user_email, new_password_hash = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+        database.update_user(user_email = user_email, new_password_hash = hashed_password, new_salt_hash = salt_hash, new_public_key = public_key)
 
         #Loop through videos to reencrypt and insert back to database and s3Bucket
         for videos1 in videos_to_decrypt2:        
@@ -664,7 +664,7 @@ def change_password_forgot():
         public_key = private_key.publickey().export_key('PEM')
         hashed_password = bcrypt.generate_password_hash(new_password).decode()
         #Insert new info into database
-        database.update_user(user_email = email, new_password_hash = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+        database.update_user(user_email = email, new_password_hash = hashed_password, new_salt_hash = salt_hash, new_public_key = public_key)
         
         #Get recieved videos that need key deleted
         videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'receiverEmail = %s', condition_values=(email,))

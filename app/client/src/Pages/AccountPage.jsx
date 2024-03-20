@@ -165,6 +165,8 @@ return (
                       <InputGroup.Text id="inputGroup-sizing-sm">First Name</InputGroup.Text>
                       <Form.Control
                         type="text"
+                        value={currentFirstName}
+                        onChange={(e)=>{setCurrentFirstName(e.target.value)}}
                         required
                       />
                     </InputGroup>
@@ -172,6 +174,8 @@ return (
                       <InputGroup.Text id="inputGroup-sizing-sm">Last Name</InputGroup.Text>
                       <Form.Control
                         type="text"
+                        value={currentLastName}
+                        onChange={(e)=>{setCurrentLastName(e.target.value)}}
                         required
                       />
                      </InputGroup> 
@@ -179,6 +183,8 @@ return (
                       <InputGroup.Text id="inputGroup-sizing-sm">Email</InputGroup.Text>
                       <Form.Control
                         type="email"
+                        value={email}
+                        onChange={(e)=>{setCurrentUser(e.target.value)}}
                         required
                       />
                     </InputGroup>

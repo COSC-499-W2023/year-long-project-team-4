@@ -3,8 +3,8 @@ import {useState} from "react";
 import { Container,Form,InputGroup,Button,Alert, CloseButton } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { IP_ADDRESS, loginPath } from '../Path'
-import see from '../Assets/eye.svg';
-import unSee from '../Assets/eye-slash.svg';
+import {ReactComponent as See} from '../Assets/eye.svg';
+import {ReactComponent as UnSee} from '../Assets/eye-slash.svg';
 import axios from "axios";
 import PasswordCheckList from "react-password-checklist";
 
@@ -27,9 +27,9 @@ const PasswordCodePage = () => {
   const handleReset = async(passcode, email, password) => {
   try {
     await axios.post(`${IP_ADDRESS}/bucket/change_password_forgot`, {
-         passcode: passcode,
+         input_code: passcode,
          email: email,
-         password: password,
+         new_password: password,
        }, {
          headers: {
            'Content-Type': 'application/x-www-form-urlencoded'
@@ -49,7 +49,7 @@ const PasswordCodePage = () => {
 
   
   return (
-    <Container className="position-absolute top-50 start-50 translate-middle text-white">
+    <Container className="position-absolute top-50 start-50 translate-middle">
         {errorMessage ? (
         <Alert show={show} variant="danger">
           <div className="d-flex justify-content-end">
@@ -59,8 +59,8 @@ const PasswordCodePage = () => {
         </Alert>):(<></>)
         }
         <Form onSubmit={handleSubmit}>
-            <div className="text-white text-center display-4"> Enter new Password</div>
-            <div className="text-white"> Enter passcode</div>
+            <div className="text-center display-4"> Enter new Password</div>
+            <div> Enter passcode</div>
             <InputGroup className="mt-2">
               <InputGroup.Text id="inputGroup-sizing-lg">Passcode</InputGroup.Text>
               <Form.Control
@@ -86,7 +86,7 @@ const PasswordCodePage = () => {
                 variant="primary" 
                 onClick={()=> setType(!type)}
                 >
-                {!type? <img src={see}/> :<img src={unSee}/>}
+                {!type? <See fill={"white"}/> :<UnSee fill={"white"}/>}
                 </Button>
             </InputGroup>
             <PasswordCheckList

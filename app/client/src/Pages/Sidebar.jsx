@@ -6,7 +6,7 @@ import './Sidebar.css';
 import { Navbar, Button, OverlayTrigger, Modal, Tooltip } from "react-bootstrap";
 import { ReactComponent as Logout } from "../Assets/box-arrow-right.svg";
 import { ReactComponent as Person } from "../Assets/person.svg";
-import { IP_ADDRESS, accountPath, homePath, viewSentVideoPath, viewVideoPath, receiveAndSendPath, uploadVideoPath, loginPath} from "../Path";
+import { IP_ADDRESS, accountPath, homePath, viewSentVideoPath, viewVideoPath, uploadVideoPath, loginPath} from "../Path";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import ViewSentVideoPage from './ViewSentVideoPage';
@@ -68,7 +68,7 @@ const Sidebar = () => {
 
     const handleLink = () => {
       if (currentUser) {
-        navigate(receiveAndSendPath);
+        navigate(viewSentVideoPath);
       } else {
         navigate(loginPath);
       }
@@ -102,23 +102,6 @@ const Sidebar = () => {
           Upload Video
         </NavLink>
   
-        {/* Person and Logout buttons */}
-        <div className="bottom-buttons">
-          <OverlayTrigger
-            overlay={<Tooltip>Account Page</Tooltip>}
-          >
-            <Button className="white-button person" href={accountPath}>
-              <Person height="30" width="30" />
-            </Button>
-          </OverlayTrigger>
-          <OverlayTrigger
-            overlay={<Tooltip>Logout</Tooltip>}
-          >
-            <Button className="white-button" onClick={handleLogout}>
-              <Logout height="30" width="30" />
-            </Button>
-          </OverlayTrigger>
-        </div>
        
         {/* Modal for error message */}
         {errorMessage && (

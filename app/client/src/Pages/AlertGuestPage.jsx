@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Alert } from 'react-bootstrap'
 import { Fade } from 'react-reveal'
-import { loginPath, receiveAndSendPath } from '../Path'
+import { loginPath, uploadVideoPath } from '../Path'
 
 const AlertGuestPage = () => {
   return (
@@ -17,7 +17,7 @@ const AlertGuestPage = () => {
                 all features of this app.
                 <p className="p-2">
                     <Button variant="outline-primary" href={loginPath}>login</Button> {" "}
-                    <Button variant="outline-danger" href={receiveAndSendPath}>continue</Button>
+                    <Button variant="outline-danger" href={uploadVideoPath}>continue</Button>
                 </p>
             </Alert>
         </Fade>     

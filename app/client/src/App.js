@@ -35,11 +35,11 @@ function App() {
   return (
     <Router>
       <Header />
+
       <Routes>
         <Route path={homePath} element={<HomePage />} />
         <Route path={loginPath} element={<LoginHomePage />} />
         <Route path={guestPath} element={<AlertGuestPage />} />
-        <Route path={receiveAndSendPath} element={<ReceiveAndSendPage />} />
         <Route path={uploadVideoPath} element={<UploadVideoPage />} />
         <Route path={viewVideoPath} element={<ViewVideoPage />} />
         <Route path={registerPath} element={<RegisterPage />} />

@@ -10,7 +10,7 @@ import { IP_ADDRESS } from '../Path';
 import Sidebar from './Sidebar';
 import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
-import { receiveAndSendPath, viewSentVideoPath } from '../Path';
+import { viewSentVideoPath } from '../Path';
 
 const UploadVideoPage = () => {
   const [type, setType] = useState(1);
@@ -103,7 +103,7 @@ const UploadVideoPage = () => {
    };
 
    const sendMain = () => {
-    navigate(receiveAndSendPath);
+    navigate(viewSentVideoPath);
   }
 
    const handleChange = (event) => {

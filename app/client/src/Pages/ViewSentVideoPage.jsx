@@ -26,6 +26,7 @@ const ViewSentVideoPage = () => {
   
   // Fetch sent videos on component mount
   useEffect(() => {
+
     socket.on('connect', () => {
         console.log('Connected to the server');
       });
@@ -44,6 +45,8 @@ const ViewSentVideoPage = () => {
     socket.on('disconnect', (reason) => {
         console.log(`Disconnected from the server due to ${reason}`);
     });
+
+   
 
     return () => {
         socket.off('connect');

@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Row, Col, Button, Modal} from 'react-bootstrap';
 import { Container } from 'react-bootstrap';
-import { receiveAndSendPath } from '../Path';
+import { viewSentVideoPath } from '../Path';
 import axios from 'axios';
 import {Fade} from 'react-reveal';
 import Sidebar from './Sidebar';
@@ -22,6 +22,7 @@ const ViewVideoPage = () => {
   
   //Fetch videos on component mount
   useEffect(() => {
+    
       // Replace with the correct URL of your backend
       axios.get(`${IP_ADDRESS}/bucket/getvideos`, {
           withCredentials: true})

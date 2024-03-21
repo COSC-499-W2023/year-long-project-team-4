@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Card, Col, Button, Row, ListGroup, Tab, Form, Modal, Tabs, InputGroup} from 'react-bootstrap';
-import { homePath, receiveAndSendPath } from '../Path';
+import { homePath, viewSentVideoPath } from '../Path';
 import {Fade} from 'react-reveal';
 import axios from 'axios';
 import see from '../Assets/eye.svg';
@@ -31,7 +31,7 @@ const handleDelete = () =>{
 }
 
 const sendMain = () => {
-  navigate(receiveAndSendPath);
+  navigate(viewSentVideoPath);
 }
 const firstName = "firstname123";
 const lastName = "lastname123";

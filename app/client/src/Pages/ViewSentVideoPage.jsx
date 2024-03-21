@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Row, Col, Button} from 'react-bootstrap';
+import {Row, Col, Button, Card} from 'react-bootstrap';
 import { receiveAndSendPath } from '../Path';
 import axios from 'axios';
 // Animation library for smooth transitions
@@ -39,25 +39,29 @@ const ViewSentVideoPage = () => {
   };
 
   return (
-     <Fade cascade>
+    <Fade cascade>
       <Row>
-          <div className="display-4 text-center"> Videos Uploaded </div>
-           <Col className="p-3">
-               <div className="display-6"> Videos</div>
-               {videos.map((video, index) => (
-                            <>
-                          <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                              <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                              <p>Video{index + 1}</p>
-                              </Button>
-                          </div>
-                          </>
-                      ))}
-          </Col>   
-      </Row>      
-          {errorMessage && <div className="error-message">{errorMessage}</div>}
-     </Fade>
-    )
+        <div className="display-4 text-center">Videos Received</div>
+        <Col className="p-3">
+          <div className="display-6">Videos</div>
+          {videos.map((video, index) => (
+            <Card key={index} className="mb-3" onClick={() => handleVideoClick(video.videoName)}>
+              <Card.Body>
+                <Card.Title>{video.videoName}</Card.Title>
+                <Card.Text>
+                  Sender's Email: <br />
+                  Sender's Name: <br />
+                  Tags: 
+                </Card.Text>
+                <Button variant="primary">View Video</Button>
+              </Card.Body>
+            </Card>
+          ))}
+        </Col>
+      </Row>
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
+    </Fade>
+  )
   }
   
   export default ViewSentVideoPage

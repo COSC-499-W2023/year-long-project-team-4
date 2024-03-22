@@ -131,6 +131,10 @@ def upload_video():
     sender_email = ''
     if 'email' in session:
         sender_email = session['email']
+        
+        if sender_email == recipient_email:
+            return jsonify({'error': 'Can not be the sender and recipient of the video'}),412
+        
         sender_public_key = get_public_key(session['email'])
         sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
         if not create_chat(video_name, retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):
@@ -498,7 +502,6 @@ def retrieve_chat(name):
 
 @bucket.route('/change_password_reencrypt', methods=['POST'])
 def change_password_reencrypt():
-
     new_password = request.form.get('new_password')
     if new_password is None:
         return jsonify({'error': 'Missing password'}), 400
@@ -551,7 +554,6 @@ def change_password_reencrypt():
             recipient_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, recipient_public_key)
             #Upload video
             proceed = s3Bucket.already_existing_file(video_path)
-            print(sender_encrypted_aes_key) 
             if (proceed == False):
                 s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
             insert_video = s3Bucket.encrypt_insert(file_flag = 'videos', file_content = encrypted_video, file_name = video_name, retDate = retention_date, senderEmail = sender_email, receiverEmail = receiver_email, senderEncryption = sender_encrypted_aes_key, receiverEncryption = recipient_encrypted_aes_key)

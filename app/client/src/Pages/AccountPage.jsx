@@ -89,10 +89,8 @@ const handleDelete = () => {
   )
   .then(response => {
     if (response.status === 200) {
-      // Redirect to the home path
       navigate(homePath);
     } else {
-      // Handle other status codes if needed
       console.log(response);
       setErrorMessage('There was an error deleting your account');
     }

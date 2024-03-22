@@ -80,15 +80,24 @@ const handleUpdate =(firstname,lastname,email,password) => {
 }
 
 const handleDelete = () => {
-  try {
-    axios.post(
-      `${IP_ADDRESS}/auth/deleteaccount`,
-      null,
-      {
-        withCredentials: true,
-      }
-    );
-  } catch (error) {
+  axios.post(
+    `${IP_ADDRESS}/auth/deleteaccount`,
+    null,
+    {
+      withCredentials: true,
+    }
+  )
+  .then(response => {
+    if (response.status === 200) {
+      // Redirect to the home path
+      navigate(homePath);
+    } else {
+      // Handle other status codes if needed
+      console.log(response);
+      setErrorMessage('There was an error deleting your account');
+    }
+  })
+  .catch(error => {
     if (error.response && error.response.data && error.response.data.error) {
       console.log(error);
       setErrorMessage(error.response.data.error);
@@ -96,7 +105,7 @@ const handleDelete = () => {
       console.log(error);
       setErrorMessage('There was an error deleting your account');
     }
-  }
+  });
 };
 
 const sendMain = () => {

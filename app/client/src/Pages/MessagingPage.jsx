@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { Fade } from 'react-reveal';
 import { Container, Row, Col, Button, Form, Card, InputGroup, Spinner } from 'react-bootstrap';
 import { viewSentVideoPath,
     IP_ADDRESS,
  } from '../Path';
 import io from 'socket.io-client';
+import Sidebar from './Sidebar';
 import axios from 'axios';
 
 const socket = io(`${IP_ADDRESS}`,  {
@@ -136,10 +138,13 @@ function MessageSender() {
     };
     return (
         <>
+        <Fade>
+          <Sidebar />
+          </Fade>
           <Container fluid style={{ marginTop: '20px', padding: '0 20px' }}>
             <Row noGutters={true}>
               {/* Video playback column (60% width) */}
-              <Col md={7} style={{ paddingRight: '15px' }}>
+              <Col md={{ span: 6, offset: 2 }} style={{ paddingRight: '15px' }}>
                 <div className="video-wrapper" style={{ width: '100%', height: 'auto', padding: '10px', backgroundColor: '#f8f9fa' }}>
                     {isLoading ? (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
@@ -153,7 +158,7 @@ function MessageSender() {
                 </div>
               </Col>
               {/* Messages column (40% width) */}
-              <Col md={5} style={{ paddingLeft: '15px' }}>
+              <Col md={4} style={{ paddingLeft: '15px' }}>
                 <Card style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <Card.Header style={{ padding: '10px 20px' }}>
                     <Card.Title>Messages</Card.Title>
@@ -188,11 +193,6 @@ function MessageSender() {
                 </Card>
               </Col>
             </Row>
-            <Row className="mt-3">
-              <Col className="text-center">
-                <Button variant="secondary" onClick={handleBack} style={{ margin: '20px' }}>Go Back to Videos</Button>
-              </Col>
-            </Row>
             {errorMessage && (
               <Row className="mt-3">
                 <Col>
@@ -201,6 +201,7 @@ function MessageSender() {
               </Row>
             )}
           </Container>
+         
         </>
       );      
 }

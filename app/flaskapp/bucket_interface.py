@@ -500,7 +500,6 @@ def retrieve_chat(name):
 def change_password_reencrypt():
 
     new_password = request.form.get('new_password')
-    print(new_password)
     if new_password is None:
         return jsonify({'error': 'Missing password'}), 400
     #Make sure user is logged in
@@ -528,6 +527,7 @@ def change_password_reencrypt():
         #Loop through videos to reencrypt and insert back to database and s3Bucket
         for videos1 in videos_to_decrypt2:        
             #Decrypt
+            print("Video in Sender")
             encrypted_aes_key = database.query_records(table_name='videos', fields='senderEncryption', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]['senderEncryption']
             retention_date = database.query_records(table_name='videos', fields='retDate', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]['retDate']
             aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
@@ -561,6 +561,7 @@ def change_password_reencrypt():
         #Repeat but for recieved videos
         for videos2 in videos_to_decrypt1:
             #Decrypt
+            print("Video in receiver")
             query_result = database.query_records(table_name='videos', fields='receiverEncryption', condition=f'videoName = %s', condition_values=(videos2['videoName'],))[0]
             video_details = database.query_records(table_name='videos', fields='retDate, senderEmail', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]
             encrypted_aes_key = query_result['receiverEncryption']
@@ -579,7 +580,7 @@ def change_password_reencrypt():
             video_name = videos2['videoName']
             retention_date = video_details["retDate"]
             sender_email = video_details["senderEmail"]
-            receiver_email - user_email
+            receiver_email = user_email
                 
             sender_public_key = get_public_key(sender_email)
             sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)

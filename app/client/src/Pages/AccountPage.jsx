@@ -79,9 +79,26 @@ const handleUpdate =(firstname,lastname,email,password) => {
   }
 }
 
-const handleDelete = () =>{
-  navigate(homePath);
-}
+const handleDelete = async () => {
+  try {
+    await axios.post(
+      `${IP_ADDRESS}/auth/deleteaccount`,
+      null,
+      {
+        withCredentials: true,
+      }
+    );
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.error) {
+      console.log(error);
+      setErrorMessage(error.response.data.error);
+    } else {
+      // Set a generic error message for other types of errors
+      console.log(error);
+      setErrorMessage('There was an error deleting your account');
+    }
+  }
+};
 
 const sendMain = () => {
   navigate(receiveAndSendPath);

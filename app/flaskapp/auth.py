@@ -282,6 +282,7 @@ def get_user_details():
         return jsonify({'firstname': firstname, 'lastname': lastname, 'email': email}), 200
     return jsonify({'error': 'No user currently logged in'}), 401
 
+
 @auth.route('/deleteaccount', methods=["POST"])
 def delete_account():
     if 'email' in session:

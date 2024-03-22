@@ -79,9 +79,9 @@ const handleUpdate =(firstname,lastname,email,password) => {
   }
 }
 
-const handleDelete = async () => {
+const handleDelete = () => {
   try {
-    await axios.post(
+    axios.post(
       `${IP_ADDRESS}/auth/deleteaccount`,
       null,
       {
@@ -93,7 +93,6 @@ const handleDelete = async () => {
       console.log(error);
       setErrorMessage(error.response.data.error);
     } else {
-      // Set a generic error message for other types of errors
       console.log(error);
       setErrorMessage('There was an error deleting your account');
     }
@@ -242,7 +241,7 @@ return (
             <div className="text-center">
               <div className="display-6 p-1"> Are you sure you want to delete your account? </div>
               <p className="m-3 p-1"> You will no longer be able to access any of the videos you sent or received.</p>
-              <Button className="m-3" href={homePath} onClick={()=>{handleDelete()}}> Delete Account</Button>
+              <Button className="m-3" onClick={()=>{handleDelete()}}> Delete Account</Button>
             </div>
           </Tab>
         </Tabs>

@@ -1,10 +1,10 @@
 import pytest
-import time
 import sys
 import os
 import json
 
 sys.path.append(os.path.abspath('../app'))
+sys.path.append(os.path.abspath('../flaskapp'))
 import database
 import s3Bucket
 import flaskapp
@@ -23,15 +23,27 @@ def test_change_password_reencrypt(client):
     assert database.resetTable(tableName="userprofile")
     assert database.resetTable(tableName="videos")
     #Insert user to recieve test video
-    post_object2 = {'email': 'safemovnow@gmail.com', 'password': 'test_password2', 'firstname': 'John2', 'lastname': 'Doe2'}
+    post_object2 = {'email': 'safemovnow@gmail.com', 'password': 'test_Password1@', 'firstname': 'John2', 'lastname': 'Doe2'}
     response = json.loads(client.post('/auth/signup', data=post_object2).data.decode('utf-8'))
     assert not 'error' in response
-    response = json.loads(client.get('/auth/logout').data.decode('utf-8'))
-    assert 'success' in response
+    
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=('safemovnow@gmail.com',))[0]['verifyKey']
+    post_object = {'input_code': f'{inputcode}', 'email': 'safemovnow@gmail.com'}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
     
     #Insert User that will have password changed
-    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'test_password', 'firstname': 'John', 'lastname': 'Doe'}
+    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'test_Password1@', 'firstname': 'John', 'lastname': 'Doe'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+    
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=('fakeusertest987@gmail.com',))[0]['verifyKey']
+    post_object = {'input_code': f'{inputcode}', 'email': 'fakeusertest987@gmail.com'}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+    
+    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'test_Password1@'}
+    response = json.loads(client.post('/auth/login', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
     
     #upload video to retrieve after re-encryption
@@ -44,7 +56,7 @@ def test_change_password_reencrypt(client):
     assert not 'error' in upload_response
     
     #change password
-    change_password_object = {'new_password' : 'newpassword'}
+    change_password_object = {'new_password' : 'newPassword1@'}
     response = json.loads(client.post('bucket/change_password_reencrypt', data=change_password_object).data.decode('utf-8'))
     assert not 'error' in response
     
@@ -53,7 +65,7 @@ def test_change_password_reencrypt(client):
     assert 'success' in response  
     
     #Try logging in under new password
-    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'newpassword', 'firstname': 'John', 'lastname': 'Doe'}
+    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'newPassword1@', 'firstname': 'John', 'lastname': 'Doe'}
     response = json.loads(client.post('/auth/login', data=post_object).data.decode('utf-8'))
     assert not 'error' in response 
     
@@ -66,8 +78,13 @@ def test_change_password_reencrypt(client):
 
 def test_set_verificationcode(client):
     assert database.resetTable(tableName="userprofile")
-    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'test_password', 'firstname': 'John', 'lastname': 'Doe'}
+    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'test_Password1@', 'firstname': 'John', 'lastname': 'Doe'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+    
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=('fakeusertest987@gmail.com',))[0]['verifyKey']
+    post_object = {'input_code': f'{inputcode}', 'email': 'fakeusertest987@gmail.com'}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
     
     set_verificationcode_object = {'email': 'fakeusertest987@gmail.com'}
@@ -77,8 +94,13 @@ def test_set_verificationcode(client):
 def test_change_password_forgot(client):
     assert database.resetTable(tableName="userprofile")
     assert database.resetTable(tableName="videos")
-    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'test_password', 'firstname': 'John', 'lastname': 'Doe'}
+    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'test_Password1@', 'firstname': 'John', 'lastname': 'Doe'}
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+    
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=('fakeusertest987@gmail.com',))[0]['verifyKey']
+    post_object = {'input_code': f'{inputcode}', 'email': 'fakeusertest987@gmail.com'}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
     
     #upload video to not retireve after key zero'd
@@ -94,12 +116,12 @@ def test_change_password_forgot(client):
     response = json.loads(client.post('bucket/set_verificationcode', data=set_verificationcode_object).data.decode('utf-8'))
 
     inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=('fakeusertest987@gmail.com',))[0]['verifyKey']
-    change_password_object = {'new_password' : 'newpassword', 'email': 'fakeusertest987@gmail.com', 'input_code': f'{inputcode}'}
+    change_password_object = {'new_password' : 'newPassword1@', 'email': 'fakeusertest987@gmail.com', 'input_code': f'{inputcode}'}
     response = json.loads(client.post('/bucket/change_password_forgot', data = change_password_object).data.decode('utf-8'))
     assert not 'error' in response
     
     #Try logging in under new password
-    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'newpassword', 'firstname': 'John', 'lastname': 'Doe'}
+    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'newPassword1@', 'firstname': 'John', 'lastname': 'Doe'}
     response = json.loads(client.post('/auth/login', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
     
@@ -110,3 +132,12 @@ def test_change_password_forgot(client):
         assert False
     except ValueError:
         assert True
+        
+    # if __name__ == "__main__":
+    #     app = flaskapp.create_app()
+    #     app.config['TESTING'] = True
+
+    #     test_change_password_reencrypt(app.test_client())
+    #     test_set_verificationcode(app.test_client())
+    #     test_change_password_forgot(app.test_client())
+      

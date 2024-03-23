@@ -133,11 +133,11 @@ def test_change_password_forgot(client):
     except ValueError:
         assert True
         
-    # if __name__ == "__main__":
-    #     app = flaskapp.create_app()
-    #     app.config['TESTING'] = True
+    if __name__ == "__main__":
+        app = flaskapp.create_app()
+        app.config['TESTING'] = True
 
-    #     test_change_password_reencrypt(app.test_client())
-    #     test_set_verificationcode(app.test_client())
-    #     test_change_password_forgot(app.test_client())
+        test_change_password_reencrypt(app.test_client())
+        test_set_verificationcode(app.test_client())
+        test_change_password_forgot(app.test_client())
       

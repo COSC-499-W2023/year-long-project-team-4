@@ -534,7 +534,7 @@ def change_password_reencrypt():
             video_details = database.query_records(table_name='videos', fields='senderEncryption, retDate, receiverEmail', condition=f'videoName = %s', condition_values=(sentvideos['videoName'],))[0]
             encrypted_aes_key = video_details['senderEncryption']
             retention_date = video_details['retDate']
-            receiver_email = video_details['retDate']
+            receiver_email = video_details['receiverEmail']
             aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
             video_path = f'/videos/{sentvideos["videoName"]}'
             object_content = s3Bucket.get_object_content(video_path)

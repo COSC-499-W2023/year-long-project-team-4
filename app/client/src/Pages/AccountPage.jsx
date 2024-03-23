@@ -154,11 +154,6 @@ useEffect(() => {
   };
   fetchCurrent();}, [])
 
-  const handleStartChat = (e, videoName) => {
-      e.preventDefault();
-      navigate(MessagingPath, { state: { videoName: videoName } });
-  };
-
 return (
    <div className="container p-4">
     <Fade>

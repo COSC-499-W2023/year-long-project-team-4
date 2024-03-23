@@ -7,8 +7,8 @@ import concurrent.futures
 from dotenv import load_dotenv
 
 LOCAL = os.getenv('LOCAL') == 'True'
-if not os.path.isdir('faceBlurring/temp'):
-    os.mkdir('faceBlurring/temp')
+if not os.path.isdir('/temp'):
+    os.mkdir('/temp')
 
 if not LOCAL: # Flag for local or not
     # RUN "AWS CONFIGURE SSO" before running code - this one included if local is not set to True 

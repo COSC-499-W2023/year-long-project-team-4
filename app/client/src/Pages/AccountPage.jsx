@@ -81,7 +81,8 @@ const handleUpdate =(firstname,lastname,email,password) => {
 
 const handleDelete = () => {
   axios.post(
-    `${IP_ADDRESS}/auth/deleteaccount`,
+    `${IP_ADDRESS}/auth/deleteaccount`, 
+    null,
     {
       withCredentials: true,
     }

@@ -89,6 +89,7 @@ def rsa_decrypt_aes256_key(encrypted_aes256_key, rsa_private_key):
 def upload_video():
     # Read the file and email from post
     file = request.files.get('file')
+    video_name = request.form.get('video_name')
     recipient_email = request.form.get('recipient')
     retention_days = request.form.get('retention_days')
     tags = None
@@ -136,7 +137,7 @@ def upload_video():
         if not create_chat(video_id, retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):
             return jsonify({'error': 'Failed to create chat'}), 502
 
-    insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_id, retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
+    insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_id, retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key, video_name)
 
     if insert_result and tags:
         tag_result = database.insert_tags(video_id, tags)

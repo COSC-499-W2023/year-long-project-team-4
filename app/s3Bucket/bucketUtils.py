@@ -250,7 +250,7 @@ def delete_file(BUCKETNAME, obj_path):
         return False
 
 
-def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption):
+def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption, videoName = None):
     """
     This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
 
@@ -312,8 +312,8 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
                                 raise ValueError("Error retrieving current users information.")
                             
                             if file_flag == "videos":
-                                insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                                data = (file_name, subDate, retDate, senderEmail, userFname, userLname, receiverEmail, senderEncryption, receiverEncryption)
+                                insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                                data = (file_name, videoName, subDate, retDate, senderEmail, userFname, userLname, receiverEmail, senderEncryption, receiverEncryption)
                                 cur.execute(insertQuery, data)
                                 
                             elif file_flag == "chats":  
@@ -333,8 +333,8 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
                         #If guest it does the same calls just without senderId
                         else: 
                             if file_flag == 'videos':       
-                                insertQuery = "INSERT INTO videos (videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s)"
-                                data = (file_name, subDate, retDate, receiverEmail, receiverEncryption)
+                                insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s)"
+                                data = (file_name, videoName, subDate, retDate, receiverEmail, receiverEncryption)
                                 cur.execute(insertQuery, data)
                                 
                             elif file_flag == 'chats':       
@@ -386,8 +386,8 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
                             raise ValueError("Error retrieving current users information.")
                         
                         if file_flag == "videos":
-                            insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                            data = (file_name, subDate, retDate, senderEmail, userFname, userLname, receiverEmail, senderEncryption, receiverEncryption)
+                            insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                            data = (file_name, videoName, subDate, retDate, senderEmail, userFname, userLname, receiverEmail, senderEncryption, receiverEncryption)
                             cur.execute(insertQuery, data)
                             
                         elif file_flag == "chats":  
@@ -407,8 +407,8 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
                     #If guest it does the same calls just without senderId
                     else: 
                         if file_flag == 'videos':       
-                            insertQuery = "INSERT INTO videos (videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s)"
-                            data = (file_name, subDate, retDate, receiverEmail, receiverEncryption)
+                            insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s)"
+                            data = (file_name, videoName, subDate, retDate, receiverEmail, receiverEncryption)
                             cur.execute(insertQuery, data)
                             
                         elif file_flag == 'chats':       

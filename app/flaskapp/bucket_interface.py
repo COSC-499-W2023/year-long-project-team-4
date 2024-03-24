@@ -111,8 +111,8 @@ def upload_video():
         retention_date = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=retention_days)
 
 
-    # Video name is a uniquely generated uuid value
-    video_name = uuid.uuid4()
+    # Video ID is a uniquely generated uuid value
+    video_id = uuid.uuid4()
 
     # Ensure that we actually got a file and that the recipient email is valid
     if file is None:
@@ -133,15 +133,15 @@ def upload_video():
         sender_email = session['email']
         sender_public_key = get_public_key(session['email'])
         sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
-        if not create_chat(video_name, retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):
+        if not create_chat(video_id, retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):
             return jsonify({'error': 'Failed to create chat'}), 502
 
-    insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_name, retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
+    insert_result = s3Bucket.encrypt_insert('videos', encrypted_video, video_id, retention_date, sender_email, recipient_email, sender_encrypted_aes_key, recipient_encrypted_aes_key)
 
     if insert_result and tags:
-        tag_result = database.insert_tags(video_name, tags)
+        tag_result = database.insert_tags(video_id, tags)
         if tag_result == -1:
-            return jsonify({'video_id': f'{video_name}', 'error': 'Tag upload failed'}), 503
+            return jsonify({'video_id': f'{video_id}', 'error': 'Tag upload failed'}), 503
 
     if insert_result and (LOCAL == False):
         sender_email = 'safemovnow@gmail.com'
@@ -206,20 +206,20 @@ def upload_video():
                 }
             )
 
-            return jsonify({'video_id': f'{video_name}'}), 200
+            return jsonify({'video_id': f'{video_id}'}), 200
         except Exception as e:
             print(e)
     elif insert_result and (LOCAL == True):
-        return jsonify({'video_id': f'{video_name}'}), 200
+        return jsonify({'video_id': f'{video_id}'}), 200
     else:
         return jsonify({'error': 'Video insertion failed'}), 502
 
 @bucket.route('/retrieve', methods=['POST'])
 def retrieve_video():
-    video_name = request.form.get('video_name')
+    video_id = request.form.get('video_id')
 
     # Retrieve the encrypted AES key and decrypt it
-    query_results = database.query_records(table_name='videos', fields='senderEmail, receiverEmail, senderEncryption, receiverEncryption', condition=f'videoName = %s', condition_values=(video_name,))[0]
+    query_results = database.query_records(table_name='videos', fields='senderEmail, receiverEmail, senderEncryption, receiverEncryption', condition=f'videoId = %s', condition_values=(video_id,))[0]
     encrypted_aes_key = None
     receiver_email = query_results['receiverEmail']
     sender_email = query_results['senderEmail']
@@ -233,7 +233,7 @@ def retrieve_video():
         return jsonify({'error': 'Currently logged in user is neither sender or receiver of requested video'}), 409
 
     aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
-    video_path = f'/videos/{video_name}'
+    video_path = f'/videos/{video_id}'
 
     # Decrypt the file and write the data to an IO buffer
     video_data = io.BytesIO()
@@ -250,7 +250,7 @@ def retrieve_video():
 @bucket.route('/getvideos', methods=['GET', 'POST'])
 def get_available_videos():
     # Get videos
-    available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
+    available_videos = database.query_records(table_name='videos', fields='videoId, videoName, senderEmail, receiverEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
 
     tags = None
     json_data = request.files.get('json')
@@ -260,15 +260,15 @@ def get_available_videos():
     if tags:
         condition_statement = 'tagName = %s OR ' * len(tags)
         condition_statement = condition_statement[:-4]
-        available_by_tags = database.query_records(table_name='tags', fields='videoName', condition=condition_statement, condition_values=tags)
-        available_by_tags = [video['videoName'] for video in available_by_tags]
-        available_videos = [video for video in available_videos if video['videoName'] in available_by_tags]
+        available_by_tags = database.query_records(table_name='tags', fields='videoId', condition=condition_statement, condition_values=tags)
+        available_by_tags = [video['videoId'] for video in available_by_tags]
+        available_videos = [video for video in available_videos if video['videoId'] in available_by_tags]
 
     return json.dumps(available_videos), 200
     
 @bucket.route('/get_sent_videos', methods=['GET', 'POST'])
 def get_sent_videos():
-    available_videos = database.query_records(table_name='videos', fields='videoName, senderEmail, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
+    available_videos = database.query_records(table_name='videos', fields='videoId, videoName, senderEmail, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
 
     tags = None
     json_data = request.files.get('json')
@@ -278,18 +278,18 @@ def get_sent_videos():
     if tags:
         condition_statement = 'tagName = %s OR ' * len(tags)
         condition_statement = condition_statement[:-4]
-        available_by_tags = database.query_records(table_name='tags', fields='videoName', condition=condition_statement, condition_values=tags)
-        available_by_tags = [video['videoName'] for video in available_by_tags]
-        available_videos = [video for video in available_videos if video['videoName'] in available_by_tags]
+        available_by_tags = database.query_records(table_name='tags', fields='videoId', condition=condition_statement, condition_values=tags)
+        available_by_tags = [video['videoId'] for video in available_by_tags]
+        available_videos = [video for video in available_videos if video['videoId'] in available_by_tags]
 
     return json.dumps(available_videos), 200
 
-def create_chat(video_name, retention_date, sender_email, receiver_email, sender_key, receiver_key):
+def create_chat(video_id, retention_date, sender_email, receiver_email, sender_key, receiver_key):
     chat_json = {
         'messages': []
     }
 
-    chat_name = video_name
+    chat_name = video_id
 
     # Encrypt the chat log
     encrypted_chat, aes_key = aes_encrypt_video(json.dumps(chat_json).encode('utf-8'))
@@ -309,7 +309,7 @@ def create_chat(video_name, retention_date, sender_email, receiver_email, sender
 
 @bucket.route('/send_chat', methods=['POST'])
 def send_chat():
-    chat_name = request.form.get('video_name')
+    chat_name = request.form.get('video_id')
     chat_text = request.form.get('chat_text')
 
     try:
@@ -429,7 +429,7 @@ def send_chat(name, text):
 
 @bucket.route('/retrieve_chat', methods=['POST'])
 def retrieve_chat():
-    chat_name = request.form.get('video_name')
+    chat_name = request.form.get('video_id')
 
     try:
         # Retrieve info for requested chat
@@ -506,10 +506,10 @@ def change_password_reencrypt():
         #Get videos to reencrypt
         old_private_key = get_private_key()
         user_email = session['email']
-        videos_to_decrypt1 = database.query_records(table_name='videos', fields='videoName', condition=f'receiverEmail = %s', condition_values=(user_email,))
+        videos_to_decrypt1 = database.query_records(table_name='videos', fields='videoId', condition=f'receiverEmail = %s', condition_values=(user_email,))
         
         #Repeat for sent
-        videos_to_decrypt2 = database.query_records(table_name='videos', fields='videoName', condition=f'senderEmail = %s', condition_values=(user_email,))
+        videos_to_decrypt2 = database.query_records(table_name='videos', fields='videoId', condition=f'senderEmail = %s', condition_values=(user_email,))
            
         #Change password, salt_hash, and pubKey
         user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(user_email,))[0]['id']
@@ -526,21 +526,21 @@ def change_password_reencrypt():
         #Loop through videos to reencrypt and insert back to database and s3Bucket
         for videos1 in videos_to_decrypt2:        
             #Decrypt
-            encrypted_aes_key = database.query_records(table_name='videos', fields='senderEncryption', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]['senderEncryption']
-            retention_date = database.query_records(table_name='videos', fields='retDate', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]['retDate']
+            encrypted_aes_key = database.query_records(table_name='videos', fields='senderEncryption', condition=f'videoId = %s', condition_values=(videos1['videoId'],))[0]['senderEncryption']
+            retention_date = database.query_records(table_name='videos', fields='retDate', condition=f'videoId = %s', condition_values=(videos1['videoId'],))[0]['retDate']
             aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
-            receiver_email = database.query_records(table_name='videos', fields='receiverEmail', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]['receiverEmail']
-            video_path = f'/videos/{videos1["videoName"]}'
+            receiver_email = database.query_records(table_name='videos', fields='receiverEmail', condition=f'videoId = %s', condition_values=(videos1['videoId'],))[0]['receiverEmail']
+            video_path = f'/videos/{videos1["videoId"]}'
             object_content = s3Bucket.get_object_content(video_path)
             decrypted_video = aes_decrypt_video(object_content, aes_key)
             s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
-            database.delete_record("videos", "videoName = %s", videos1["videoName"])
+            database.delete_record("videos", "videoId = %s", videos1["videoId"])
             #Reencrypt
             aes_key = bytes
             session['private_key'] = private_key.export_key()
             encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
             #Insert into s3Bucket (sent videos first)
-            video_name = videos1['videoName']
+            video_id = videos1['videoId']
             sender_email = user_email
                 
             sender_public_key = get_public_key(user_email)
@@ -552,29 +552,29 @@ def change_password_reencrypt():
             print(sender_encrypted_aes_key) 
             if (proceed == False):
                 s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
-            insert_video = s3Bucket.encrypt_insert(file_flag = 'videos', file_content = encrypted_video, file_name = video_name, retDate = retention_date, senderEmail = sender_email, receiverEmail = receiver_email, senderEncryption = sender_encrypted_aes_key, receiverEncryption = recipient_encrypted_aes_key)
+            insert_video = s3Bucket.encrypt_insert(file_flag = 'videos', file_content = encrypted_video, file_name = video_id, retDate = retention_date, senderEmail = sender_email, receiverEmail = receiver_email, senderEncryption = sender_encrypted_aes_key, receiverEncryption = recipient_encrypted_aes_key)
             
             if insert_video == False:
                 return jsonify({"status": "error",'message': 'Video insertion failed'}), 502
         #Repeat but for recieved videos
         for videos2 in videos_to_decrypt1:
             #Decrypt
-            query_result = database.query_records(table_name='videos', fields='receiverEncryption', condition=f'videoName = %s', condition_values=(videos2['videoName'],))[0]
-            video_details = database.query_records(table_name='videos', fields='retDate, senderEmail', condition=f'videoName = %s', condition_values=(videos1['videoName'],))[0]
+            query_result = database.query_records(table_name='videos', fields='receiverEncryption', condition=f'videoId = %s', condition_values=(videos2['videoId'],))[0]
+            video_details = database.query_records(table_name='videos', fields='retDate, senderEmail', condition=f'videoId = %s', condition_values=(videos1['videoId'],))[0]
             encrypted_aes_key = query_result['receiverEncryption']
             aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
-            video_path = f'/videos/{videos2["videoName"]}'
+            video_path = f'/videos/{videos2["videoId"]}'
             object_content = s3Bucket.get_object_content(video_path)
             decrypted_video = aes_decrypt_video(object_content, aes_key)
             s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
-            database.delete_record("videos", "videoName = %s", videos2["videoName"])
+            database.delete_record("videos", "videoId = %s", videos2["videoId"])
             #Reencrypt
             session['private_key'] = private_key.export_key()
             aes_key = bytes
             encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
             print(aes_key)
             #Insert into s3Bucket (received)
-            video_name = videos2['videoName']
+            video_id = videos2['videoId']
             retention_date = video_details["retDate"]
             sender_email = video_details["senderEmail"]
             receiver_email - user_email
@@ -588,7 +588,7 @@ def change_password_reencrypt():
             if proceed == False:
                 s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
             print(sender_encrypted_aes_key)  
-            insert_video = s3Bucket.encrypt_insert(file_flag = 'videos', file_content = encrypted_video, file_name = video_name, retDate = retention_date, senderEmail = sender_email, receiverEmail = receiver_email, senderEncryption = sender_encrypted_aes_key, receiverEncryption = recipient_encrypted_aes_key)    
+            insert_video = s3Bucket.encrypt_insert(file_flag = 'videos', file_content = encrypted_video, file_name = video_id, retDate = retention_date, senderEmail = sender_email, receiverEmail = receiver_email, senderEncryption = sender_encrypted_aes_key, receiverEncryption = recipient_encrypted_aes_key)    
             if insert_video == False:
                 return jsonify({"status": "error",'message': 'Video insertion failed'}), 502
                     
@@ -665,17 +665,17 @@ def change_password_forgot():
         database.update_user(user_email = email, new_password_hash = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
         
         #Get recieved videos that need key deleted
-        videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'receiverEmail = %s', condition_values=(email,))
+        videos_to_delete_key = database.query_records(table_name='videos', fields='videoId', condition=f'receiverEmail = %s', condition_values=(email,))
         #Loop through list, deleting files individually
         for videos in videos_to_delete_key:
             #Delete key from database for recieved videos
-            database.delete_key(videoName = videos['videoName'],sender =False,receiver =True)
+            database.delete_key(videoId = videos['videoId'],sender =False,receiver =True)
         #Get recieved videos that need key deleted
-        videos_to_delete_key = database.query_records(table_name='videos', fields='videoName', condition=f'senderEmail = %s', condition_values=(email,))
+        videos_to_delete_key = database.query_records(table_name='videos', fields='videoId', condition=f'senderEmail = %s', condition_values=(email,))
         #Loop through list, deleting files individually
         for videos in videos_to_delete_key:
             #Delete key from database for recieved videos
-            database.delete_key(videoName = videos['videoName'],sender =True,receiver =False)
+            database.delete_key(videoId = videos['videoId'],sender =True,receiver =False)
             
         current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(email,))[0]['password_hash']
         if current_password == hashed_password:

@@ -44,6 +44,7 @@ const Header = () => {
           console.log("Logged out successfully");
           setCurrentUser(null);
           navigate(loginPath);
+          window.location.reload(false);
         } else {
           console.error("Logout error:", response.data.error);
         }

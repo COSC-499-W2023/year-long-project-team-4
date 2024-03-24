@@ -33,6 +33,7 @@ const LoginHomePage = () => {
       if (response.data.email) {
         setCurrentUser(response.data.email);
         navigate(receiveAndSendPath);
+        window.location.reload(false);
       } else {
         setErrorMessage(response.data.error);
       }

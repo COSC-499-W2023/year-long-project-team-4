@@ -24,6 +24,7 @@
 Before you begin, ensure you have met the following requirements:
 - Access to an AWS S3 bucket to store your images.
 - Ability to call AWS Rekognition APIs.
+- Access to either AWS access keys or AWS CLI installed and working
 - NodeJS installed
 - Nginx reverse proxy installed to serve your application. (not needed if running locally or preferred way of hosting)
 - Gunicorn installed to run your Flask application. (Similar to nginx)
@@ -120,7 +121,7 @@ BUCKETNAME= S3 bucket name
 TEST=True/False - Uses test database & test options (This assumes you have a development and production database. For simplicity of getting this just running, set Test to False.  
 LOCAL= True/False - Use this to mimic S3 locally 
 
-# These below are to be grabbed from the AWS Console. 
+# These below are to be grabbed from the AWS Console. These are needed for Email to work (along side AWS CLI) or if you do not have AWS CLI then these keys are needed.  
 ACCESSKEY=''
 SECRETKEY=''
 SESSTOKEN=''

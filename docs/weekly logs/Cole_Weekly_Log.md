@@ -296,5 +296,23 @@ Tasks from the project board relevant to things I worked on:
 - Encrypting and decrypting chats
 - Public / private key generation
 
+
+# Term 2 Week (10): Mar 17 - Mar 24
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/0b342749-0829-4221-95b7-13480596a806)
+
+## Goal Recap:
+Things I worked on:
+- Added backend support for titling videos
+- Refactored old "title" system into a "video ID" system (IDs are unique, titles are not unique going forward)
+- Started work on overhauling how tags work in the backend (they should just be returned as data along with other video info, but currently you request videos with certain tags instead which isn't very useful)
+- Code review
+  
+Tasks from the project board relevant to things I worked on:
+- Tags
+- Uploading videos (title stuff)
+  
 Currently working on:
-- Need to figure this out at Tuesday class, since I finished everything that was on my list for this week.
+- Tag stuff mentioned above
+- Will start on making UX better for the "stop recording" and "preview video" buttons after tags done

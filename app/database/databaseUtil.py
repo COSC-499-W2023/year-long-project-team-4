@@ -440,7 +440,7 @@ def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
                     if (sender):
                         set_clause = "senderEncryption = 0, senderEmail = NULL"
                     elif (receiver):
-                        set_clause = "recieverEncryption = 0, receiverEmail = NULL"
+                        set_clause = "receiverEncryption = 0, receiverEmail = NULL"
                     else:
                         result = -1
                     query = f"UPDATE videos SET {set_clause} WHERE videoName = %s"
@@ -460,7 +460,7 @@ def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
                 if (sender):
                     set_clause = "senderEncryption = 0, senderEmail = NULL"
                 elif (receiver):
-                    set_clause = "recieverEncryption = 0, receiverEmail = NULL"
+                    set_clause = "receiverEncryption = 0, receiverEmail = NULL"
                 else:
                     result = -1
                 query = f"UPDATE videos SET {set_clause} WHERE videoName = %s"

@@ -312,7 +312,7 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
                                 raise ValueError("Error retrieving current users information.")
                             
                             if file_flag == "videos":
-                                insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                                insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)"
                                 data = (file_name, videoName, subDate, retDate, senderEmail, userFname, userLname, receiverEmail, senderEncryption, receiverEncryption)
                                 cur.execute(insertQuery, data)
                                 
@@ -333,7 +333,7 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
                         #If guest it does the same calls just without senderId
                         else: 
                             if file_flag == 'videos':       
-                                insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s)"
+                                insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s,%s)"
                                 data = (file_name, videoName, subDate, retDate, receiverEmail, receiverEncryption)
                                 cur.execute(insertQuery, data)
                                 
@@ -386,7 +386,7 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
                             raise ValueError("Error retrieving current users information.")
                         
                         if file_flag == "videos":
-                            insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                            insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)"
                             data = (file_name, videoName, subDate, retDate, senderEmail, userFname, userLname, receiverEmail, senderEncryption, receiverEncryption)
                             cur.execute(insertQuery, data)
                             
@@ -407,7 +407,7 @@ def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, rec
                     #If guest it does the same calls just without senderId
                     else: 
                         if file_flag == 'videos':       
-                            insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s)"
+                            insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s,%s)"
                             data = (file_name, videoName, subDate, retDate, receiverEmail, receiverEncryption)
                             cur.execute(insertQuery, data)
                             

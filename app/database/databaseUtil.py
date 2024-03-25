@@ -86,7 +86,7 @@ def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, 
         # Returns what 1 or -1 
         return result
 
-def insert_video(videoId:str, retDate:datetime, senderEmail:str, receiverEmail:str, senderEncryption, receiverEncryption) -> int:
+def insert_video(videoId:str, videoName:str, retDate:datetime, senderEmail:str, receiverEmail:str, senderEncryption, receiverEncryption) -> int:
     '''
     Insert a new video into the database.
 
@@ -107,6 +107,7 @@ def insert_video(videoId:str, retDate:datetime, senderEmail:str, receiverEmail:s
     '''
     db = None
     result = None
+    print(videoName)
     try:
         if SSH:
             # Creates the SSH tunnel to connect to the DB
@@ -117,8 +118,8 @@ def insert_video(videoId:str, retDate:datetime, senderEmail:str, receiverEmail:s
                 cur = db.cursor()
                 subDate = datetime.now(timezone.utc)
                 retDate = datetime.strptime(retDate, '%Y-%m-%d %H:%M:%S')
-                query = "INSERT INTO videos(videoId, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-                data = (videoId, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption)
+                query = "INSERT INTO videos(videoId, videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                data = (videoId, videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption)
                 cur.execute(query, data)
                 print("Insertation Complete")
                 db.commit()
@@ -130,8 +131,8 @@ def insert_video(videoId:str, retDate:datetime, senderEmail:str, receiverEmail:s
             cur = db.cursor()
             subDate = datetime.now(timezone.utc)
             retDate = datetime.strptime(retDate, '%Y-%m-%d %H:%M:%S')
-            query = "INSERT INTO videos(videoId, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-            data = (videoId, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption)
+            query = "INSERT INTO videos(videoId, videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            data = (videoId, videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption)
             cur.execute(query, data)
             print("Insertation Complete")
             db.commit()

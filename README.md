@@ -27,6 +27,71 @@ Before you begin, ensure you have met the following requirements:
 - NodeJS installed
 - Nginx reverse proxy installed to serve your application. (not needed if running locally or preferred way of hosting)
 - Gunicorn installed to run your Flask application. (Similar to nginx)
+- Access to a database (local or remote) running this schema:
+```
+DROP DATABASE IF EXISTS Team4db; /* This name can be changed as long as it is reflected in the .env */
+
+CREATE DATABASE Team4db; /* This name can be changed as long as it is reflected in the .env */
+
+USE Team4db; /* This name can be changed as long as it is reflected in the .env */
+
+CREATE TABLE userprofile (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR (100) UNIQUE,
+    password_hash VARCHAR (255),
+    firstname VARCHAR (50),
+    lastname VARCHAR (50),
+    salthash VARBINARY(128),
+    publickey VARCHAR(500),
+    verifyKey VARCHAR(10),
+    verifiedAcc BOOLEAN
+);
+
+CREATE TABLE videos (
+    videoName VARCHAR(100) PRIMARY KEY,
+    subDate DATETIME,
+    retDate DATETIME,
+    senderEmail VARCHAR(100),
+    senderFName VARCHAR(50),
+    senderLName VARCHAR(50),
+    receiverEmail VARCHAR(100),
+    senderEncryption VARCHAR(500),
+    receiverEncryption VARCHAR(500),
+    FOREIGN KEY (senderEmail) REFERENCES userprofile(email) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (receiverEmail) REFERENCES userprofile(email) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE forms (
+    formID int PRIMARY KEY,
+    subDate DATETIME,
+    senderID int,
+    receiverID int,
+    encrpyt VARCHAR(500),
+    FOREIGN KEY (receiverID) REFERENCES userprofile(id) ON DELETE CASCADE
+);
+
+CREATE TABLE chats (
+    chatName VARCHAR(100) PRIMARY KEY,
+    timestamp DATETIME,
+    senderEmail VARCHAR(100),
+    senderFName VARCHAR(50),
+    senderLName VARCHAR(50),
+    receiverEmail VARCHAR(100),
+    receiverFirstName VARCHAR(100),
+    receiverLastName VARCHAR(100),
+    senderEncryption VARCHAR(500),
+    receiverEncryption VARCHAR(500),
+    retDate DATETIME,
+    FOREIGN KEY (senderEmail) REFERENCES userprofile(email) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (receiverEmail) REFERENCES userprofile(email) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE tags (
+    tagName VARCHAR(20),
+    videoName VARCHAR(100),
+    FOREIGN KEY (videoName) REFERENCES videos(videoName) ON DELETE CASCADE ON UPDATE CASCADE
+);
+```
 
 ### Installation 
 To start, clone our repo:
@@ -124,6 +189,6 @@ This means that you are free to use, modify, and distribute the software as per 
 
 For more details about the permissions and restrictions imposed by the GNU GPL v3.0, please refer to the [full text of the license](https://www.gnu.org/licenses/gpl-3.0.html).
 
-Please note partially parts of the project contain code derived or copied from the following project:
+Please note that parts of the project contain code derived or copied from the following project:
 - [Rekognition-video-people-blurring-cdk (MIT-0 License)](https://github.com/aws-samples/rekognition-video-people-blurring-cdk)
 

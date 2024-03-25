@@ -200,5 +200,15 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 - Finishing up Mobile view
 - Finishing up peer testing changes. 
 
+# Term 2 Week 10: March 20th- March 27th
+![term2_week11](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/91bae3f2-3a3f-43d4-9de6-f08416b125f2)
+- Finished integration
+- Updating mobile view with update integration changes
+- Created pr for more peer testing changes (some things are causing bugs)
+
+# In progress: 
+- Finishing up Mobile view
+- Dealing with bugs in peer testing.
+
 
   

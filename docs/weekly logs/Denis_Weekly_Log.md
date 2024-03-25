@@ -395,4 +395,26 @@ Completed:
   
 Additional Context:
 
+# Term 2 Week 11: March 17 - March 24 (Monday to Sunday)
+## Tasks Worked this Week:
+
+
+![WorkDone](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/af721bda-fb3d-42d7-bc98-4daa0211aaaf)
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Documentation
+- Small front end edits
+- Help merge Update-integration finally
+
+Tasks from the Project Board:
+- Documentation
+- Peer testing 2 fixes
+
+Completed:
+- Finally merged the long overdue branch of Update-integration. 
+  
+Additional Context:
+
 

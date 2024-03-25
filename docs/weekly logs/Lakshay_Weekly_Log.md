@@ -392,3 +392,25 @@ Completed:
 
 Additional Context:
 
+# Term 2 Week 11: March 17 - March 24 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="988" alt="Screenshot 2024-03-24 at 11 56 50 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/787e9fcb-06b7-45b2-ac68-4e68db9b1bd3">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Changed video page implementation to display video information
+- Implement Peer testing 2 fixes
+- Add frontend tests
+
+Tasks from the Project Board:
+- Webpage Creation
+- Frontend testing
+
+Completed:
+- Changed video page implementation to display video information
+- Implement Peer testing 2 fixes
+- Add frontend tests
+  
+Additional Context:
+

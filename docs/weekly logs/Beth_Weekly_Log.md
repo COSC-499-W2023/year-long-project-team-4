@@ -318,3 +318,21 @@ Completed:
 - Added the logout and account buttons to side bar
 - General tweaks to make the sidebar and header look nicer, sizing, different hover and clicked colours, etc
 - Added logo to header
+
+# Week 9: March 11 - March 17
+
+## Tasks Completed:
+
+![2Week10act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/555d59b1-39f7-4a94-ad20-e045f8476db3)
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Frontend cleanup
+
+Completed:
+- Sidebar is consistent on all pages on
+- Removed uploadand recieve path/page
+- Put logout and account buttons back onto header
+- Cleaned up change password re-encrypt

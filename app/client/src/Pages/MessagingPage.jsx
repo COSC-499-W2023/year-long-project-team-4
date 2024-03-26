@@ -21,7 +21,7 @@ function MessageSender() {
     const navigate = useNavigate();
 
     // Retreive video from location state
-    const videoName = location.state?.videoName;
+    const videoId = location.state?.videoId;
 
     const messagesEndRef = useRef(null); // Ref for auto-scrolling
 
@@ -39,14 +39,14 @@ function MessageSender() {
         scrollToBottom();
     }, [chatMessages]);
 
-    // Fetch existing chat messages on component mount or when videoName changes
+    // Fetch existing chat messages on component mount
     useEffect(() => {
-        if (videoName) {
+        if (videoId) {
             socket.connect();
             setIsLoading(true);
 
             const formData = new FormData();
-            formData.append('video_name', videoName);
+            formData.append('video_name', videoId);
         
             axios.post(`${IP_ADDRESS}/bucket/retrieve`, formData, {
                 withCredentials: true,
@@ -62,7 +62,7 @@ function MessageSender() {
                 setIsLoading(false);
             });
 
-            socket.emit('join_chat', { chat_name: videoName });
+            socket.emit('join_chat', { chat_name: videoId });
       
             socket.on('new_chat_message', (newMessage) => {
                 console.log("New chat message");
@@ -88,11 +88,11 @@ function MessageSender() {
         navigate(receiveAndSendPath);
     };
 
-    // Display error if videoName is not available
-    if (!videoName) {
+    // Display error if videoId is not available
+    if (!videoId) {
         return (
             <div>
-                <p>Video name is required to join the chat.</p>
+                <p>Video ID is required to join the chat.</p>
                 <Button onClick={handleBack}>Go Back to Receive Video</Button>
             </div>
         );
@@ -104,7 +104,7 @@ function MessageSender() {
 
         if (message.trim()) {
             socket.connect();
-            socket.emit('send_chat_message', { chat_name: videoName, message: message });
+            socket.emit('send_chat_message', { chat_name: videoId, message: message });
             setMessage(''); // Clear the input after sending
         } else {
             setErrorMessage('Please enter a message before sending.');

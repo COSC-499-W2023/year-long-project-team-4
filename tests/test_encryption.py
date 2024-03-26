@@ -130,8 +130,16 @@ def test_encrypt_decrypt_key_fail(client):
     # Generate AES key, encrypt it, decrypt it, check output does not match initial key
     aes256_key = Random.get_random_bytes(32)
     encrypted_aes_key = rsa_encrypt_aes256_key(aes256_key, public_key)
-    decrypted_aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
-    assert aes256_key != decrypted_aes_key
+
+    # Invalid key decryption is allowed to fail in 2 ways
+    # In some cases the key is able to complete the decryption algorithm, but gives a value different than our original input
+    # In other cases, the key won't work to decrypt the data at all, and throws ValueError
+    # Both of these are okay
+    try:
+        decrypted_aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, private_key)
+        assert aes256_key != decrypted_aes_key
+    except ValueError:
+        pass
 
 # Encrypt a message then decrypt it with correct AES key
 def test_encrypt_decrypt_message_success(client):

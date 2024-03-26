@@ -46,7 +46,7 @@ function MessageSender() {
             setIsLoading(true);
 
             const formData = new FormData();
-            formData.append('video_name', videoId);
+            formData.append('video_id', videoId);
         
             axios.post(`${IP_ADDRESS}/bucket/retrieve`, formData, {
                 withCredentials: true,

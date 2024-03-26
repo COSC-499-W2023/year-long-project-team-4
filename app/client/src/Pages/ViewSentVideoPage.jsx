@@ -34,8 +34,8 @@ const ViewSentVideoPage = () => {
   }, []);
   
   // Handles video selection and retrieves video URL
-  const handleVideoClick = (videoName) => {
-    navigate(MessagingPath, { state: { videoName: videoName } });
+  const handleVideoClick = (videoId) => {
+    navigate(MessagingPath, { state: { videoId: videoId } });
   };
 
   return (
@@ -46,7 +46,7 @@ const ViewSentVideoPage = () => {
                <div className="display-6"> Videos</div>
                {videos.map((video, index) => (
                             <>
-                          <div key={index} onClick={() => handleVideoClick(video.videoName)}>
+                          <div key={index} onClick={() => handleVideoClick(video.videoId)}>
                               <Button className='text-center mb-2' style={{minWidth: '150px'}}>
                               <p>Video{index + 1}</p>
                               </Button>

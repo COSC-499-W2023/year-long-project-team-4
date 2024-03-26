@@ -47,7 +47,7 @@ def test_create_chat_success(client):
     assert not 'error' in upload_response
 
     # Retrieve the chat, ensure chat matches expected start state
-    data = {'video_name': upload_response['video_id']}
+    data = {'video_id': upload_response['video_id']}
     response = json.loads(client.post('/bucket/retrieve_chat', data=data).data.decode('utf-8'))
     assert not 'error' in response
     assert 'messages' in response
@@ -78,7 +78,7 @@ def test_create_chat_fail(client):
     assert not 'error' in upload_response
 
     # Try to retrieve chat, ensure it does not exist
-    data = {'video_name': upload_response['video_id']}
+    data = {'video_id': upload_response['video_id']}
     response = json.loads(client.post('/bucket/retrieve_chat', data=data).data.decode('utf-8'))
     assert 'error' in response
     assert response['error'] == 'Chat does not exist'
@@ -108,7 +108,7 @@ def test_send_receive_chat(client):
 
     # Send a few chats
     for i in range(3):
-        data = {'video_name': upload_response['video_id'], 'chat_text': i}
+        data = {'video_id': upload_response['video_id'], 'chat_text': i}
         response = json.loads(client.post('/bucket/send_chat', data=data).data.decode('utf-8'))
         assert not 'error' in response
         assert 'chat_id' in response

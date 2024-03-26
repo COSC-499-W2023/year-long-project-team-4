@@ -434,7 +434,7 @@ def send_chat(name, text):
 
 @bucket.route('/retrieve_chat', methods=['POST'])
 def retrieve_chat():
-    chat_name = request.form.get('video_id')
+    chat_name = request.form.get('video_name')
 
     try:
         # Retrieve info for requested chat

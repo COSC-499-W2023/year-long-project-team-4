@@ -281,3 +281,18 @@ def get_user_details():
         lastname = query_results['lastname']
         return jsonify({'firstname': firstname, 'lastname': lastname, 'email': email}), 200
     return jsonify({'error': 'No user currently logged in'}), 401
+
+
+@auth.route('/deleteaccount', methods=["POST"])
+def delete_account():
+    if 'email' in session:
+        email = session['email']
+        result = database.delete_record("userprofile", "email = %s", (email,))
+        if result == 1:
+            # Clear session data
+            session.clear()
+            return jsonify({"message": "Account deleted successfully"}), 200
+        else:
+            return jsonify({"error": "Failed to delete account"}), 500
+    else:
+        return jsonify({"error": "User not logged in"}), 401

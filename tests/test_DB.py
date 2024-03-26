@@ -18,8 +18,8 @@ def test_insert_user():
     assert result2 == 1  # Assuming insertion was successful
 
 def test_insert_video():
-    result = database.insert_video("Test.mp4", "2024-01-24 11:59:00", "updated@example.com", "Test@example.com","1","2")
-    resultGuest = database.insert_video("TestGuest.mp4", "2024-01-24 11:59:00",None, "Test@example.com","1","2")
+    result = database.insert_video("Test.mp4", "Testname","2024-01-24 11:59:00", "updated@example.com", "Test@example.com","1","2")
+    resultGuest = database.insert_video("TestGuest.mp4", "Testname", "2024-01-24 11:59:00",None, "Test@example.com","1","2")
 
     assert result == 1  # Assuming insertion was successful
     assert resultGuest == 1
@@ -35,7 +35,7 @@ def test_delete():
     assert result2 == 1  # Assuming the deletion was successful
     
 def test_delete_key():
-    database.insert_video("TestDeleteKey.mp4", "2024-01-24 11:59:00", "updated@example.com", "Test@example.com","1","2")
+    database.insert_video("TestDeleteKey.mp4", "Testname","2024-01-24 11:59:00", "updated@example.com", "Test@example.com","1","2")
     result = database.delete_key("TestDeleteKey.mp4", sender = True, receiver = False)
     assert result == 1  # Assuming the delete was successful
        

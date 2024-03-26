@@ -217,7 +217,7 @@ def test_video_upload_download(client):
     upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
 
     # Retrieve the video
-    retrieve_video_post_object = {'video_name': upload_response['video_id']}
+    retrieve_video_post_object = {'video_id': upload_response['video_id']}
     retrieve_response = client.post('/bucket/retrieve', data=retrieve_video_post_object)
 
     # Check that retrieved video matches test file

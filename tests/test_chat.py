@@ -26,8 +26,8 @@ def client(app):
 # Tests that we can successfully create chats when a video is sent
 def test_create_chat_success(client):
     # Setup some test data
-    sender_post_object = {'email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
-    receiver_post_object = {'email': 'example@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    sender_post_object = {'email': 'test123@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
+    receiver_post_object = {'email': 'example@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     file = 'test_video.mp4'
     data = {
         'recipient': receiver_post_object['email'],
@@ -56,7 +56,7 @@ def test_create_chat_success(client):
 # Tests that videos sent from guest accounts do not create chats
 def test_create_chat_fail(client):
     # Setup some test data
-    receiver_post_object = {'email': 'example@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    receiver_post_object = {'email': 'example@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     file = 'test_video.mp4'
     data = {
         'recipient': receiver_post_object['email'],
@@ -86,8 +86,8 @@ def test_create_chat_fail(client):
 # Tests that we can use the created chats to send messages between accounts
 def test_send_receive_chat(client):
     # Setup some test data
-    sender_post_object = {'email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
-    receiver_post_object = {'email': 'example@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    sender_post_object = {'email': 'test123@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
+    receiver_post_object = {'email': 'example@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     file = 'test_video.mp4'
     data = {
         'recipient': receiver_post_object['email'],

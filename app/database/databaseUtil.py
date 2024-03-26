@@ -6,7 +6,7 @@ import sys
 from datetime import datetime, timezone
 
 sys.path.append(os.path.abspath('../app'))
-load_dotenv() 
+load_dotenv('myenv.env') 
 SSH = os.getenv("SSH") == 'True'
 SSHUSER = os.getenv("SSHUSER")
 KPATH = os.getenv("KEYPATH")

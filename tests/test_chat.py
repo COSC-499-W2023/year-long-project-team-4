@@ -37,10 +37,23 @@ def test_create_chat_success(client):
     # Reset tables and signup
     assert database.resetTable(tableName="userprofile")
     assert database.resetTable(tableName="videos")
+
     response = json.loads(client.post('/auth/signup', data=receiver_post_object).data.decode('utf-8'))
     assert not 'error' in response
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(receiver_post_object['email'],))[0]['verifyKey']
+    post_object2 = {'input_code': f'{inputcode}', 'email': receiver_post_object['email']}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object2).data.decode('utf-8'))
+    assert not 'error' in response
+
     response = json.loads(client.post('/auth/signup', data=sender_post_object).data.decode('utf-8'))
     assert not 'error' in response
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(sender_post_object['email'],))[0]['verifyKey']
+    post_object2 = {'input_code': f'{inputcode}', 'email': sender_post_object['email']}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object2).data.decode('utf-8'))
+    assert not 'error' in response
+
+    login_response = json.loads(client.post('/auth/login', data=sender_post_object).data.decode('utf-8'))
+    assert login_response.get('email') == sender_post_object['email'] # Ensure we are now logged in
 
     # Upload our test video to create the chat
     upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
@@ -97,10 +110,23 @@ def test_send_receive_chat(client):
     # Reset tables and signup
     assert database.resetTable(tableName="userprofile")
     assert database.resetTable(tableName="videos")
+
     response = json.loads(client.post('/auth/signup', data=receiver_post_object).data.decode('utf-8'))
     assert not 'error' in response
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(receiver_post_object['email'],))[0]['verifyKey']
+    post_object2 = {'input_code': f'{inputcode}', 'email': receiver_post_object['email']}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object2).data.decode('utf-8'))
+    assert not 'error' in response
+
     response = json.loads(client.post('/auth/signup', data=sender_post_object).data.decode('utf-8'))
     assert not 'error' in response
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(sender_post_object['email'],))[0]['verifyKey']
+    post_object2 = {'input_code': f'{inputcode}', 'email': sender_post_object['email']}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object2).data.decode('utf-8'))
+    assert not 'error' in response
+
+    login_response = json.loads(client.post('/auth/login', data=sender_post_object).data.decode('utf-8'))
+    assert login_response.get('email') == sender_post_object['email'] # Ensure we are now logged in
 
     # Upload our test video to create the chat
     upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
@@ -114,7 +140,7 @@ def test_send_receive_chat(client):
         assert 'chat_id' in response
 
     # Retrieve chat from sender POV and ensure it matches expectations
-    data = {'video_name': upload_response['video_id']}
+    data = {'video_id': upload_response['video_id']}
     response = json.loads(client.post('/bucket/retrieve_chat', data=data).data.decode('utf-8'))
     assert not 'error' in response
     assert 'messages' in response
@@ -128,7 +154,7 @@ def test_send_receive_chat(client):
     assert login_response.get('email') == receiver_post_object['email'] # Ensure we are now logged in
 
     # Retrieve chat from receiver POV and ensure it matches expectations
-    data = {'video_name': upload_response['video_id']}
+    data = {'video_id': upload_response['video_id']}
     response = json.loads(client.post('/bucket/retrieve_chat', data=data).data.decode('utf-8'))
     assert not 'error' in response
     assert 'messages' in response

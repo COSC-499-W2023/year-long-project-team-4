@@ -132,6 +132,10 @@ def upload_video():
     sender_email = ''
     if 'email' in session:
         sender_email = session['email']
+        
+        if sender_email == recipient_email:
+            return jsonify({'error': 'Can not be the sender and recipient of the video'}),412
+        
         sender_public_key = get_public_key(session['email'])
         sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
         if not create_chat(video_id, retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):
@@ -507,10 +511,10 @@ def change_password_reencrypt():
         #Get videos to reencrypt
         old_private_key = get_private_key()
         user_email = session['email']
-        videos_to_decrypt1 = database.query_records(table_name='videos', fields='videoId', condition=f'receiverEmail = %s', condition_values=(user_email,))
+        videos_to_decrypt_received = database.query_records(table_name='videos', fields='videoName', condition=f'receiverEmail = %s', condition_values=(user_email,))
         
         #Repeat for sent
-        videos_to_decrypt2 = database.query_records(table_name='videos', fields='videoId', condition=f'senderEmail = %s', condition_values=(user_email,))
+        videos_to_decrypt_sent = database.query_records(table_name='videos', fields='videoName', condition=f'senderEmail = %s', condition_values=(user_email,))
            
         #Change password, salt_hash, and pubKey
         user_id = database.query_records(table_name='userprofile', fields='id', condition=f'email = %s', condition_values=(user_email,))[0]['id']
@@ -522,26 +526,27 @@ def change_password_reencrypt():
         public_key = private_key.publickey().export_key('PEM')
         hashed_password = bcrypt.generate_password_hash(new_password).decode()
         #Insert new info into database
-        database.update_user(user_email = user_email, new_password_hash = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+        database.update_user(user_email = user_email, new_password_hash = hashed_password, new_salt_hash = salt_hash, new_public_key = public_key)
 
         #Loop through videos to reencrypt and insert back to database and s3Bucket
-        for videos1 in videos_to_decrypt2:        
+        for sentvideos in videos_to_decrypt_sent:        
             #Decrypt
-            encrypted_aes_key = database.query_records(table_name='videos', fields='senderEncryption', condition=f'videoId = %s', condition_values=(videos1['videoId'],))[0]['senderEncryption']
-            retention_date = database.query_records(table_name='videos', fields='retDate', condition=f'videoId = %s', condition_values=(videos1['videoId'],))[0]['retDate']
+            video_details = database.query_records(table_name='videos', fields='senderEncryption, retDate, receiverEmail', condition=f'videoName = %s', condition_values=(sentvideos['videoName'],))[0]
+            encrypted_aes_key = video_details['senderEncryption']
+            retention_date = video_details['retDate']
+            receiver_email = video_details['receiverEmail']
             aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
-            receiver_email = database.query_records(table_name='videos', fields='receiverEmail', condition=f'videoId = %s', condition_values=(videos1['videoId'],))[0]['receiverEmail']
-            video_path = f'/videos/{videos1["videoId"]}'
+            video_path = f'/videos/{sentvideos["videoName"]}'
             object_content = s3Bucket.get_object_content(video_path)
             decrypted_video = aes_decrypt_video(object_content, aes_key)
             s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
-            database.delete_record("videos", "videoId = %s", videos1["videoId"])
+            database.delete_record("videos", "videoName = %s", sentvideos["videoName"])
             #Reencrypt
             aes_key = bytes
             session['private_key'] = private_key.export_key()
             encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
             #Insert into s3Bucket (sent videos first)
-            video_id = videos1['videoId']
+            video_name = sentvideos['videoName']
             sender_email = user_email
                 
             sender_public_key = get_public_key(user_email)
@@ -550,7 +555,6 @@ def change_password_reencrypt():
             recipient_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, recipient_public_key)
             #Upload video
             proceed = s3Bucket.already_existing_file(video_path)
-            print(sender_encrypted_aes_key) 
             if (proceed == False):
                 s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
             insert_video = s3Bucket.encrypt_insert(file_flag = 'videos', file_content = encrypted_video, file_name = video_id, retDate = retention_date, senderEmail = sender_email, receiverEmail = receiver_email, senderEncryption = sender_encrypted_aes_key, receiverEncryption = recipient_encrypted_aes_key)
@@ -558,27 +562,27 @@ def change_password_reencrypt():
             if insert_video == False:
                 return jsonify({"status": "error",'message': 'Video insertion failed'}), 502
         #Repeat but for recieved videos
-        for videos2 in videos_to_decrypt1:
+        for receivedvideos in videos_to_decrypt_received:
             #Decrypt
-            query_result = database.query_records(table_name='videos', fields='receiverEncryption', condition=f'videoId = %s', condition_values=(videos2['videoId'],))[0]
-            video_details = database.query_records(table_name='videos', fields='retDate, senderEmail', condition=f'videoId = %s', condition_values=(videos1['videoId'],))[0]
-            encrypted_aes_key = query_result['receiverEncryption']
+            print("Video in receiver")
+            video_details = database.query_records(table_name='videos', fields='retDate, senderEmail, receiverEncryption', condition=f'videoName = %s', condition_values=(receivedvideos['videoName'],))[0]
+            encrypted_aes_key = video_details['receiverEncryption']
             aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
-            video_path = f'/videos/{videos2["videoId"]}'
+            video_path = f'/videos/{receivedvideos["videoName"]}'
             object_content = s3Bucket.get_object_content(video_path)
             decrypted_video = aes_decrypt_video(object_content, aes_key)
             s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
-            database.delete_record("videos", "videoId = %s", videos2["videoId"])
+            database.delete_record("videos", "videoName = %s", receivedvideos["videoName"])
             #Reencrypt
             session['private_key'] = private_key.export_key()
             aes_key = bytes
             encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
             print(aes_key)
             #Insert into s3Bucket (received)
-            video_id = videos2['videoId']
+            video_name = receivedvideos['videoName']
             retention_date = video_details["retDate"]
             sender_email = video_details["senderEmail"]
-            receiver_email - user_email
+            receiver_email = user_email
                 
             sender_public_key = get_public_key(sender_email)
             sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
@@ -663,7 +667,7 @@ def change_password_forgot():
         public_key = private_key.publickey().export_key('PEM')
         hashed_password = bcrypt.generate_password_hash(new_password).decode()
         #Insert new info into database
-        database.update_user(user_email = email, new_password_hash = hashed_password, new_salthash = salt_hash, new_publicKey = public_key)
+        database.update_user(user_email = email, new_password_hash = hashed_password, new_salt_hash = salt_hash, new_public_key = public_key)
         
         #Get recieved videos that need key deleted
         videos_to_delete_key = database.query_records(table_name='videos', fields='videoId', condition=f'receiverEmail = %s', condition_values=(email,))

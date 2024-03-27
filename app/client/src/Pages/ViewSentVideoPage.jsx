@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Row, Col, Button} from 'react-bootstrap';
+import {Row, Col, Button, Card} from 'react-bootstrap';
 import { receiveAndSendPath } from '../Path';
 import axios from 'axios';
 // Animation library for smooth transitions
@@ -38,26 +38,56 @@ const ViewSentVideoPage = () => {
     navigate(MessagingPath, { state: { videoId: videoId } });
   };
 
+  const [hoverIndex, setHoverIndex] = useState(-1); // State to keep track of which card is being hovered
+
+  const defaultCardStyle = {
+    backgroundColor: '#13056be0', // Default card background
+    color: 'white', // Default text color
+    transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
+  };
+
+  const hoverCardStyle = {
+    backgroundColor: 'white', // Hover card background
+    color: '#13056be0', // Hover text color
+    transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
+  };
+
+  const getCardStyle = (isHovered) => (
+    isHovered ? {...defaultCardStyle, ...hoverCardStyle} : defaultCardStyle
+  );
+
   return (
-     <Fade cascade>
-      <Row>
-          <div className="display-4 text-center"> Videos Uploaded </div>
-           <Col className="p-3">
-               <div className="display-6"> Videos</div>
-               {videos.map((video, index) => (
-                            <>
-                          <div key={index} onClick={() => handleVideoClick(video.videoId)}>
-                              <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                              <p>Video{index + 1}</p>
-                              </Button>
-                          </div>
-                          </>
-                      ))}
-          </Col>   
-      </Row>      
-          {errorMessage && <div className="error-message">{errorMessage}</div>}
-     </Fade>
-    )
+    <Fade cascade>
+      {/* Adjusted the padding top for the row that contains the heading */}
+      <Row style={{ paddingTop: '2rem' }}>
+        <div className="display-4 text-center" style={{ color: '#13056be0', marginBottom: '2rem' }}>Videos Received</div>
+      </Row>
+      {/* Adjusted the margin bottom for each card for even spacing between cards */}
+      <Row xs={1} md={2} className="g-4">
+        {videos.map((video, index) => (
+          <Col key={index} style={{ marginBottom: '1.5rem' }}> {/* This adds space below each card */}
+            <Card 
+              style={getCardStyle(index === hoverIndex)}
+              onMouseEnter={() => setHoverIndex(index)}
+              onMouseLeave={() => setHoverIndex(-1)}
+              onClick={() => handleVideoClick(video.videoId)}
+              className="mb-3" // You can remove this if you are now using inline styles
+            >
+              <Card.Body>
+                <Card.Title>{video.videoName}</Card.Title>
+                <Card.Text>
+                  Sender's Email: <br />
+                  Sender's Name: <br />
+                  Tags:
+                </Card.Text>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
+    </Fade>
+  );
   }
   
   export default ViewSentVideoPage

@@ -5,7 +5,7 @@ import record from "../Assets/record-btn.svg"
 import axios from "axios";
 import info from "../Assets/info-circle.svg"
 import { Fade } from 'react-reveal';
-import { IP_ADDRESS } from '../Path';
+import { IP_ADDRESS, viewSentVideoPath } from '../Path';
 import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
 
@@ -91,7 +91,8 @@ const UploadVideoPage = () => {
   })
   .then(response => {
     console.log('Video uploaded successfully', response.data);
-    setUploadSuccess(true); // Updates the state to reflect a successful upload;
+    setUploadSuccess(true);
+    navigate(viewSentVideoPath);
   })
   .catch(error => {
     console.error('Error uploading video', error);

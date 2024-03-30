@@ -86,7 +86,7 @@ def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, 
         # Returns what 1 or -1 
         return result
 
-def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail:str, senderEncryption, receiverEncryption) -> int:
+def insert_video(videoId:str, videoName:str, retDate:datetime, senderEmail:str, receiverEmail:str, senderEncryption, receiverEncryption) -> int:
     '''
     Insert a new video into the database.
 
@@ -107,6 +107,7 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
     '''
     db = None
     result = None
+    print(videoName)
     try:
         if SSH:
             # Creates the SSH tunnel to connect to the DB
@@ -117,8 +118,8 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
                 cur = db.cursor()
                 subDate = datetime.now(timezone.utc)
                 retDate = datetime.strptime(retDate, '%Y-%m-%d %H:%M:%S')
-                query = "INSERT INTO videos(videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-                data = (videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption)
+                query = "INSERT INTO videos(videoId, videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                data = (videoId, videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption)
                 cur.execute(query, data)
                 print("Insertation Complete")
                 db.commit()
@@ -130,8 +131,8 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
             cur = db.cursor()
             subDate = datetime.now(timezone.utc)
             retDate = datetime.strptime(retDate, '%Y-%m-%d %H:%M:%S')
-            query = "INSERT INTO videos(videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-            data = (videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption)
+            query = "INSERT INTO videos(videoId, videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            data = (videoId, videoName, subDate, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption)
             cur.execute(query, data)
             print("Insertation Complete")
             db.commit()
@@ -146,13 +147,13 @@ def insert_video(videoName:str, retDate:datetime, senderEmail:str, receiverEmail
     return result
 
 
-def insert_tags(video_name: str, tags: list[str]) -> int:
+def insert_tags(video_id: str, tags: list[str]) -> int:
     result = 0
 
     query_data = []
     for tag in tags:
         query_data.append(tag)
-        query_data.append(video_name)
+        query_data.append(video_id)
 
     try:
         if SSH:
@@ -163,7 +164,7 @@ def insert_tags(video_name: str, tags: list[str]) -> int:
                 cur = db.cursor()
                 set_clause = "(%s,%s)," * len(tags)
                 set_clause = set_clause[:-1] # Get rid of last comma
-                query = f"INSERT INTO tags (tagName, videoName) VALUES {set_clause}"
+                query = f"INSERT INTO tags (tagName, videoId) VALUES {set_clause}"
                 cur.execute(query, query_data)
 
                 db.commit()
@@ -175,7 +176,7 @@ def insert_tags(video_name: str, tags: list[str]) -> int:
             cur = db.cursor()
             set_clause = "(%s,%s)," * len(tags)
             set_clause = set_clause[:-1] # Get rid of last comma
-            query = f"INSERT INTO tags (tagName, videoName) VALUES {set_clause}"
+            query = f"INSERT INTO tags (tagName, videoId) VALUES {set_clause}"
             cur.execute(query, query_data)
 
             db.commit()
@@ -411,12 +412,12 @@ def resetTable(tableName:str)-> bool:
             db.close()
     return False  # Reset failed
 
-def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
+def delete_key(videoId:str,sender:bool,receiver:bool) -> int:
     '''
     Zeros out a user's key so they can no longer access a video
 
     Args:
-        videoName(str): The video's name where the key will be deleted
+        videoId(str): The video's ID where the key will be deleted
         sender(bool): true if the user is the sender
         reciever(bool): true if the user is the reciever
 
@@ -440,16 +441,16 @@ def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
                     if (sender):
                         set_clause = "senderEncryption = 0, senderEmail = NULL"
                     elif (receiver):
-                        set_clause = "recieverEncryption = 0, receiverEmail = NULL"
+                        set_clause = "receiverEncryption = 0, receiverEmail = NULL"
                     else:
                         result = -1
-                    query = f"UPDATE videos SET {set_clause} WHERE videoName = %s"
-                    cur.execute(query, videoName)   
+                    query = f"UPDATE videos SET {set_clause} WHERE videoId = %s"
+                    cur.execute(query, videoId)   
                     # Check if video has chats associated with it and removes user's access
-                    query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoName,))
+                    query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoId,))
                     if query_results:
                         query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
-                        cur.execute(query2, videoName) 
+                        cur.execute(query2, videoId) 
                     cur.close()
                     result = 1  # Set result to 1 to indicate success
         else:
@@ -460,16 +461,16 @@ def delete_key(videoName:str,sender:bool,receiver:bool) -> int:
                 if (sender):
                     set_clause = "senderEncryption = 0, senderEmail = NULL"
                 elif (receiver):
-                    set_clause = "recieverEncryption = 0, receiverEmail = NULL"
+                    set_clause = "receiverEncryption = 0, receiverEmail = NULL"
                 else:
                     result = -1
-                query = f"UPDATE videos SET {set_clause} WHERE videoName = %s"
-                cur.execute(query, videoName)   
+                query = f"UPDATE videos SET {set_clause} WHERE videoId = %s"
+                cur.execute(query, videoId)   
                 # Check if video has chats associated with it and removes user's access
-                query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoName,))
+                query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoId,))
                 if query_results:
                     query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
-                    cur.execute(query2, videoName) 
+                    cur.execute(query2, videoId) 
                 cur.close()
                 result = 1  # Set result to 1 to indicate success 
     except Exception as e:

@@ -4,22 +4,6 @@ from flask_socketio import join_room, emit
 from .bucket_interface import send_chat, retrieve_chat
 from flask import session
 
-
-users = {}
-
-@socketio.on('connect')
-def handle_connect():
-    user_email = session.get('email')
-    if user_email:
-        users[request.sid] = user_email
-        emit('connected', {'email': user_email})
-    else:
-        print("No user email in session")
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    users.pop(request.sid, None)
-
 @socketio.on('message')
 def handle_message(data):
     socketio.emit('message', data)

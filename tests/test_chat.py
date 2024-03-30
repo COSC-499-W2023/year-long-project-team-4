@@ -26,8 +26,8 @@ def client(app):
 # Tests that we can successfully create chats when a video is sent
 def test_create_chat_success(client):
     # Setup some test data
-    sender_post_object = {'email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
-    receiver_post_object = {'email': 'example@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    sender_post_object = {'email': 'test123@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
+    receiver_post_object = {'email': 'example@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     file = 'test_video.mp4'
     data = {
         'recipient': receiver_post_object['email'],
@@ -37,17 +37,30 @@ def test_create_chat_success(client):
     # Reset tables and signup
     assert database.resetTable(tableName="userprofile")
     assert database.resetTable(tableName="videos")
+
     response = json.loads(client.post('/auth/signup', data=receiver_post_object).data.decode('utf-8'))
     assert not 'error' in response
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(receiver_post_object['email'],))[0]['verifyKey']
+    post_object2 = {'input_code': f'{inputcode}', 'email': receiver_post_object['email']}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object2).data.decode('utf-8'))
+    assert not 'error' in response
+
     response = json.loads(client.post('/auth/signup', data=sender_post_object).data.decode('utf-8'))
     assert not 'error' in response
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(sender_post_object['email'],))[0]['verifyKey']
+    post_object2 = {'input_code': f'{inputcode}', 'email': sender_post_object['email']}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object2).data.decode('utf-8'))
+    assert not 'error' in response
+
+    login_response = json.loads(client.post('/auth/login', data=sender_post_object).data.decode('utf-8'))
+    assert login_response.get('email') == sender_post_object['email'] # Ensure we are now logged in
 
     # Upload our test video to create the chat
     upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
     assert not 'error' in upload_response
 
     # Retrieve the chat, ensure chat matches expected start state
-    data = {'video_name': upload_response['video_id']}
+    data = {'video_id': upload_response['video_id']}
     response = json.loads(client.post('/bucket/retrieve_chat', data=data).data.decode('utf-8'))
     assert not 'error' in response
     assert 'messages' in response
@@ -56,7 +69,7 @@ def test_create_chat_success(client):
 # Tests that videos sent from guest accounts do not create chats
 def test_create_chat_fail(client):
     # Setup some test data
-    receiver_post_object = {'email': 'example@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    receiver_post_object = {'email': 'example@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     file = 'test_video.mp4'
     data = {
         'recipient': receiver_post_object['email'],
@@ -78,7 +91,7 @@ def test_create_chat_fail(client):
     assert not 'error' in upload_response
 
     # Try to retrieve chat, ensure it does not exist
-    data = {'video_name': upload_response['video_id']}
+    data = {'video_id': upload_response['video_id']}
     response = json.loads(client.post('/bucket/retrieve_chat', data=data).data.decode('utf-8'))
     assert 'error' in response
     assert response['error'] == 'Chat does not exist'
@@ -86,8 +99,8 @@ def test_create_chat_fail(client):
 # Tests that we can use the created chats to send messages between accounts
 def test_send_receive_chat(client):
     # Setup some test data
-    sender_post_object = {'email': 'test123@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
-    receiver_post_object = {'email': 'example@example.com', 'password': 'test_password', 'firstname': 'Test', 'lastname': 'LastName'}
+    sender_post_object = {'email': 'test123@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
+    receiver_post_object = {'email': 'example@example.com', 'password': 'Test_password1!', 'firstname': 'Test', 'lastname': 'LastName'}
     file = 'test_video.mp4'
     data = {
         'recipient': receiver_post_object['email'],
@@ -97,10 +110,23 @@ def test_send_receive_chat(client):
     # Reset tables and signup
     assert database.resetTable(tableName="userprofile")
     assert database.resetTable(tableName="videos")
+
     response = json.loads(client.post('/auth/signup', data=receiver_post_object).data.decode('utf-8'))
     assert not 'error' in response
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(receiver_post_object['email'],))[0]['verifyKey']
+    post_object2 = {'input_code': f'{inputcode}', 'email': receiver_post_object['email']}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object2).data.decode('utf-8'))
+    assert not 'error' in response
+
     response = json.loads(client.post('/auth/signup', data=sender_post_object).data.decode('utf-8'))
     assert not 'error' in response
+    inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=(sender_post_object['email'],))[0]['verifyKey']
+    post_object2 = {'input_code': f'{inputcode}', 'email': sender_post_object['email']}
+    response = json.loads(client.post('/auth/confirm_user', data=post_object2).data.decode('utf-8'))
+    assert not 'error' in response
+
+    login_response = json.loads(client.post('/auth/login', data=sender_post_object).data.decode('utf-8'))
+    assert login_response.get('email') == sender_post_object['email'] # Ensure we are now logged in
 
     # Upload our test video to create the chat
     upload_response = json.loads(client.post('/bucket/upload', data=data).data.decode('utf-8'))
@@ -108,13 +134,13 @@ def test_send_receive_chat(client):
 
     # Send a few chats
     for i in range(3):
-        data = {'video_name': upload_response['video_id'], 'chat_text': i}
+        data = {'video_id': upload_response['video_id'], 'chat_text': i}
         response = json.loads(client.post('/bucket/send_chat', data=data).data.decode('utf-8'))
         assert not 'error' in response
         assert 'chat_id' in response
 
     # Retrieve chat from sender POV and ensure it matches expectations
-    data = {'video_name': upload_response['video_id']}
+    data = {'video_id': upload_response['video_id']}
     response = json.loads(client.post('/bucket/retrieve_chat', data=data).data.decode('utf-8'))
     assert not 'error' in response
     assert 'messages' in response
@@ -128,7 +154,7 @@ def test_send_receive_chat(client):
     assert login_response.get('email') == receiver_post_object['email'] # Ensure we are now logged in
 
     # Retrieve chat from receiver POV and ensure it matches expectations
-    data = {'video_name': upload_response['video_id']}
+    data = {'video_id': upload_response['video_id']}
     response = json.loads(client.post('/bucket/retrieve_chat', data=data).data.decode('utf-8'))
     assert not 'error' in response
     assert 'messages' in response

@@ -8,10 +8,6 @@ import { receiveAndSendPath,
 import io from 'socket.io-client';
 import axios from 'axios';
 
-const socket = io(`${IP_ADDRESS}`,  {
-    withCredentials: true,
-  });
-
 function MessageSender() {
     const [message, setMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -25,7 +21,7 @@ function MessageSender() {
     const navigate = useNavigate();
 
     // Retreive video from location state
-    const videoName = location.state?.videoName;
+    const videoId = location.state?.videoId;
 
     const messagesEndRef = useRef(null); // Ref for auto-scrolling
 
@@ -33,18 +29,24 @@ function MessageSender() {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    const socket = io(`${IP_ADDRESS}`,  {
+        withCredentials: true,
+        autoConnect: false
+    });
+
     useEffect(() => {
         // Auto-scroll to the bottom whenever messages change
         scrollToBottom();
     }, [chatMessages]);
 
-    // Fetch existing chat messages on component mount or when videoName changes
+    // Fetch existing chat messages on component mount
     useEffect(() => {
-        if (videoName) {
+        if (videoId) {
+            socket.connect();
             setIsLoading(true);
 
             const formData = new FormData();
-            formData.append('video_name', videoName);
+            formData.append('video_id', videoId);
         
             axios.post(`${IP_ADDRESS}/bucket/retrieve`, formData, {
                 withCredentials: true,
@@ -60,64 +62,37 @@ function MessageSender() {
                 setIsLoading(false);
             });
 
-            socket.emit('join_chat', { chat_name: videoName });
+            socket.emit('join_chat', { chat_name: videoId });
       
             socket.on('new_chat_message', (newMessage) => {
-                console.log("kinda working");
+                console.log("New chat message");
                 setChatMessages((prevMessages) => [...prevMessages, newMessage]);
             });
 
             socket.on('chat_history', (messages) => {
+                console.log("Chat history");
                 setChatMessages(messages);
-
-                /*const roomName = messages.find(message => message.sender !== currentUser);
-                console.log(roomName['sender']);
-                if (roomName && !chatRoomName) {
-                    setChatRoomName(`${roomName['sender']}'s Room`);
-                    console.log("hey")
-                    console.log(chatRoomName);
-                }*/
             });
 
             // Clean up on component unmount
             return () => {
                 socket.off('new_chat_message');
                 socket.off('chat_history');
+                socket.disconnect();
             };
         }
-    }, [videoName]);
-
-    useEffect(() => {
-        const fetchCurrentUser = async () => {
-          try {
-            const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
-              withCredentials: true
-            });
-      
-            if (response.data.email) {
-              setCurrentUser(response.data.email);
-            } else {
-              console.error('No user currently logged in');
-            }
-          } catch (error) {
-            console.error('There was an error fetching the current user', error);
-            setErrorMessage('There was an error fetching the current user');
-          }
-        };
-      
-        fetchCurrentUser();
-      }, []);  
+    }, []);
 
     //Navigate back to view videos
     const handleBack = () => {
         navigate(receiveAndSendPath);
     };
 
-    // Display error if videoName is not available
-    if (!videoName) {
+    // Display error if videoId is not available
+    if (!videoId) {
         return (
             <div>
-                <p>Video name is required to join the chat.</p>
+                <p>Video ID is required to join the chat.</p>
                 <Button onClick={handleBack}>Go Back to Receive Video</Button>
             </div>
         );
@@ -128,7 +103,8 @@ function MessageSender() {
         e.preventDefault();
 
         if (message.trim()) {
-            socket.emit('send_chat_message', { chat_name: videoName, message: message });
+            socket.connect();
+            socket.emit('send_chat_message', { chat_name: videoId, message: message });
             setMessage(''); // Clear the input after sending
         } else {
             setErrorMessage('Please enter a message before sending.');

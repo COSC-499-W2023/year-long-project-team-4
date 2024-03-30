@@ -14,11 +14,10 @@ import {ReactComponent as See} from '../Assets/eye.svg';
 import {ReactComponent as UnSee} from '../Assets/eye-slash.svg';
 
 const LoginHomePage = () => {
+  const navigate = useNavigate();
   const [type, setType] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
-  const navigate = useNavigate();
-
   const handleLogin = async (email, password) => {
     try {
       const response = await axios.post(`${IP_ADDRESS}/auth/login`, {

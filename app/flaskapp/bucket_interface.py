@@ -255,7 +255,7 @@ def retrieve_video():
 @bucket.route('/getvideos', methods=['GET'])
 def get_available_videos():
     table_join = 'videos LEFT JOIN tags ON videos.videoId=tags.videoID'
-    fields = 'videos.videoId, videos.videoName, videos.senderEmail, videos.receiverEmail, tags.tagName'
+    fields = 'videos.videoId, videos.videoName, videos.senderEmail, videos.receiverEmail, videos.senderFName, videos.senderLName, tags.tagName'
     videos_with_tags = database.query_records(table_name=table_join, fields=fields, condition=f'videos.receiverEmail = %s', condition_values=(session['email'],))
 
     # Since videos to tags are a one to many relationship, the join will return multiple of each video if there are multiple tags
@@ -283,7 +283,7 @@ def get_available_videos():
 @bucket.route('/get_sent_videos', methods=['GET'])
 def get_sent_videos():
     table_join = 'videos LEFT JOIN tags ON videos.videoId=tags.videoID'
-    fields = 'videos.videoId, videos.videoName, videos.senderEmail, videos.receiverEmail, tags.tagName'
+    fields = 'videos.videoId, videos.videoName, videos.senderEmail, videos.receiverEmail, videos.senderFName, videos.senderLName, tags.tagName'
     videos_with_tags = database.query_records(table_name=table_join, fields=fields, condition=f'videos.senderEmail = %s', condition_values=(session['email'],))
 
     # Since videos to tags are a one to many relationship, the join will return multiple of each video if there are multiple tags

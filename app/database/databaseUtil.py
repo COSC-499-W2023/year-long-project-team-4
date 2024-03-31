@@ -509,18 +509,18 @@ def update_key(videoId:str,sender:bool,receiver:bool, encrpytKey) -> int:
                     cur = db.cursor()
                     #Create set clause depending on whether user is sender or receiver
                     if (sender):
-                        set_clause = f"senderEncryption = {encrpytKey}"
+                        set_clause = f"senderEncryption = %s"
                     elif (receiver):
-                        set_clause = f"receiverEncryption = {encrpytKey}"
+                        set_clause = f"receiverEncryption = %s"
                     else:
                         result = -1
                     query = f"UPDATE videos SET {set_clause} WHERE videoId = %s"
-                    cur.execute(query, videoId)   
+                    cur.execute(query, (encrpytKey, videoId))   
                     # Check if video has chats associated with it and removes user's access
                     query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoId,))
                     if query_results:
                         query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
-                        cur.execute(query2, videoId) 
+                        cur.execute(query2, (encrpytKey, videoId)) 
                     cur.close()
                     result = 1  # Set result to 1 to indicate success
         else:

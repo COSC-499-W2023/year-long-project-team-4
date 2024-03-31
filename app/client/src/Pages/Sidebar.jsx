@@ -74,53 +74,92 @@ const Sidebar = () => {
       }
     }
 
-    return (
-      <div className="sidebar" style={{ height: '100vh', overflow: 'hidden' }}>
-        {/* Sidebar content */}
-        <NavLink
-          to={viewSentVideoPath}
-          className={`nav-link ${activeTab === "uploadedVideos" ? "active" : ""}`}
-          onClick={() => handleSetActiveTab("uploadedVideos")}
-          style={{ maxWidth: '200px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}
-        >
-          Videos Uploaded
-        </NavLink>
-        <NavLink
-          to={viewVideoPath}
-          className={`nav-link ${activeTab === "viewVideos" ? "active" : ""}`}
-          onClick={() => handleSetActiveTab("viewVideos")}
-          style={{ maxWidth: '200px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}
-        >
-          Videos Received
-        </NavLink>
-        <NavLink
-          to={uploadVideoPath}
-          className={`nav-link ${activeTab === "uploadVideo" ? "active" : ""}`}
-          onClick={() => handleSetActiveTab("uploadVideo")}
-          style={{ maxWidth: '200px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}
-        >
-          Upload Video
-        </NavLink>
-  
-       
-        {/* Modal for error message */}
-        {errorMessage && (
-          <Modal
-            show={modal}
-            onHide={() => setModal(false)}
-            backdrop="static"
-            keyboard={false}
-            variant="Danger"
-            contentClassName="bg-danger text-white"
+    if (currentUser) {
+      return (
+        <div className="sidebar" style={{ height: '100vh', overflow: 'hidden' }}>
+         
+          <NavLink
+            to={viewSentVideoPath}
+            className={`nav-link ${activeTab === "uploadedVideos" ? "active" : ""}`}
+            onClick={() => handleSetActiveTab("uploadedVideos")}
+            style={{ maxWidth: '200px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}
           >
-            <Modal.Header closeButton>
-              <Modal.Title>Error!</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>{errorMessage}</Modal.Body>
-          </Modal>
-        )}
-      </div>
-    );
+            Videos Uploaded
+          </NavLink>
+          <NavLink
+            to={viewVideoPath}
+            className={`nav-link ${activeTab === "viewVideos" ? "active" : ""}`}
+            onClick={() => handleSetActiveTab("viewVideos")}
+            style={{ maxWidth: '200px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}
+          >
+            Videos Received
+          </NavLink>
+          <NavLink
+            to={uploadVideoPath}
+            className={`nav-link ${activeTab === "uploadVideo" ? "active" : ""}`}
+            onClick={() => handleSetActiveTab("uploadVideo")}
+            style={{ maxWidth: '200px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}
+          >
+            Upload Video
+          </NavLink>
+    
+         
+          {/* Modal for error message */}
+          {errorMessage && (
+            <Modal
+              show={modal}
+              onHide={() => setModal(false)}
+              backdrop="static"
+              keyboard={false}
+              variant="Danger"
+              contentClassName="bg-danger text-white"
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Error!</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>{errorMessage}</Modal.Body>
+            </Modal>
+          )}
+        </div>
+      );
+    };
+
+    
+    if (!currentUser) {
+      return (
+      <div className="sidebar" style={{ height: '100vh', overflow: 'hidden' }}>
+          
+          <NavLink
+            to={uploadVideoPath}
+            className={`nav-link ${activeTab === "uploadVideo" ? "active" : ""}`}
+            onClick={() => handleSetActiveTab("uploadVideo")}
+            style={{ maxWidth: '200px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}
+          >
+            Upload Video
+          </NavLink>
+    
+         
+          {/* Modal for error message */}
+          {errorMessage && (
+            <Modal
+              show={modal}
+              onHide={() => setModal(false)}
+              backdrop="static"
+              keyboard={false}
+              variant="Danger"
+              contentClassName="bg-danger text-white"
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Error!</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>{errorMessage}</Modal.Body>
+            </Modal>
+          )}
+        </div>
+      );
+
+    };
+    
   };
   
   export default Sidebar;

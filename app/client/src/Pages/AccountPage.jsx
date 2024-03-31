@@ -6,6 +6,7 @@ import axios from 'axios';
 import see from '../Assets/eye.svg';
 import unSee from '../Assets/eye-slash.svg';
 import {useNavigate} from 'react-router-dom';
+import Sidebar from './Sidebar';
 import {
     MessagingPath,
     IP_ADDRESS,
@@ -64,6 +65,14 @@ const handleStartChat = (e, videoName) => {
 };
 
 return (
+  <Fade cascade>
+      <Row>
+            <Col xs={2}>
+                <Fade>
+                <Sidebar />
+                </Fade>
+            </Col>
+            <Col xs={10}>
    <div className="container p-4">
     <Fade>
       <Card>
@@ -139,6 +148,9 @@ return (
       </div>
     </Fade>   
    </div>
+   </Col>   
+    </Row>  
+    </Fade>
   )
 }
 

@@ -536,7 +536,7 @@ def change_password_reencrypt():
 
             #Reencrypt
             aes_key = bytes(aes_key)
-            session['private_key'] = generate_key(new_password + salt_hash.hex()).export_key() 
+            session['private_key'] = private_key.export_key() 
             video_id = sentvideos['videoId']
             sender_public_key = get_public_key(user_email)
             sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
@@ -556,7 +556,7 @@ def change_password_reencrypt():
             
             #Reencrypt
             session['private_key'] = private_key.export_key()
-            aes_key = bytes
+            aes_key = bytes(aes_key)
             video_id = receivedvideos['videoId']
             recipient_public_key = get_public_key(user_email)
             recipient_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, recipient_public_key)

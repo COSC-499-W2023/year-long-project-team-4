@@ -133,8 +133,8 @@ def upload_video():
     if 'email' in session:
         sender_email = session['email']
         
-        if sender_email == recipient_email:
-            return jsonify({'error': 'Can not be the sender and recipient of the video'}),412
+        # if sender_email == recipient_email:
+        #     return jsonify({'error': 'Can not be the sender and recipient of the video'}),412
         
         sender_public_key = get_public_key(session['email'])
         sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
@@ -239,7 +239,6 @@ def retrieve_video():
 
     aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
     video_path = f'/videos/{video_id}'
-
     # Decrypt the file and write the data to an IO buffer
     video_data = io.BytesIO()
     object_content = s3Bucket.get_object_content(video_path)
@@ -536,14 +535,14 @@ def change_password_reencrypt():
             aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
 
             #Reencrypt
-            aes_key = bytes
-            session['private_key'] = private_key.export_key()
+            aes_key = bytes(aes_key)
+            session['private_key'] = generate_key(new_password + salt_hash.hex()).export_key() 
             video_id = sentvideos['videoId']
             sender_public_key = get_public_key(user_email)
             sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
             
             #Update video
-            update_video = database.update_key(video_id = video_id, sender = True, receiver = False, encryptKey = sender_encrypted_aes_key)
+            update_video = database.update_key(videoId = video_id, sender = True, receiver = False, encrpytKey = sender_encrypted_aes_key)
         
             if update_video == False:
                 return jsonify({"status": "error",'message': 'Video insertion failed'}), 502

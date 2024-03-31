@@ -316,7 +316,7 @@ const UploadVideoPage = () => {
           <>
           {file === null? 
           (<Fade>
-            <Webcam  width="400" height="225" audio={true} ref={webcamRef}/>
+            <Webcam  width="225" height="400" audio={true} ref={webcamRef}/>
            </Fade>
             ):(
             <Fade>

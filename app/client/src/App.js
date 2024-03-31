@@ -30,23 +30,39 @@ import AccountPage from "./Pages/AccountPage";
 import PageNotFound from "./Pages/PageNotFound";
 import AlertGuestPage from "./Pages/AlertGuestPage";
 import ViewSentVideoPage from "./Pages/ViewSentVideoPage";
+import { useState } from "react";
 
 function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+
   return (
     <Router>
-      <Header />
+      <Header currentUser={currentUser} setCurrentUser={setCurrentUser} />
       <Routes>
         <Route path={homePath} element={<HomePage />} />
-        <Route path={loginPath} element={<LoginHomePage />} />
+        <Route
+          path={loginPath}
+          setCurrentUser={setCurrentUser}
+          element={<LoginHomePage />}
+        />
         <Route path={guestPath} element={<AlertGuestPage />} />
-        <Route path={receiveAndSendPath} element={<ReceiveAndSendPage />} />
+        <Route
+          currentUser={currentUser}
+          path={receiveAndSendPath}
+          element={<ReceiveAndSendPage />}
+        />
         <Route path={uploadVideoPath} element={<UploadVideoPage />} />
         <Route path={viewVideoPath} element={<ViewVideoPage />} />
         <Route path={registerPath} element={<RegisterPage />} />
         <Route path={MessagingPath} element={<MessagingPage />} />
         <Route path={viewSentVideoPath} element={<ViewSentVideoPage />} />
-        <Route element={<PrivateRoute />}>
-          <Route path={accountPath} element={<AccountPage />} />
+        <Route currentUser={currentUser} element={<PrivateRoute />}>
+          <Route
+            currentUser={currentUser}
+            setCurrentUser={setCurrentUser}
+            path={accountPath}
+            element={<AccountPage />}
+          />
         </Route>
         <Route path={changePasswordPath} element={<ForgotPasswordPage />} />
         <Route path={passwordCodePath} element={<PasswordCodePage />} />

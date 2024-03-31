@@ -12,7 +12,6 @@ function MessageSender() {
     const [message, setMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
-    const [currentUser, setCurrentUser] = useState(null);
     const [videoURL, setVideoURL] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 

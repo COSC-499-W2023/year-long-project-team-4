@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Row, Col, Button, Card} from 'react-bootstrap';
-import { receiveAndSendPath } from '../Path';
+import {Row, Col, Card} from 'react-bootstrap';
 import axios from 'axios';
 // Animation library for smooth transitions
 import {Fade} from 'react-reveal';

@@ -412,7 +412,7 @@ def resetTable(tableName:str)-> bool:
             db.close()
     return False  # Reset failed
 
-def delete_key(videoId:str,sender:bool,receiver:bool,) -> int:
+def delete_key(videoId:str,sender:bool,receiver:bool) -> int:
     '''
     Zeros out a user's key so they can no longer access a video
 

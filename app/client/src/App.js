@@ -42,26 +42,23 @@ function App() {
         <Route path={homePath} element={<HomePage />} />
         <Route
           path={loginPath}
-          setCurrentUser={setCurrentUser}
-          element={<LoginHomePage />}
+          element={<LoginHomePage setCurrentUser={setCurrentUser}/>}
         />
         <Route path={guestPath} element={<AlertGuestPage />} />
         <Route
-          currentUser={currentUser}
           path={receiveAndSendPath}
-          element={<ReceiveAndSendPage />}
+          element={<ReceiveAndSendPage currentUser={currentUser}/>}
         />
         <Route path={uploadVideoPath} element={<UploadVideoPage />} />
         <Route path={viewVideoPath} element={<ViewVideoPage />} />
         <Route path={registerPath} element={<RegisterPage />} />
         <Route path={MessagingPath} element={<MessagingPage />} />
         <Route path={viewSentVideoPath} element={<ViewSentVideoPage />} />
-        <Route currentUser={currentUser} element={<PrivateRoute />}>
+        <Route element={<PrivateRoute currentUser={currentUser}/>}>
           <Route
-            currentUser={currentUser}
-            setCurrentUser={setCurrentUser}
             path={accountPath}
-            element={<AccountPage />}
+            element={<AccountPage currentUser={currentUser}
+            setCurrentUser={setCurrentUser}/>}
           />
         </Route>
         <Route path={changePasswordPath} element={<ForgotPasswordPage />} />

@@ -42,6 +42,10 @@ const Header = ({currentUser, setCurrentUser}) => {
         navigate(loginPath);
       }
     }
+
+    const sendAccount = () =>{
+      navigate(accountPath);
+    }
   
   return (
    <> 
@@ -56,7 +60,7 @@ const Header = ({currentUser, setCurrentUser}) => {
             placement="bottom"
             overlay={<Tooltip>Account Page</Tooltip>}
           >
-            <Button className="m-2" href={accountPath}>
+            <Button className="m-2" onClick={sendAccount}>
               <Person fill={"white"} height="50" width="50" />
             </Button>
           </OverlayTrigger>

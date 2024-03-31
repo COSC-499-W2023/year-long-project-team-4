@@ -417,4 +417,28 @@ Completed:
   
 Additional Context:
 
+# Term 2 Week 12: March 25 - March 31 (Monday to Sunday)
+## Tasks Worked this Week:
+
+
+![ThingsIDid](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/aaccda0e-0b1f-4864-9e37-6090a3022f11)
+
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Documentation
+- Small front-end edits
+- Helped solve issues for Beth & Rahul on various branches 
+
+Tasks from the Project Board:
+- Documentation
+- Peer testing 2 fixes
+- Password encryption changes
+
+Completed:
+- 
+  
+Additional Context:
+
 

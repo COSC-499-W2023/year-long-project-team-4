@@ -27,7 +27,8 @@
 ## Weekly Report Details:
 
 **Weekly Task Board:**
-![TableView](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/e9be027c-e49e-440d-a6a8-706c0c8fabc5)
+![TableView](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/cef7b9bf-92c3-4468-ab75-9538e0bb5618)
+
 
 
 

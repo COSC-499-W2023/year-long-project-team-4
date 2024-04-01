@@ -414,3 +414,26 @@ Completed:
   
 Additional Context:
 
+# Term 2 Week 12: March 25 - March 31 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="868" alt="Screenshot 2024-03-31 at 8 40 47 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/7cf4a944-52fd-4c65-af4f-60508025f6e8">
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Documentation
+- Dispaly video info and tags
+- Add frontend testing
+
+Tasks from the Project Board:
+- Documentation
+- Peer testing 2 fixes
+- Integration
+
+Completed:
+- Documentation
+- Dispaly video info and tags
+- Add frontend testing
+  
+Additional Context:

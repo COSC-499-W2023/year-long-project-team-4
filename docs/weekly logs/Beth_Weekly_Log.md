@@ -319,7 +319,7 @@ Completed:
 - General tweaks to make the sidebar and header look nicer, sizing, different hover and clicked colours, etc
 - Added logo to header
 
-# Week 9: March 11 - March 17
+# Week 10: March 11 - March 17
 
 ## Tasks Completed:
 
@@ -336,3 +336,20 @@ Completed:
 - Removed uploadand recieve path/page
 - Put logout and account buttons back onto header
 - Cleaned up change password re-encrypt
+
+# Week 11: March 18 - March 31
+
+## Tasks Completed:
+
+![2Week11act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/9fed1f05-b816-4557-9909-741da91f86bc)
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Frontend cleanup
+- Password encryption changes
+
+Completed:
+- Edited Siderbar to show different buttons depending on if user is a guest or not
+- Update change password function, changes were requested

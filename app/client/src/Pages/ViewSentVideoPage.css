@@ -1,0 +1,42 @@
+/* ViewSentVideoPage.css */
+
+.video-page-container {
+    padding-top: 2rem;
+  }
+  
+  .videos-received-heading {
+    color: #13056be0;
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .video-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between; /* This will distribute space between the cards */
+  }
+  
+  .video-card {
+    flex: 1 1 30%; /* This allows the cards to grow and take up 30% of the container's width */
+    cursor: pointer;
+    padding: 1rem;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    /* Add border, margin, padding, etc., as desired */
+  }
+  
+  .error-message {
+    color: red;
+    text-align: center;
+  }
+
+  .card:hover {
+    background-color: #f8f9fa; /* This is a light grey, you can choose any color you prefer */
+    border-color: #13056be0; /* This is a blue color, again choose what you like */
+    cursor: pointer; /* Changes the cursor to indicate the card is clickable */
+    transform: scale(1.03); /* Optional: Slightly increases the size of the card */
+    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; /* Smooth transition for the hover effect */
+  }
+  
+  

@@ -1,93 +1,60 @@
-import React, {useState, useEffect} from 'react';
-import {Row, Col, Button, Card} from 'react-bootstrap';
-import { receiveAndSendPath } from '../Path';
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card } from 'react-bootstrap';
+import { Fade } from 'react-reveal';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// Animation library for smooth transitions
-import {Fade} from 'react-reveal';
-import {useNavigate} from 'react-router-dom';
-import {
-    MessagingPath,
-    IP_ADDRESS,
-  } from "../Path";
+import './ViewSentVideoPage.css'; // Ensure this file contains no conflicting styles
+import { MessagingPath, IP_ADDRESS } from "../Path";
 
 const ViewSentVideoPage = () => {
-  
   const [videos, setVideos] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
-
   const navigate = useNavigate();
-  
-  // Fetch sent videos on component mount
-  useEffect(() => {
-      axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, {
-          withCredentials: true})
-          .then(response => {
-              setVideos(response.data);
-              console.log(response.data)
-          })
-          .catch(error => {
-              console.error('There was an error fetching the videos!', error);
-          });
 
-    return () => {};
-      
+  useEffect(() => {
+    axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, { withCredentials: true })
+      .then(response => {
+        // Assuming the response data includes senderEmail, senderName, and tags
+        setVideos(response.data);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the videos!', error);
+        setErrorMessage('Error fetching videos');
+      });
   }, []);
-  
-  // Handles video selection and retrieves video URL
+
   const handleVideoClick = (videoId) => {
     navigate(MessagingPath, { state: { videoId: videoId } });
   };
 
-  const [hoverIndex, setHoverIndex] = useState(-1); // State to keep track of which card is being hovered
-
-  const defaultCardStyle = {
-    backgroundColor: '#13056be0', // Default card background
-    color: 'white', // Default text color
-    transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
-  };
-
-  const hoverCardStyle = {
-    backgroundColor: 'white', // Hover card background
-    color: '#13056be0', // Hover text color
-    transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
-  };
-
-  const getCardStyle = (isHovered) => (
-    isHovered ? {...defaultCardStyle, ...hoverCardStyle} : defaultCardStyle
-  );
-
   return (
     <Fade cascade>
-      {/* Adjusted the padding top for the row that contains the heading */}
-      <Row style={{ paddingTop: '2rem' }}>
-        <div className="display-4 text-center" style={{ color: '#13056be0', marginBottom: '2rem' }}>Videos Received</div>
-      </Row>
-      {/* Adjusted the margin bottom for each card for even spacing between cards */}
-      <Row xs={1} md={2} className="g-4">
-        {videos.map((video, index) => (
-          <Col key={index} style={{ marginBottom: '1.5rem' }}> {/* This adds space below each card */}
-            <Card 
-              style={getCardStyle(index === hoverIndex)}
-              onMouseEnter={() => setHoverIndex(index)}
-              onMouseLeave={() => setHoverIndex(-1)}
-              onClick={() => handleVideoClick(video.videoId)}
-              className="mb-3" // You can remove this if you are now using inline styles
-            >
-              <Card.Body>
-                <Card.Title>{video.videoName}</Card.Title>
-                <Card.Text>
-                  Sender's Email: <br />
-                  Sender's Name: <br />
-                  Tags:
-                </Card.Text>
-              </Card.Body>
-            </Card>
+      <Container>
+        <Row className="mb-4">
+          <Col>
+            <h1 className="text-center">Sent Videos</h1>
           </Col>
-        ))}
-      </Row>
-      {errorMessage && <div className="error-message">{errorMessage}</div>}
+        </Row>
+        <Row>
+          {videos.map((video, index) => (
+            <Col key={index} className="col mb-4"> {/* This applies full width on all breakpoints */}
+              <Card onClick={() => handleVideoClick(video.videoId)} style={{ cursor: 'pointer' }}>
+                <Card.Body>
+                  <Card.Title>{video.videoName}</Card.Title>
+                  <Card.Text>
+                    Sender's Email: {video.senderEmail}<br />
+                    Sender's Name: {video.senderLName}<br />
+                    Tags: {video.tags ? video.tags.join(', ') : 'None'}<br />
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+        {errorMessage && <div className="text-center text-danger">{errorMessage}</div>}
+      </Container>
     </Fade>
   );
-  }
-  
-  export default ViewSentVideoPage
+}
+
+export default ViewSentVideoPage;

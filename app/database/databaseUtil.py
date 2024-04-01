@@ -520,7 +520,8 @@ def update_key(videoId:str,sender:bool,receiver:bool, encrpytKey) -> int:
                     query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoId,))
                     if query_results:
                         query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
-                        cur.execute(query2, (encrpytKey, videoId)) 
+                        cur.execute(query2, (encrpytKey, videoId))
+                    db.commit()
                     cur.close()
                     result = 1  # Set result to 1 to indicate success
         else:
@@ -540,7 +541,8 @@ def update_key(videoId:str,sender:bool,receiver:bool, encrpytKey) -> int:
                 query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoId,))
                 if query_results:
                     query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
-                    cur.execute(query2, videoId) 
+                    cur.execute(query2, videoId)
+                db.commit()
                 cur.close()
                 result = 1  # Set result to 1 to indicate success 
     except Exception as e:

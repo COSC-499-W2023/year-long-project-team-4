@@ -316,3 +316,24 @@ Tasks from the project board relevant to things I worked on:
 Currently working on:
 - Tag stuff mentioned above
 - Will start on making UX better for the "stop recording" and "preview video" buttons after tags done
+
+
+# Term 2 Week (11): Mar 24 - Mar 31
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/efddd9ef-ee42-407d-a15b-c28502a12e56)
+
+## Goal Recap:
+Things I worked on:
+- Overhauled tag fetching system on backend
+- Retrieving video info now returns useful stuff about the video including title and all tags
+- Previously you could pass in tags to filter by to the backend, now we just pass all tags and let the frontend filter however it wants using them
+- Huge troubleshoot session for reencrypting AES keys upon password change to work with changed private keys (like 3 hours of pain)
+- The above was part of a preemtive code review to get a feature working - I know I don't have one officially because the branch isn't up for PR yet but look at my commits to delete-old-key-content branch
+  
+Tasks from the project board relevant to things I worked on:
+- Tags
+- Encryption / Decryption
+  
+Currently working on:
+- Next up is to make UX better for the "stop recording" and "preview video" buttons

@@ -1,0 +1,192 @@
+
+.container-fluid-custom {
+    margin-top: 20px;
+    padding: 0 20px;
+  }
+  
+  /*.video-wrapper {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    background-color: #f8f9fa;
+  }*/
+
+  .video-container {
+    position: relative;
+    /* Use padding-top to create aspect ratio: 56.25% for 16:9 aspect ratio */
+    padding-top: 56.25%;
+  }
+
+  .video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Adjustments for smaller screens */
+  @media (max-width: 768px) {
+    .video-wrapper,
+    .card-full-height,
+    .message-area {
+      height: 400px; /* Smaller fixed height for smaller devices */
+    }
+  
+    .flex-center {
+      height: 400px; /* Same adjustment for the spinner container */
+    }
+  }
+
+  .video-wrapper {
+    height: 600px; /* Same height to align with the messages box */
+    overflow: hidden; /* Hide overflow to maintain the aspect ratio of the video */
+  }
+  
+  .flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /*height: 100%;*/
+    height: 600px; /* Same height as the messages box */
+  }
+  
+  /*.card-full-height {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }*/
+
+  .card-full-height {
+    height: 600px; /* This should be the same as the message-area if you want them to match */
+    overflow: hidden; /* Ensures the card itself doesn't scroll */
+  }
+  
+  .card-content-padding {
+    padding: 10px 20px;
+  }
+
+  .message-bubble {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f0f0f0; 
+    border-radius: 0px;
+    /*border: 1px solid #e0e0e0; 
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05); */
+}
+
+.message-bubble small {
+    display: block;
+    color: #666; 
+    margin-top: 5px;
+}
+
+.message-bubble strong {
+    color: #333; 
+}
+
+
+.message-bubble-sent {
+    margin-right: auto;
+    margin-left: 10px;
+    background-color: #13056b2f; /* Light green background for sent messages */
+    border-radius: 0px 15px 15px 0px;
+    padding: 10px 15px;
+    max-width: 80%;
+    /*box-shadow: 0 1px 2px rgba(0,0,0,0.1);*/
+    align-self: flex-start; /* Aligns to the left */
+}
+
+.message-bubble-received {
+    margin-left: auto;
+    margin-right: 10px;
+    background-color: #f0f0f0;
+    border-radius: 15px 0px 0px 15px;
+    padding: 10px 15px;
+    max-width: 80%;
+    /*box-shadow: 0 1px 2px rgba(0,0,0,0.1);*/
+    position: relative;
+  }
+ /* 
+  .message-bubble-received::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-right-color: #f0f0f0;
+    border-left: 0;
+    margin-top: 5px;
+    margin-left: -10px;
+  }*/
+  
+  .message-bubble-received strong {
+    display: block;
+    color: #333;
+  }
+  
+  .message-bubble-received small {
+    display: block;
+    color: #666;
+    font-size: 0.75em;
+    margin-top: 5px;
+  }
+
+  .message-area {
+    display: flex;
+    flex-direction: column-reverse; /* Reverse the order so new messages are at the bottom */
+    overflow-y: auto;
+    height: 600px; /* Set a fixed height */
+    padding: 10px 0; /* Add padding on top and bottom if needed */
+}
+
+/* Ensures new content is added to the bottom and old content scrolls up */
+.message-area-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Aligns content to the bottom */
+}
+  
+  .message-content {
+    flex-grow: 1; /* Takes up the remaining space */
+  }
+
+  .message-info {
+    margin-bottom: 5px; /* Adjust as needed */
+    font-size: 0.6em; /* Smaller text for sender and timestamp */
+    display: flex;
+    justify-content: space-between; /* This will put space between sender and timestamp */
+    align-items: center; /* Aligns items vertically in the center */
+    flex-wrap: nowrap; /* Prevents wrapping to a new line */
+    margin-bottom: 5px; /* Space below the message info */
+  }
+  
+  .message-sender {
+    /* Styles for the sender's name */
+    flex-shrink: 0; /* Prevents the sender's name from shrinking */
+  }
+  
+  .message-timestamp {
+    /* Styles for the timestamp */
+    flex-shrink: 0; /* Prevents the timestamp from shrinking */
+    opacity: 0.6; /* Optional: Makes the timestamp less prominent */
+  }
+
+  .input-group-custom {
+    margin-top: 10px; /* Space above the input group */
+    background-color: white; /* White background */
+    
+}
+
+.input-group-custom .form-control {
+    border: none; /* Remove borders */
+    box-shadow: none; /* Remove shadows for a flat appearance */
+    padding: 10px; /* Comfortable padding around the text */
+}
+
+.input-group-custom .input-group-text {
+    background-color: transparent; /* No background for the input group addon */
+    border: none; /* No borders for the addon */
+}

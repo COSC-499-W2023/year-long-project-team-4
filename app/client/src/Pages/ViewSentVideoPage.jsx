@@ -1,92 +1,94 @@
-import React, {useState, useEffect} from 'react';
-import {Row, Col, Card} from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Form, InputGroup, Button } from 'react-bootstrap';
+import { Fade } from 'react-reveal';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// Animation library for smooth transitions
-import {Fade} from 'react-reveal';
-import {useNavigate} from 'react-router-dom';
-import {
-    MessagingPath,
-    IP_ADDRESS,
-  } from "../Path";
+import './ViewSentVideoPage.css'; // Ensure this file contains no conflicting styles
+import { MessagingPath, IP_ADDRESS } from "../Path";
 
 const ViewSentVideoPage = () => {
-  
   const [videos, setVideos] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredVideos, setFilteredVideos] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
-
   const navigate = useNavigate();
-  
-  // Fetch sent videos on component mount
-  useEffect(() => {
-      axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, {
-          withCredentials: true})
-          .then(response => {
-              setVideos(response.data);
-              console.log(response.data)
-          })
-          .catch(error => {
-              console.error('There was an error fetching the videos!', error);
-          });
 
-    return () => {};
-      
+  useEffect(() => {
+    axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, { withCredentials: true })
+      .then(response => {
+        // Assuming the response data includes senderEmail, senderName, and tags
+        setVideos(response.data);
+        setFilteredVideos(response.data);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the videos!', error);
+        setErrorMessage('Error fetching videos');
+      });
   }, []);
-  
-  // Handles video selection and retrieves video URL
+
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredVideos(videos);
+    } else {
+      const lowercasedSearchTerm = searchTerm.toLowerCase();
+      const searchedVideos = videos.filter(video =>
+        video.tags.some(tag => tag.toLowerCase().includes(lowercasedSearchTerm))
+      );
+      setFilteredVideos(searchedVideos);
+    }
+  }, [searchTerm, videos]);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
   const handleVideoClick = (videoId) => {
     navigate(MessagingPath, { state: { videoId: videoId } });
   };
 
-  const [hoverIndex, setHoverIndex] = useState(-1); // State to keep track of which card is being hovered
-
-  const defaultCardStyle = {
-    backgroundColor: '#13056be0', // Default card background
-    color: 'white', // Default text color
-    transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
-  };
-
-  const hoverCardStyle = {
-    backgroundColor: 'white', // Hover card background
-    color: '#13056be0', // Hover text color
-    transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
-  };
-
-  const getCardStyle = (isHovered) => (
-    isHovered ? {...defaultCardStyle, ...hoverCardStyle} : defaultCardStyle
-  );
-
   return (
     <Fade cascade>
-      {/* Adjusted the padding top for the row that contains the heading */}
-      <Row style={{ paddingTop: '2rem' }}>
-        <div className="display-4 text-center" style={{ color: '#13056be0', marginBottom: '2rem' }}>Videos Received</div>
-      </Row>
-      {/* Adjusted the margin bottom for each card for even spacing between cards */}
-      <Row xs={1} md={2} className="g-4">
-        {videos.map((video, index) => (
-          <Col key={index} style={{ marginBottom: '1.5rem' }}> {/* This adds space below each card */}
-            <Card 
-              style={getCardStyle(index === hoverIndex)}
-              onMouseEnter={() => setHoverIndex(index)}
-              onMouseLeave={() => setHoverIndex(-1)}
-              onClick={() => handleVideoClick(video.videoId)}
-              className="mb-3" // You can remove this if you are now using inline styles
-            >
+      <Container className='video-cards-container'>
+        <Row className="mb-4">
+          <Col>
+            <h1 className="text-center">Uploaded Videos</h1>
+            <InputGroup id="search-bar" className="mb-3">
+              <Form.Control
+                placeholder="Search by tags..."
+                onChange={handleSearchChange}
+                value={searchTerm}
+              />
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                Clear
+              </Button>
+            </InputGroup>
+          </Col>
+        </Row>
+        <Row>
+        {filteredVideos.map((video, index) => (
+          <Col key={index} md={4} className="col mb-4">
+            <Card onClick={() => handleVideoClick(video.videoId)} style={{ cursor: 'pointer' }}>
               <Card.Body>
                 <Card.Title>{video.videoName}</Card.Title>
                 <Card.Text>
-                  Sender's Email: <br />
-                  Sender's Name: <br />
+                  <strong>Sender's Email: </strong>{video.senderEmail}<br />
+                  Sender's Name: {video.senderFName} {video.senderLName}<br />
                   Tags:
+                  <div className="tags-container">
+                    {video.tags.length > 0 ? video.tags.map((tag, tagIndex) => (
+                      <span key={tagIndex} className="tag-badge">{tag}</span>
+                    )) : 'None'}
+                  </div>
                 </Card.Text>
               </Card.Body>
             </Card>
           </Col>
         ))}
       </Row>
-      {errorMessage && <div className="error-message">{errorMessage}</div>}
+        {errorMessage && <div className="text-center text-danger">{errorMessage}</div>}
+      </Container>
     </Fade>
   );
-  }
-  
-  export default ViewSentVideoPage
+}
+
+export default ViewSentVideoPage;

@@ -1,42 +1,37 @@
-/* ViewSentVideoPage.css */
-
-.video-page-container {
-    padding-top: 2rem;
-  }
-  
-  .videos-received-heading {
-    color: #13056be0;
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-  }
-  
-  .video-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: space-between; /* This will distribute space between the cards */
-  }
-  
-  .video-card {
-    flex: 1 1 30%; /* This allows the cards to grow and take up 30% of the container's width */
-    cursor: pointer;
-    padding: 1rem;
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
-    /* Add border, margin, padding, etc., as desired */
-  }
-  
-  .error-message {
-    color: red;
-    text-align: center;
-  }
-  
 .card:hover {
     background-color: #f8f9fa; 
     border-color: #13056be0; 
     cursor: pointer; 
-    transform: scale(1.03); 
-    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; 
+    transform: scale(1.02); 
+    transition: transform 0.15s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; 
+}
+#search-bar {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px; /* Adjust the space between tags */
+    margin-bottom: 10px; /* Space below the tags container */
+}
+  
+.tag-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px;
+    background-color: #e0e0e0; /* Light gray background, change as needed */
+    border-radius: 5px; /* Optional: rounds the corners of the tag badge */
+    margin-right: 5px; /* Space between tags */
+    font-size: 0.85em; /* Smaller font size for tags */
+}
+
+/* Style for tablets and larger devices */
+@media (min-width: 768px) {
+    #search-bar {
+        width: 50%;
+    }
 }
   
   

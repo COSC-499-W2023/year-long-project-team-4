@@ -9,3 +9,21 @@
 .nav-pills .nav-link:hover {
     color: black;
 }
+
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* This will make the page container take full viewport height */
+}
+
+.content-wrapper {
+    display: flex;
+    flex-grow: 1; /* This will allow the content area to grow and fill available space */
+    overflow: hidden; /* Hide the overflow */
+}
+
+.tab-content-wrapper {
+    flex-grow: 1; /* This will allow the tab content area to grow */
+    overflow-y: auto; /* Add vertical scroll to the tab content */
+}

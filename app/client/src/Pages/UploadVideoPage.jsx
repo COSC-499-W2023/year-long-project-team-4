@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Alert, Form, Offcanvas, Modal, Button, ToggleButtonGroup, Spinner, ToggleButton} from 'react-bootstrap'
 import Webcam from 'react-webcam';
 import record from "../Assets/record-btn.svg"
@@ -10,11 +10,11 @@ import { IP_ADDRESS, viewSentVideoPath } from '../Path';
 import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
 import { receiveAndSendPath } from '../Path';
+import "./UploadVideoPage.css";
 
 const UploadVideoPage = () => {
   const [type, setType] = useState(1);
   const [time, setTime] = useState(0);
-  const [file, setFile] = useState(null);
   const [backend, setBackend] = useState(null);
   const [disable, setDisable] = useState(true);
   const [disableRecord, setDisableRecord] = useState(false);
@@ -22,16 +22,33 @@ const UploadVideoPage = () => {
   const mediaRecorderRef = React.useRef(null);
   const [capturing, setCapturing] = React.useState(false);
   const [recordedChunks, setRecordedChunks] = React.useState([]);
-  const [recipientEmail, setRecipientEmail] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [show, setShow] = useState(false);
   const [load, setLoad] = useState(false);
-  const [retentionPeriod, setRetentionPeriod] = useState(90);
   const [modal, setModal] = useState(true);
+
+  //user fields
+  const [file, setFile] = useState(null);
+  const [recipientEmail, setRecipientEmail] = useState('');
+  const [tagsInput, setTagsInput] = useState('');
+  const [tags, setTags] = useState([]);
+  const [retentionPeriod, setRetentionPeriod] = useState(90);
 
   let startTime;
   var duration;
   const navigate = useNavigate()
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && tagsInput.trim()) {
+      setTags([...tags, tagsInput.trim()]);
+      setTagsInput(''); // Reset input field to empty string
+      event.preventDefault();
+    }
+  };
+
+  const removeTag = (indexToRemove) => {
+    setTags(tags.filter((_, index) => index !== indexToRemove));
+  };
 
   const handleClose = () => setShow(false);
   
@@ -85,6 +102,9 @@ const UploadVideoPage = () => {
     // Appends the video file and recipient's email to the FormData object
     videoData.append('file', backend, 'videoFile.mp4');
     videoData.append('recipient', recipientEmail);
+
+    const tagsPayload = { tags }; // Ensure the payload structure is correct
+    videoData.append('json', new Blob([JSON.stringify(tagsPayload)], { type: "application/json" }));
   
     axios.post(`${IP_ADDRESS}/bucket/upload`, videoData, {
     withCredentials: true,
@@ -287,6 +307,25 @@ const UploadVideoPage = () => {
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
           </Form.Group>
+          <Form.Group controlId="formTags" className="mb-3">
+            <Form.Label>Tags</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Type a tag and press Enter"
+              value={tagsInput} // Controlled component
+              onChange={(e) => setTagsInput(e.target.value)} // Use onChange instead
+              onKeyDown={handleKeyDown}
+            />
+          </Form.Group>
+          {/* Display the tags */}
+          <div className="tags-container">
+            {tags.map((tag, index) => (
+              <div key={index} className="tag-badge">
+                {tag}
+                <button type="button" onClick={() => removeTag(index)}>×</button>
+              </div>
+            ))}
+          </div>
           <Form.Group controlId="formRetentionPeriod" className="mb-3">
             <Form.Label className="text-black">Retention Period in days (1-365)</Form.Label>
             <Form.Control 

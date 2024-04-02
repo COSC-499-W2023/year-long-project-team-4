@@ -58,6 +58,24 @@ const ViewVideoPage = () => {
         navigate(MessagingPath, { state: { videoName: videoName } });
     };
 
+    const [hoverIndex, setHoverIndex] = useState(-1); // State to keep track of which card is being hovered
+
+    const defaultCardStyle = {
+      backgroundColor: '#13056be0', // Default card background
+      color: 'white', // Default text color
+      transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
+    };
+
+    const hoverCardStyle = {
+      backgroundColor: 'white', // Hover card background
+      color: '#13056be0', // Hover text color
+      transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
+    };
+
+    const getCardStyle = (isHovered) => (
+      isHovered ? {...defaultCardStyle, ...hoverCardStyle} : defaultCardStyle
+    );
+
     return (
         <Fade cascade>
             <Row>

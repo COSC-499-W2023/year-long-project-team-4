@@ -18,7 +18,6 @@ const LoginHomePage = () => {
   const [type, setType] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(viewSentVideoPath);
 
   const handleLogin = async (email, password) => {

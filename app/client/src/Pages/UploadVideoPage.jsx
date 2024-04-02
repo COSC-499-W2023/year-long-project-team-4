@@ -33,6 +33,7 @@ const UploadVideoPage = () => {
   const [tagsInput, setTagsInput] = useState('');
   const [tags, setTags] = useState([]);
   const [retentionPeriod, setRetentionPeriod] = useState(90);
+  const [videoName, setVideoName] = useState('');
 
   let startTime;
   var duration;
@@ -100,6 +101,7 @@ const UploadVideoPage = () => {
     const videoData = new FormData();
 
     // Appends the video file and recipient's email to the FormData object
+    videoData.append('video_name', videoName);
     videoData.append('file', backend, 'videoFile.mp4');
     videoData.append('recipient', recipientEmail);
 
@@ -299,6 +301,7 @@ const UploadVideoPage = () => {
             </div>
           </Form.Group>
           <Form.Group controlId="formRecipientEmail" className="mb-3 mt-3">
+              <Form.Label>Recipient Email</Form.Label>
               <Form.Control 
                 type="email" 
                 required 
@@ -306,6 +309,15 @@ const UploadVideoPage = () => {
                 value={recipientEmail} 
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
+          </Form.Group>
+          <Form.Group controlId="formVideoName" className="mb-3">
+            <Form.Label>Video Name</Form.Label>
+            <Form.Control 
+              type="text" 
+              placeholder="Enter video name" 
+              value={videoName} 
+              onChange={(e) => setVideoName(e.target.value)} // Update the videoName state when the input changes
+            />
           </Form.Group>
           <Form.Group controlId="formTags" className="mb-3">
             <Form.Label>Tags</Form.Label>
@@ -386,6 +398,7 @@ const UploadVideoPage = () => {
           )}
           </>
           <Form.Group controlId="formRecipientEmail" className="mb-3 mt-3">
+              <Form.Label>Recipient Email</Form.Label>
               <Form.Control 
                 type="email" 
                 required 
@@ -393,6 +406,15 @@ const UploadVideoPage = () => {
                 value={recipientEmail} 
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
+          </Form.Group>
+          <Form.Group controlId="formVideoName" className="mb-3">
+            <Form.Label>Video Name</Form.Label>
+            <Form.Control 
+              type="text" 
+              placeholder="Enter video name" 
+              value={videoName} 
+              onChange={(e) => setVideoName(e.target.value)} // Update the videoName state when the input changes
+            />
           </Form.Group>
           <Form.Group controlId="formTags" className="mb-3">
             <Form.Label>Tags</Form.Label>

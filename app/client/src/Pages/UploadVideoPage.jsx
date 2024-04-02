@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import {Alert, Form, Offcanvas, Modal, Button, ToggleButtonGroup, Spinner, ToggleButton} from 'react-bootstrap'
 import Webcam from 'react-webcam';
-import record from "../Assets/record-btn.svg"
+import  {ReactComponent as Record} from "../Assets/record-btn.svg"
 import axios from "axios";
 import info from "../Assets/info-circle.svg"
 import { Fade } from 'react-reveal';
@@ -298,17 +298,17 @@ const UploadVideoPage = () => {
           <div className="mb-2"> 
           {capturing? 
             ( <>
-                <Button variant= "danger" active>
-                  <img width="16" height="22" src={record}/> 
-                </Button> {' '}
-                <Button onClick={handleStopRecord}>Stop Recording</Button>
+                <Button variant="danger" onClick={handleStopRecord}>
+                  <Record width="16" height="22"/> {' '}
+                  Stop Recording
+                </Button>
               </>
             ):(
               <> 
-                <Button variant= "secondary" active>
-                  <img width="16" height="22" src={record}/> 
-                </Button> {' '}
-                <Button onClick={handleStartRecord} disabled={disableRecord}>Start Recording</Button>
+                <Button onClick={handleStartRecord} disabled={disableRecord}>
+                  <Record fill={"white"} width="16" height="22"/> {' '}
+                  Start Recording
+                </Button>
               </> 
             )
           }
@@ -316,7 +316,7 @@ const UploadVideoPage = () => {
           <>
           {file === null? 
           (<Fade>
-            <Webcam  width="225" height="400" audio={true} ref={webcamRef}/>
+            <Webcam  width="400" height="225" audio={true} ref={webcamRef}/>
            </Fade>
             ):(
             <Fade>

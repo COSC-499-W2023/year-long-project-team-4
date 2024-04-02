@@ -394,6 +394,36 @@ const UploadVideoPage = () => {
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
           </Form.Group>
+          <Form.Group controlId="formTags" className="mb-3">
+            <Form.Label>Tags</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Type a tag and press Enter"
+              value={tagsInput} // Controlled component
+              onChange={(e) => setTagsInput(e.target.value)} // Use onChange instead
+              onKeyDown={handleKeyDown}
+            />
+          </Form.Group>
+          {/* Display the tags */}
+          <div className="tags-container">
+            {tags.map((tag, index) => (
+              <div key={index} className="tag-badge">
+                {tag}
+                <button type="button" onClick={() => removeTag(index)}>×</button>
+              </div>
+            ))}
+          </div>
+          <Form.Group controlId="formRetentionPeriod" className="mb-3">
+            <Form.Label className="text-black">Retention Period in days (1-365)</Form.Label>
+            <Form.Control 
+              type="number" 
+              required 
+              min="1" max="365" 
+              placeholder="Enter retention period in days" 
+              value={retentionPeriod} 
+              onChange={(e) => setRetentionPeriod(e.target.value)} 
+            />
+          </Form.Group>
           <div className="mt-2">
             <Button onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}
             <Button onClick={()=>{handleRetake()}} disabled={disable}>Retake video</Button> {' '}

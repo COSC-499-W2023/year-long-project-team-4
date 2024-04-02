@@ -48,10 +48,10 @@ const ViewSentVideoPage = () => {
 
   return (
     <Fade cascade>
-      <Container>
+      <Container className='video-cards-container'>
         <Row className="mb-4">
           <Col>
-            <h1 className="text-center">Received Videos</h1>
+            <h1 className="text-center">Uploaded Videos</h1>
             <InputGroup id="search-bar" className="mb-3">
               <Form.Control
                 placeholder="Search by tags..."

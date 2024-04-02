@@ -67,7 +67,7 @@ const Header = () => {
   
   return (
     <>
-    <Navbar className="bg-primary" style={{ height: "80px", padding: "0 20px" }}>
+    <Navbar className="bg-primary" style={{ height: "12vh", padding: "0 20px" }}>
         
       {currentUser ? (
         <>

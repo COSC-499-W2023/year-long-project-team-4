@@ -94,7 +94,8 @@ const UploadVideoPage = () => {
   })
   .then(response => {
     console.log('Video uploaded successfully', response.data);
-    setUploadSuccess(true); // Updates the state to reflect a successful upload;
+    setUploadSuccess(true);
+    navigate(viewSentVideoPath);
   })
   .catch(error => {
     console.error('Error uploading video', error);

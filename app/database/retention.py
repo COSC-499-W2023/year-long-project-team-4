@@ -64,7 +64,7 @@ def get_passed_retDates() -> list:
                 db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
                 cur = db.cursor()
                 now = datetime.now(timezone.utc)
-                query = f"SELECT videoName FROM videos WHERE retDate <= %s"
+                query = f"SELECT videoID FROM videos WHERE retDate <= %s"
                 cur.execute(query, (now,))
                 result = cur.fetchall()
                 cur.close()
@@ -73,7 +73,7 @@ def get_passed_retDates() -> list:
             db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
             cur = db.cursor()
             now = datetime.now(timezone.utc)
-            query = f"SELECT videoName FROM videos WHERE retDate <= %s"
+            query = f"SELECT videoID FROM videos WHERE retDate <= %s"
             cur.execute(query, (now,))
             result = cur.fetchall()
             cur.close()
@@ -185,7 +185,7 @@ def retention() -> int:
         deleted_files = 0
         data = get_passed_retDates()
         for items in data:
-            retention_delete("videoName = %s", (items,), items)
+            retention_delete("videoID = %s", (items,), items)
             # Get how many files have been deleted
             if (not already_existing_file('team4-s3',items)):
                 deleted_files += 1

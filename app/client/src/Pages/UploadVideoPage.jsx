@@ -317,7 +317,7 @@ const UploadVideoPage = () => {
               placeholder="Enter video name" 
               value={videoName} 
               onChange={(e) => setVideoName(e.target.value)} // Update the videoName state when the input changes
-            />
+            />{/* */}
           </Form.Group>
           <Form.Group controlId="formTags" className="mb-3">
             <Form.Label>Tags</Form.Label>

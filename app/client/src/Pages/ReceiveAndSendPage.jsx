@@ -13,8 +13,7 @@ const ReceiveAndSendPage = ({currentUser}) => {
   
   return (
     <Fade>
-      <Container fluid>
-      {currentUser && <h3 className="text-center text-white p-2">Welcome, {currentUser}!</h3>}
+      <div className='page-container'>
       {errorMessage &&
         <Modal
         show={modal}
@@ -32,8 +31,8 @@ const ReceiveAndSendPage = ({currentUser}) => {
           </Modal.Body>
         </Modal>
       }
-      <div className="d-flex align-items-start">
-        <div className="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+      <div className='content-wrapper'>
+      <div className="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
           <button 
             className="nav-link active p-4 m-2"  
             data-bs-toggle="pill" 
@@ -67,7 +66,7 @@ const ReceiveAndSendPage = ({currentUser}) => {
               Upload Video
           </button>
         </div>
-        <div className="tab-content" id="v-pills-tabContent">
+        <div className="tab-content flex-grow-1" id="v-pills-tabContent" style={{ overflowY: 'auto' }}>
           <div 
             className="tab-pane fade show active" 
             id="uploadedVideos" 
@@ -88,7 +87,7 @@ const ReceiveAndSendPage = ({currentUser}) => {
           </div>
         </div>
       </div>
-      </Container>
+      </div>
     </Fade>
   )
 }

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Row, Col, Button, Modal} from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, InputGroup, Button } from 'react-bootstrap';
 import { receiveAndSendPath } from '../Path';
 import axios from 'axios';
 import {Fade} from 'react-reveal';
@@ -12,6 +12,8 @@ import {
 const ViewVideoPage = () => {
   
   const [videos, setVideos] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredVideos, setFilteredVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -25,12 +27,29 @@ const ViewVideoPage = () => {
           withCredentials: true})
           .then(response => {
               setVideos(response.data);
-              console.log(response.data)
+              setFilteredVideos(response.data);
+              console.log(response.data);
           })
           .catch(error => {
               console.error('There was an error fetching the videos!', error);
           });
   }, []);
+
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredVideos(videos);
+    } else {
+      const lowercasedSearchTerm = searchTerm.toLowerCase();
+      const searchedVideos = videos.filter(video =>
+        video.tags.some(tag => tag.toLowerCase().includes(lowercasedSearchTerm))
+      );
+      setFilteredVideos(searchedVideos);
+    }
+  }, [searchTerm, videos]);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
   
   // Handles video selection and retrieves video URL
   const handleVideoClick = (videoId) => {
@@ -39,25 +58,48 @@ const ViewVideoPage = () => {
   
 
   return (
-     <Fade cascade>
-      <Row>
-          <div className="display-4 text-center"> Videos Received </div>
-           <Col className="p-3">
-               <div className="display-6"> Videos</div>
-               {videos.map((video, index) => (
-                    <>
-                        <div key={index} onClick={() => handleVideoClick(video.videoId)}>
-                            <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                                <p>Video{index + 1}</p>
-                            </Button>
-                        </div>
-                    </>
-                ))}
-           </Col>   
-        </Row>      
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
-     </Fade>
-    )
+    <Fade cascade>
+      <Container className='video-cards-container'>
+        <Row className="mb-4">
+          <Col>
+            <h1 className="text-center">Received Videos</h1>
+            <InputGroup id="search-bar" className="mb-3">
+              <Form.Control
+                placeholder="Search by tags..."
+                onChange={handleSearchChange}
+                value={searchTerm}
+              />
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                Clear
+              </Button>
+            </InputGroup>
+          </Col>
+        </Row>
+        <Row>
+        {filteredVideos.map((video, index) => (
+          <Col key={index} md={4} className="col mb-4">
+            <Card onClick={() => handleVideoClick(video.videoId)} style={{ cursor: 'pointer' }}>
+              <Card.Body>
+                <Card.Title>{video.videoName}</Card.Title>
+                <Card.Text>
+                  <strong>Sender's Email: </strong>{video.senderEmail}<br />
+                  Sender's Name: {video.senderFName} {video.senderLName}<br />
+                  Tags:
+                  <div className="tags-container">
+                    {video.tags.length > 0 ? video.tags.map((tag, tagIndex) => (
+                      <span key={tagIndex} className="tag-badge">{tag}</span>
+                    )) : 'None'}
+                  </div>
+                </Card.Text>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+        {errorMessage && <div className="text-center text-danger">{errorMessage}</div>}
+      </Container>
+    </Fade>
+  );
   }
   
   export default ViewVideoPage

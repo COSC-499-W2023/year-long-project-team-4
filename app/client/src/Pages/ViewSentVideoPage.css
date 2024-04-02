@@ -30,13 +30,14 @@
     color: red;
     text-align: center;
   }
-
-  .card:hover {
-    background-color: #f8f9fa; /* This is a light grey, you can choose any color you prefer */
-    border-color: #13056be0; /* This is a blue color, again choose what you like */
-    cursor: pointer; /* Changes the cursor to indicate the card is clickable */
-    transform: scale(1.03); /* Optional: Slightly increases the size of the card */
-    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; /* Smooth transition for the hover effect */
-  }
+  
+.card:hover {
+    background-color: #f8f9fa; 
+    border-color: #13056be0; 
+    cursor: pointer; 
+    transform: scale(1.03); 
+    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; 
+}
+  
   
   

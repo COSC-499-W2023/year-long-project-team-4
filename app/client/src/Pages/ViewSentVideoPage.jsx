@@ -32,7 +32,7 @@ const ViewSentVideoPage = () => {
       <Container>
         <Row className="mb-4">
           <Col>
-            <h1 className="text-center">Sent Videos</h1>
+            <h1 className="text-center">Received Videos</h1>
           </Col>
         </Row>
         <Row>

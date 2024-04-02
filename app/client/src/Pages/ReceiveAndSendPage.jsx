@@ -1,46 +1,16 @@
-import React, {useEffect, useState} from 'react'
-import {Button, Container,Modal} from 'react-bootstrap'
-import {useNavigate} from 'react-router-dom'
-import {
-  uploadVideoPath,
-  loginPath,
-  viewSentVideoPath,
-  IP_ADDRESS
-} from "../Path";
-import axios from 'axios';
+import React, {useState} from 'react'
+import {Container,Modal} from 'react-bootstrap'
+import UploadVideoPage from './UploadVideoPage';
 import {Fade} from 'react-reveal';
 import "./ReceiveAndSendPage.css";
 import ViewSentVideoPage from './ViewSentVideoPage';
 import ViewVideoPage from './ViewVideoPage';
 
-const ReceiveAndSendPage = () => {
+const ReceiveAndSendPage = ({currentUser}) => {
 
   const [errorMessage, setErrorMessage] = useState(null);
-  const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState(null);
   const [modal, setModal] = useState(true);
   
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
-          withCredentials: true
-        });
-  
-        if (response.data.email) {
-          setCurrentUser(response.data.email);
-        } else {
-          console.error('No user currently logged in');
-        }
-      } catch (error) {
-        console.error('There was an error fetching the current user', error);
-        setErrorMessage('There was an error fetching the current user');
-      }
-    };
-  
-    fetchCurrentUser();
-  }, []);  
-
   return (
     <Fade>
       <div className='page-container'>
@@ -86,11 +56,12 @@ const ReceiveAndSendPage = () => {
           </button>
           <button
             className="nav-link p-4 m-2" 
-            data-bs-toggle="pill" 
+            data-bs-toggle="pill"
+            data-bs-target="#uploadVideos"  
             type="button" 
             role="tab" 
             aria-selected="false"
-            onClick={()=>navigate(uploadVideoPath)}
+            aria-controls="uploadVideos" 
             >
               Upload Video
           </button>
@@ -107,6 +78,12 @@ const ReceiveAndSendPage = () => {
             id="viewVideos" 
             role="tabpanel">
               <ViewVideoPage />
+          </div>
+          <div 
+            className="tab-pane fade mb-2" 
+            id="uploadVideos" 
+            role="tabpanel">
+              <UploadVideoPage/>
           </div>
         </div>
       </div>

@@ -9,14 +9,14 @@ import {useNavigate} from 'react-router-dom';
 import {
     MessagingPath,
     IP_ADDRESS,
+    loginPath,
   } from "../Path";
 import "./AccountPage.css";
 
 import PasswordCheckList from "react-password-checklist";
 
-const AccountPage = () => {
+const AccountPage = ({currentUser, setCurrentUser}) => {
 const [type, setType] = useState(false)
-const [currentUser, setCurrentUser] = useState(null);
 const [currentFirstName, setCurrentFirstName] = useState(null);
 const [currentLastName, setCurrentLastName] = useState(null);
 const [errorMessage, setErrorMessage] = useState("");
@@ -111,28 +111,6 @@ const sendMain = () => {
 }
 
 const email = currentUser;
-
-useEffect(() => {
-        const fetchCurrentUser = async () => {
-            try {
-              const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
-                withCredentials: true
-              });
-              if (response.data.email) {
-                
-                setCurrentUser(response.data.email);
-              if (response.data.email) {
-                setCurrentUser(response.data.email);
-              } else {
-                console.error('No user currently logged in');
-              }
-            }
-            } catch (error) {
-              console.error('There was an error fetching the current user', error);
-            }      
-          } 
-          fetchCurrentUser();
-        }, []);
 
   useEffect(()=>{
   const fetchCurrent =async()=> {

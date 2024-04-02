@@ -3,36 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import { ReactComponent as Person } from "../Assets/person.svg";
 import { ReactComponent as Logout } from "../Assets/box-arrow-right.svg";
 import { Navbar, Button, OverlayTrigger, Modal, Tooltip } from "react-bootstrap";
-import { IP_ADDRESS, accountPath, homePath, loginPath, receiveAndSendPath } from "../Path";
-import { useState, useEffect } from "react";
+import { IP_ADDRESS, accountPath, loginPath, receiveAndSendPath } from "../Path";
+import { useState } from "react";
 import axios from "axios";
 
-const Header = () => {
+const Header = ({currentUser, setCurrentUser}) => {
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState(null);
-    const [currentUser, setCurrentUser] = useState(null);
     const [modal, setModal] = useState(true);
-  
-    useEffect(() => {
-      const fetchCurrentUser = async () => {
-        try {
-          const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
-            withCredentials: true,
-          });
-  
-          if (response.data.email) {
-            setCurrentUser(response.data.email);
-          } else {
-            console.error("No user currently logged in");
-          }
-        } catch (error) {
-          console.error("There was an error fetching the current user", error);
-        }
-      };
-  
-      fetchCurrentUser();
-    }, []);
-  
+   
     const handleLogout = async () => {
       try {
         const response = await axios.get(`${IP_ADDRESS}/auth/logout`, {
@@ -63,6 +42,10 @@ const Header = () => {
         navigate(loginPath);
       }
     }
+
+    const sendAccount = () =>{
+      navigate(accountPath);
+    }
   
   return (
    <> 
@@ -77,7 +60,7 @@ const Header = () => {
             placement="bottom"
             overlay={<Tooltip>Account Page</Tooltip>}
           >
-            <Button className="m-2" href={accountPath}>
+            <Button className="m-2" onClick={sendAccount}>
               <Person fill={"white"} height="50" width="50" />
             </Button>
           </OverlayTrigger>

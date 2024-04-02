@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import {Card, Col, Button, Row, ListGroup, Tab, Form, Modal, Tabs, InputGroup} from 'react-bootstrap';
-import { homePath, viewSentVideoPath } from '../Path';
+import {Card, Col, Button, Row, ListGroup, Tab, Form, Modal, Tabs, InputGroup, Alert} from 'react-bootstrap';
+import { homePath, viewSentVideoPath, uploadVideoPath} from '../Path';
 import {Fade} from 'react-reveal';
 import axios from 'axios';
 import see from '../Assets/eye.svg';
@@ -20,6 +20,7 @@ const [currentUser, setCurrentUser] = useState(null);
 const [errorMessage, setErrorMessage] = useState("");
 const [key, setKey] = useState('account');
 const navigate = useNavigate();
+const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 const handleSubmit = (e) => {
     e.preventDefault();
@@ -47,17 +48,22 @@ useEffect(() => {
         
               if (response.data.email) {
                 setCurrentUser(response.data.email);
+                setIsAuthenticated(true);
               if (response.data.email) {
                 setCurrentUser(response.data.email);
+                setIsAuthenticated(true);
               } else {
                 console.error('No user currently logged in');
               }
             }
             } catch (error) {
+              navigate(uploadVideoPath);
               console.error('There was an error fetching the current user', error);
+              setIsAuthenticated(false);
             }
           fetchCurrentUser();
 }});
+
 
 const handleStartChat = (e, videoName) => {
   e.preventDefault();

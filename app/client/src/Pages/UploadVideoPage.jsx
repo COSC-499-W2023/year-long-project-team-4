@@ -6,11 +6,10 @@ import axios from "axios";
 import info from "../Assets/info-circle.svg"
 import back from "../Assets/arrow-left.svg"
 import { Fade } from 'react-reveal';
-import { IP_ADDRESS } from '../Path';
+import { IP_ADDRESS , viewSentVideoPath} from '../Path';
 import Sidebar from './Sidebar';
 import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
-import { viewSentVideoPath } from '../Path';
 
 const UploadVideoPage = () => {
   const [type, setType] = useState(1);

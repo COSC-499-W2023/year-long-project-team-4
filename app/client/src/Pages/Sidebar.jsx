@@ -74,92 +74,70 @@ const Sidebar = () => {
       }
     }
 
-    if (currentUser) {
-      return (
-        <div className="sidebar" style={{ height: '100vh', overflow: 'hidden' }}>
-         
-          <NavLink
-            to={viewSentVideoPath}
-            className={`nav-link ${activeTab === "uploadedVideos" ? "active" : ""}`}
-            onClick={() => handleSetActiveTab("uploadedVideos")}
-            style={{ maxWidth: '200px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}
-          >
-            Videos Uploaded
-          </NavLink>
-          <NavLink
-            to={viewVideoPath}
-            className={`nav-link ${activeTab === "viewVideos" ? "active" : ""}`}
-            onClick={() => handleSetActiveTab("viewVideos")}
-            style={{ maxWidth: '200px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}
-          >
-            Videos Received
-          </NavLink>
-          <NavLink
-            to={uploadVideoPath}
-            className={`nav-link ${activeTab === "uploadVideo" ? "active" : ""}`}
-            onClick={() => handleSetActiveTab("uploadVideo")}
-            style={{ maxWidth: '200px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}
-          >
-            Upload Video
-          </NavLink>
-    
-         
-          {/* Modal for error message */}
-          {errorMessage && (
-            <Modal
-              show={modal}
-              onHide={() => setModal(false)}
-              backdrop="static"
-              keyboard={false}
-              variant="Danger"
-              contentClassName="bg-danger text-white"
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>Error!</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>{errorMessage}</Modal.Body>
-            </Modal>
+    return (
+      <div className="sidebar" style={{ height: '100vh', width: '200px', position: 'fixed', top: 0, left: 0, bottom: 0, overflow: 'hidden' }}>
+          {currentUser && (
+              <>
+                  <NavLink
+                      to={viewSentVideoPath}
+                      className={`nav-link ${activeTab === "uploadedVideos" ? "active" : ""}`}
+                      onClick={() => handleSetActiveTab("uploadedVideos")}
+                  >
+                      Videos Uploaded
+                  </NavLink>
+                  <NavLink
+                      to={viewVideoPath}
+                      className={`nav-link ${activeTab === "viewVideos" ? "active" : ""}`}
+                      onClick={() => handleSetActiveTab("viewVideos")}
+                  >
+                      Videos Received
+                  </NavLink>
+              </>
           )}
-        </div>
-      );
-    };
-
-    
-    if (!currentUser) {
-      return (
-      <div className="sidebar" style={{ height: '100vh', overflow: 'hidden' }}>
-          
           <NavLink
-            to={uploadVideoPath}
-            className={`nav-link ${activeTab === "uploadVideo" ? "active" : ""}`}
-            onClick={() => handleSetActiveTab("uploadVideo")}
-            style={{ maxWidth: '200px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}
+              to={uploadVideoPath}
+              className={`nav-link ${activeTab === "uploadVideo" ? "active" : ""}`}
+              onClick={() => handleSetActiveTab("uploadVideo")}
           >
-            Upload Video
+              Upload Video
           </NavLink>
-    
-         
-          {/* Modal for error message */}
-          {errorMessage && (
-            <Modal
-              show={modal}
-              onHide={() => setModal(false)}
-              backdrop="static"
-              keyboard={false}
-              variant="Danger"
-              contentClassName="bg-danger text-white"
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>Error!</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>{errorMessage}</Modal.Body>
-            </Modal>
-          )}
-        </div>
-      );
 
-    };
-    
-  };
-  
-  export default Sidebar;
+          {!currentUser && (
+              <>
+                  <OverlayTrigger
+                      key="bottom"
+                      placement="bottom"
+                      overlay={<Tooltip id="tooltip-bottom">User not logged in</Tooltip>}
+                  >
+                      <div className="nav-link" style={{ cursor: 'not-allowed' }}>Videos Uploaded</div>
+                  </OverlayTrigger>
+                  <OverlayTrigger
+                      key="bottom"
+                      placement="bottom"
+                      overlay={<Tooltip id="tooltip-bottom">User not logged in</Tooltip>}
+                  >
+                      <div className="nav-link" style={{ cursor: 'not-allowed' }}>Videos Received</div>
+                  </OverlayTrigger>
+              </>
+          )}
+
+          {errorMessage && (
+              <Modal
+                  show={modal}
+                  onHide={() => setModal(false)}
+                  backdrop="static"
+                  keyboard={false}
+                  variant="Danger"
+                  contentClassName="bg-danger text-white"
+              >
+                  <Modal.Header closeButton>
+                      <Modal.Title>Error!</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>{errorMessage}</Modal.Body>
+              </Modal>
+          )}
+      </div>
+  );
+};
+
+export default Sidebar;

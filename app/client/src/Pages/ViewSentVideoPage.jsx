@@ -1,91 +1,86 @@
-import React, {useState, useEffect} from 'react';
-import {Row, Col, Button} from 'react-bootstrap';
-import { receiveAndSendPath } from '../Path';
-import { Container } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Button } from 'react-bootstrap';
+import { Fade } from 'react-reveal';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// Animation library for smooth transitions
-import {Fade} from 'react-reveal';
-import {useNavigate} from 'react-router-dom';
-import {
-    MessagingPath,
-    IP_ADDRESS,
-  } from "../Path";
-import io from 'socket.io-client';
 import Sidebar from './Sidebar';
+import { MessagingPath, IP_ADDRESS, uploadVideoPath } from '../Path';
 
-const socket = io(`${IP_ADDRESS}`,  {
-    withCredentials: true,
-  });
+const ViewVideoPage = () => {
+    const [videos, setVideos] = useState([]);
+    const [selectedVideo, setSelectedVideo] = useState(null);
+    const [showVideoModal, setShowVideoModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-const ViewSentVideoPage = () => {
-  
-  const [videos, setVideos] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
+    const navigate = useNavigate();
 
-  const navigate = useNavigate();
-  
-  // Fetch sent videos on component mount
-  useEffect(() => {
+    useEffect(() => {
+        // Fetch videos on component mount
+        axios.get(`${IP_ADDRESS}/bucket/getvideos`, {
+            withCredentials: true
+        })
+        .then(response => {
+            setVideos(response.data);
+            console.log(response.data)
+        })
+        .catch(error => {
+            console.error('There was an error fetching the videos!', error);
+        });
 
-    socket.on('connect', () => {
-        console.log('Connected to the server');
-      });
-  
+        // Fetch current user on component mount
+        const fetchCurrentUser = async () => {
+            try {
+                const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
+                    withCredentials: true
+                });
 
-      axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, {
-          withCredentials: true})
-          .then(response => {
-              setVideos(response.data);
-              console.log(response.data)
-          })
-          .catch(error => {
-              console.error('There was an error fetching the videos!', error);
-          });
+                if (response.data.email) {
+                    setIsAuthenticated(true);
+                } else {
+                    setIsAuthenticated(false);
+                }
+                
+            } catch (error) {
+                navigate(uploadVideoPath);
+                console.error('There was an error fetching the current user', error);
+                setIsAuthenticated(false);
+            }
+        };
 
-    socket.on('disconnect', (reason) => {
-        console.log(`Disconnected from the server due to ${reason}`);
-    });
+        fetchCurrentUser();
+    }, []);
 
-   
 
-    return () => {
-        socket.off('connect');
-        socket.off('disconnect');
-      };
-      
-  }, []);
-  
-  // Handles video selection and retrieves video URL
-  const handleVideoClick = (videoName) => {
-    navigate(MessagingPath, { state: { videoName: videoName } });
-  };
 
-  return (
-      <Row>
-        <Col xs={2}>
-          <Fade>
-          <Sidebar />
-          </Fade>
-        </Col>
-        <Col xs={10}>
-          <Fade cascade>
-            <div>
-              <div className="display-4 text-center">Videos Uploaded</div>
-              <div className="display-6">Videos</div>
-              {videos.map((video, index) => (
-                <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                  <Button className="text-center mb-2" style={{ minWidth: '150px' }}>
-                    <p>Video{index + 1}</p>
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </Fade>
-        </Col>
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
-      </Row>
-  
-  );
+    // Handles video selection and redirects to messaging page
+    const handleVideoClick = (videoName) => {
+        navigate(MessagingPath, { state: { videoName: videoName } });
+    };
+
+    return (
+        <Fade cascade>
+            <Row>
+                <Col xs={2}>
+                    <Fade>
+                        <Sidebar />
+                    </Fade>
+                </Col>
+                <Col xs={10}>
+                    <div className="display-4 text-center"> Videos Received </div>
+                    <div className="display-6"> Videos</div>
+                    {videos.map((video, index) => (
+                        <div key={index} onClick={() => handleVideoClick(video.videoName)}>
+                            <Button className='text-center mb-2' style={{minWidth: '150px'}}>
+                                <p>Video{index + 1}</p>
+                            </Button>
+                        </div>
+                    ))}
+                </Col>   
+            </Row>    
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
+        </Fade>
+    );
 };
 
-export default ViewSentVideoPage;
+export default ViewVideoPage;

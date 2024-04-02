@@ -136,8 +136,29 @@ useEffect(() => {
               console.error('There was an error fetching the current user', error);
               setIsAuthenticated(false);
             }
+          }
           fetchCurrentUser();
         }, []);
+
+useEffect(()=>{
+  const fetchCurrent =async()=> {
+    try {
+      const response = await axios.get(`${IP_ADDRESS}/auth/userdetails`, {
+        withCredentials: true
+      });
+      console.log(response);
+      if (response.data.email) {
+        setCurrentUser(response.data.email);
+        setCurrentFirstName(response.data.firstname);
+        setCurrentLastName(response.data.lastname);
+      } else {
+        console.error('No user currently logged in');
+      }
+    } catch (error) {
+      console.error('There was an error fetching the current user', error);
+    }
+  };
+  fetchCurrent();}, [])
 
 
 const handleStartChat = (e, videoName) => {

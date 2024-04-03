@@ -34,6 +34,13 @@ function MessageSender({currentUser, setCurrentUser}) {
         autoConnect: false
     });
 
+    const UnixTimestampToReadableDate = (unixTimestamp) =>{
+      const date = new Date(unixTimestamp * 1000);
+      const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      const readableDate = date.toLocaleString('en-US', options);
+      return <span>{readableDate}</span>;
+    }
+
     useEffect(() => {
         // Auto-scroll to the bottom whenever messages change
         scrollToBottom();
@@ -165,7 +172,9 @@ function MessageSender({currentUser, setCurrentUser}) {
                             >
                               <div className="message-info">
                                 <span className="message-sender"><strong>{chatMessage.sender}</strong></span>
-                                <span className="message-timestamp"><small>{new Date(chatMessage.timestamp).toLocaleString()}</small></span>
+                                {/*<span className="message-timestamp"><small>{new Date(chatMessage.timestamp).toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}</small></span>*/}
+                                {console.log(chatMessage)}
+                                <span className="message-timestamp"><small>{UnixTimestampToReadableDate(chatMessage.timestamp)}</small></span>
                               </div>
                               <div className="message-content">
                                 <Card.Text>{chatMessage.message}</Card.Text>

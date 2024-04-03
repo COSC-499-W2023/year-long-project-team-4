@@ -114,32 +114,6 @@ const sendMain = () => {
 
 const email = currentUser;
 
-useEffect(() => {
-        const fetchCurrentUser = async () => {
-            try {
-              const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
-                withCredentials: true
-              });
-              if (response.data.email) {
-                
-                setCurrentUser(response.data.email);
-                setIsAuthenticated(true);
-              if (response.data.email) {
-                setCurrentUser(response.data.email);
-                setIsAuthenticated(true);
-              } else {
-                console.error('No user currently logged in');
-              }
-            }
-            } catch (error) {
-              navigate(uploadVideoPath);
-              console.error('There was an error fetching the current user', error);
-              setIsAuthenticated(false);
-            }
-          }
-          fetchCurrentUser();
-        }, []);
-
 useEffect(()=>{
   const fetchCurrent =async()=> {
     try {
@@ -151,11 +125,14 @@ useEffect(()=>{
         setCurrentUser(response.data.email);
         setCurrentFirstName(response.data.firstname);
         setCurrentLastName(response.data.lastname);
+        setIsAuthenticated(true);
       } else {
         console.error('No user currently logged in');
       }
     } catch (error) {
-      console.error('There was an error fetching the current user', error);
+        navigate(uploadVideoPath);
+        console.error('There was an error fetching the current user', error);
+        setIsAuthenticated(false);
     }
   };
   fetchCurrent();}, [])

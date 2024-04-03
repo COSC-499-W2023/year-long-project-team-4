@@ -39,6 +39,10 @@ def test_delete_key():
     result = database.delete_key("TestDeleteKey.mp4", sender = True, receiver = False)
     assert result == 1  # Assuming the delete was successful
        
+def test_update_key():
+    database.insert_video("TestUpdateKey.mp4", "Testname123","2024-01-24 11:59:00", "updated@example.com", "Test@example.com","1","2")
+    result = database.update_key("TestUpdateKey.mp4", sender = True, receiver = False, encrpytKey = 'fakeEncryptKey')
+    assert result == 1  # Assuming the update was successful
        
 if __name__ == "__main__":
     
@@ -49,5 +53,6 @@ if __name__ == "__main__":
     test_update()
     test_delete()   
     test_delete_key()
+    test_update_key()
     end_time = time.time()
     print("Time taken: ",end_time - start_time,"seconds")

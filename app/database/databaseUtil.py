@@ -480,3 +480,75 @@ def delete_key(videoId:str,sender:bool,receiver:bool) -> int:
         if db:
             db.close()
     return result  # Return the result
+
+def update_key(videoId:str,sender:bool,receiver:bool, encrpytKey) -> int:
+    '''
+    Updates a user's ecrytion on a video after password change
+
+    Args:
+        videoId(str): The video's ID where the key will be deleted
+        sender(bool): true if the user is the sender
+        reciever(bool): true if the user is the reciever
+        encrpytKey: The public key of the sender or receiver
+
+    Returns:
+        int: An integer result code indicating the outcome of the delete operation.
+             - 1: Update was successful.
+             - -1: An error occurred during the update.
+    '''
+    db = None
+    result = 0  # Initialize the result to 0
+    
+    try:
+        if SSH:
+            with SSHTunnelForwarder((EC2), ssh_username=SSHUSER,ssh_pkey=KPATH, remote_bind_address=(ADDRESS,PORT)) as tunnel:
+                print("SSH Tunnel Established")
+                #Db connection string
+                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+                if db:
+                    cur = db.cursor()
+                    #Create set clause depending on whether user is sender or receiver
+                    if (sender):
+                        set_clause = f"senderEncryption = %s"
+                    elif (receiver):
+                        set_clause = f"receiverEncryption = %s"
+                    else:
+                        result = -1
+                    query = f"UPDATE videos SET {set_clause} WHERE videoId = %s"
+                    cur.execute(query, (encrpytKey, videoId))   
+                    # Check if video has chats associated with it and removes user's access
+                    query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoId,))
+                    if query_results:
+                        query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
+                        cur.execute(query2, (encrpytKey, videoId))
+                    db.commit()
+                    cur.close()
+                    result = 1  # Set result to 1 to indicate success
+        else:
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
+            if db:
+                cur = db.cursor()
+                #Create set clause depending on whether user is sender or receiver
+                if (sender):
+                        set_clause = f"senderEncryption = {encrpytKey}"
+                elif (receiver):
+                        set_clause = f"receiverEncryption = {encrpytKey}"
+                else:
+                    result = -1
+                query = f"UPDATE videos SET {set_clause} WHERE videoId = %s"
+                cur.execute(query, videoId)   
+                # Check if video has chats associated with it and removes user's access
+                query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoId,))
+                if query_results:
+                    query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
+                    cur.execute(query2, videoId)
+                db.commit()
+                cur.close()
+                result = 1  # Set result to 1 to indicate success 
+    except Exception as e:
+        print(e)
+        result = -1  # Set result to -1 to indicate an error
+    finally:
+        if db:
+            db.close()
+    return result  # Return the result

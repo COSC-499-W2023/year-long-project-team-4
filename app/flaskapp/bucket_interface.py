@@ -133,9 +133,6 @@ def upload_video():
     if 'email' in session:
         sender_email = session['email']
         
-        if sender_email == recipient_email:
-            return jsonify({'error': 'Can not be the sender and recipient of the video'}),412
-        
         sender_public_key = get_public_key(session['email'])
         sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
         if not create_chat(video_id, retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):
@@ -239,7 +236,6 @@ def retrieve_video():
 
     aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, get_private_key())
     video_path = f'/videos/{video_id}'
-
     # Decrypt the file and write the data to an IO buffer
     video_data = io.BytesIO()
     object_content = s3Bucket.get_object_content(video_path)
@@ -542,79 +538,47 @@ def change_password_reencrypt():
         salt_hash = os.urandom(64)
         private_key_seed = new_password + salt_hash.hex()
         private_key = generate_key(private_key_seed)
+        session['private_key'] = private_key.export_key()
         public_key = private_key.publickey().export_key('PEM')
         hashed_password = bcrypt.generate_password_hash(new_password).decode()
         #Insert new info into database
         database.update_user(user_email = user_email, new_password_hash = hashed_password, new_salt_hash = salt_hash, new_public_key = public_key)
 
         #Loop through videos to reencrypt and insert back to database and s3Bucket
-        for sentvideos in videos_to_decrypt_sent:        
-            #Decrypt
-            video_details = database.query_records(table_name='videos', fields='senderEncryption, retDate, receiverEmail', condition=f'videoId = %s', condition_values=(sentvideos['videoId'],))[0]
-            encrypted_aes_key = video_details['senderEncryption']
-            retention_date = video_details['retDate']
-            receiver_email = video_details['receiverEmail']
-            aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
-            video_path = f'/videos/{sentvideos["videoId"]}'
-            object_content = s3Bucket.get_object_content(video_path)
-            decrypted_video = aes_decrypt_video(object_content, aes_key)
-            s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
-            database.delete_record("videos", "videoId = %s", sentvideos["videoId"])
-            #Reencrypt
-            aes_key = bytes
-            session['private_key'] = private_key.export_key()
-            encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
-            #Insert into s3Bucket (sent videos first)
+        for sentvideos in videos_to_decrypt_sent:
             video_id = sentvideos['videoId']
-            sender_email = user_email
-                
+
+            #Decrypt
+            video_details = database.query_records(table_name='videos', fields='senderEncryption', condition=f'videoId = %s', condition_values=(video_id,))[0]
+            encrypted_aes_key = video_details['senderEncryption']
+            aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
+
+            #Reencrypt
             sender_public_key = get_public_key(user_email)
             sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
-            recipient_public_key = get_public_key(receiver_email)
-            recipient_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, recipient_public_key)
-            #Upload video
-            proceed = s3Bucket.already_existing_file(video_path)
-            if (proceed == False):
-                s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
-            insert_video = s3Bucket.encrypt_insert(file_flag = 'videos', file_content = encrypted_video, file_name = video_id, retDate = retention_date, senderEmail = sender_email, receiverEmail = receiver_email, senderEncryption = sender_encrypted_aes_key, receiverEncryption = recipient_encrypted_aes_key)
             
-            if insert_video == False:
-                return jsonify({"status": "error",'message': 'Video insertion failed'}), 502
+            #Update key
+            update_key = database.update_key(videoId = video_id, sender = True, receiver = False, encrpytKey = sender_encrypted_aes_key)
+            if update_key == False:
+                return jsonify({"status": "error",'message': 'Key update failed'}), 502
+
         #Repeat but for recieved videos
         for receivedvideos in videos_to_decrypt_received:
+            video_id = receivedvideos['videoId']
+
             #Decrypt
-            print("Video in receiver")
-            video_details = database.query_records(table_name='videos', fields='retDate, senderEmail, receiverEncryption', condition=f'videoId = %s', condition_values=(receivedvideos['videoId'],))[0]
+            video_details = database.query_records(table_name='videos', fields='receiverEncryption', condition=f'videoId = %s', condition_values=(video_id,))[0]
             encrypted_aes_key = video_details['receiverEncryption']
             aes_key = rsa_decrypt_aes256_key(encrypted_aes_key, old_private_key)
-            video_path = f'/videos/{receivedvideos["videoId"]}'
-            object_content = s3Bucket.get_object_content(video_path)
-            decrypted_video = aes_decrypt_video(object_content, aes_key)
-            s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
-            database.delete_record("videos", "videoId = %s", receivedvideos["videoId"])
+            
             #Reencrypt
-            session['private_key'] = private_key.export_key()
-            aes_key = bytes
-            encrypted_video, aes_key = aes_encrypt_video(decrypted_video)
-            print(aes_key)
-            #Insert into s3Bucket (received)
-            video_id = receivedvideos['videoId']
-            retention_date = video_details["retDate"]
-            sender_email = video_details["senderEmail"]
-            receiver_email = user_email
-                
-            sender_public_key = get_public_key(sender_email)
-            sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
             recipient_public_key = get_public_key(user_email)
             recipient_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, recipient_public_key)
-            #Upload video
-            proceed = s3Bucket.already_existing_file(video_path)
-            if proceed == False:
-                s3Bucket.delete_file(BUCKETNAME='team4-s3',obj_path=video_path)
-            print(sender_encrypted_aes_key)  
-            insert_video = s3Bucket.encrypt_insert(file_flag = 'videos', file_content = encrypted_video, file_name = video_id, retDate = retention_date, senderEmail = sender_email, receiverEmail = receiver_email, senderEncryption = sender_encrypted_aes_key, receiverEncryption = recipient_encrypted_aes_key)    
-            if insert_video == False:
-                return jsonify({"status": "error",'message': 'Video insertion failed'}), 502
+            
+            #Update key
+            update_key = database.update_key(video_id = video_id, sender = False, receiver = True, encryptKey = recipient_encrypted_aes_key)
+            if update_key == False:
+                return jsonify({"status": "error",'message': 'Key update failed'}), 502
                     
         #Check if password has been changed
         current_password = database.query_records(table_name='userprofile', fields='password_hash', condition=f'email = %s', condition_values=(user_email,))[0]['password_hash']

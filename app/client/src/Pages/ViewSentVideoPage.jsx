@@ -1,33 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, InputGroup, Button } from 'react-bootstrap';
 import { Fade } from 'react-reveal';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from './Sidebar';
+import './ViewSentVideoPage.css'; 
 import { MessagingPath, IP_ADDRESS, uploadVideoPath } from '../Path';
 
 const ViewVideoPage = () => {
     const [videos, setVideos] = useState([]);
     const [selectedVideo, setSelectedVideo] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredVideos, setFilteredVideos] = useState([]);
     const [showVideoModal, setShowVideoModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch videos on component mount
-        axios.get(`${IP_ADDRESS}/bucket/getvideos`, {
-            withCredentials: true
-        })
-        .then(response => {
-            setVideos(response.data);
-            console.log(response.data)
-        })
-        .catch(error => {
-            console.error('There was an error fetching the videos!', error);
-        });
-
         // Fetch current user on component mount
         const fetchCurrentUser = async () => {
             try {
@@ -51,30 +41,38 @@ const ViewVideoPage = () => {
         fetchCurrentUser();
     }, []);
 
-
-
-    // Handles video selection and redirects to messaging page
-    const handleVideoClick = (videoName) => {
-        navigate(MessagingPath, { state: { videoName: videoName } });
+    useEffect(() => {
+      axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, { withCredentials: true })
+        .then(response => {
+          // Assuming the response data includes senderEmail, senderName, and tags
+          setVideos(response.data);
+          setFilteredVideos(response.data);
+        })
+        .catch(error => {
+          console.error('There was an error fetching the videos!', error);
+          setErrorMessage('Error fetching videos');
+        });
+    }, []);
+  
+    useEffect(() => {
+      if (!searchTerm) {
+        setFilteredVideos(videos);
+      } else {
+        const lowercasedSearchTerm = searchTerm.toLowerCase();
+        const searchedVideos = videos.filter(video =>
+          video.tags.some(tag => tag.toLowerCase().includes(lowercasedSearchTerm))
+        );
+        setFilteredVideos(searchedVideos);
+      }
+    }, [searchTerm, videos]);
+  
+    const handleSearchChange = (e) => {
+      setSearchTerm(e.target.value);
     };
-
-    const [hoverIndex, setHoverIndex] = useState(-1); // State to keep track of which card is being hovered
-
-    const defaultCardStyle = {
-      backgroundColor: '#13056be0', // Default card background
-      color: 'white', // Default text color
-      transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
+  
+    const handleVideoClick = (videoId) => {
+      navigate(MessagingPath, { state: { videoId: videoId } });
     };
-
-    const hoverCardStyle = {
-      backgroundColor: 'white', // Hover card background
-      color: '#13056be0', // Hover text color
-      transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
-    };
-
-    const getCardStyle = (isHovered) => (
-      isHovered ? {...defaultCardStyle, ...hoverCardStyle} : defaultCardStyle
-    );
 
     return (
         <Fade cascade>
@@ -85,15 +83,45 @@ const ViewVideoPage = () => {
                     </Fade>
                 </Col>
                 <Col xs={10}>
-                    <div className="display-4 text-center"> Videos Received </div>
-                    <div className="display-6"> Videos</div>
-                    {videos.map((video, index) => (
-                        <div key={index} onClick={() => handleVideoClick(video.videoName)}>
-                            <Button className='text-center mb-2' style={{minWidth: '150px'}}>
-                                <p>Video{index + 1}</p>
-                            </Button>
-                        </div>
-                    ))}
+                <Container className='video-cards-container'>
+        <Row className="mb-4">
+          <Col>
+            <h1 className="text-center">Uploaded Videos</h1>
+            <InputGroup id="search-bar" className="mb-3">
+              <Form.Control
+                placeholder="Search by tags..."
+                onChange={handleSearchChange}
+                value={searchTerm}
+              />
+              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                Clear
+              </Button>
+            </InputGroup>
+          </Col>
+        </Row>
+        <Row>
+        {filteredVideos.map((video, index) => (
+          <Col key={index} md={4} className="col mb-4">
+            <Card onClick={() => handleVideoClick(video.videoId)} style={{ cursor: 'pointer' }}>
+              <Card.Body>
+                <Card.Title>{video.videoName}</Card.Title>
+                <Card.Text>
+                  <strong>Sender's Email: </strong>{video.senderEmail}<br />
+                  Sender's Name: {video.senderFName} {video.senderLName}<br />
+                  Tags:
+                  <div className="tags-container">
+                    {video.tags.length > 0 ? video.tags.map((tag, tagIndex) => (
+                      <span key={tagIndex} className="tag-badge">{tag}</span>
+                    )) : 'None'}
+                  </div>
+                </Card.Text>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+        {errorMessage && <div className="text-center text-danger">{errorMessage}</div>}
+      </Container>
                 </Col>   
             </Row>    
             {errorMessage && <div className="error-message">{errorMessage}</div>}

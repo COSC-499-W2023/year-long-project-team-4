@@ -1,10 +1,9 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Alert, Form, Offcanvas, Modal, Button, ToggleButtonGroup, Spinner, ToggleButton} from 'react-bootstrap'
 import Webcam from 'react-webcam';
-import record from "../Assets/record-btn.svg"
+import  {ReactComponent as Record} from "../Assets/record-btn.svg"
 import axios from "axios";
 import info from "../Assets/info-circle.svg"
-import back from "../Assets/arrow-left.svg"
 import { Fade } from 'react-reveal';
 import { IP_ADDRESS , viewSentVideoPath} from '../Path';
 import Sidebar from './Sidebar';
@@ -15,7 +14,6 @@ import "./UploadVideoPage.css";
 const UploadVideoPage = () => {
   const [type, setType] = useState(1);
   const [time, setTime] = useState(0);
-  const [file, setFile] = useState(null);
   const [backend, setBackend] = useState(null);
   const [disable, setDisable] = useState(true);
   const [disableRecord, setDisableRecord] = useState(false);
@@ -23,16 +21,34 @@ const UploadVideoPage = () => {
   const mediaRecorderRef = React.useRef(null);
   const [capturing, setCapturing] = React.useState(false);
   const [recordedChunks, setRecordedChunks] = React.useState([]);
-  const [recipientEmail, setRecipientEmail] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [show, setShow] = useState(false);
   const [load, setLoad] = useState(false);
-  const [retentionPeriod, setRetentionPeriod] = useState(90);
   const [modal, setModal] = useState(true);
+
+  //user fields
+  const [file, setFile] = useState(null);
+  const [recipientEmail, setRecipientEmail] = useState('');
+  const [tagsInput, setTagsInput] = useState('');
+  const [tags, setTags] = useState([]);
+  const [retentionPeriod, setRetentionPeriod] = useState(90);
+  const [videoName, setVideoName] = useState('');
 
   let startTime;
   var duration;
   const navigate = useNavigate()
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && tagsInput.trim()) {
+      setTags([...tags, tagsInput.trim()]);
+      setTagsInput(''); // Reset input field to empty string
+      event.preventDefault();
+    }
+  };
+
+  const removeTag = (indexToRemove) => {
+    setTags(tags.filter((_, index) => index !== indexToRemove));
+  };
 
   const handleClose = () => setShow(false);
   
@@ -67,7 +83,7 @@ const UploadVideoPage = () => {
       [setRecordedChunks]
     );
 
-    const handleStopRecord =  React.useCallback(() => {
+  const handleStopRecord =  React.useCallback(() => {
       duration = Date.now() - startTime;
       setDisableRecord(true);
       setTime(duration);
@@ -75,8 +91,7 @@ const UploadVideoPage = () => {
       
       setCapturing(false);
 
-
-    }, [mediaRecorderRef, webcamRef, setCapturing]);
+  }, [mediaRecorderRef, webcamRef, setCapturing]);
 
   const handleSubmit =(e)=>{
     e.preventDefault();
@@ -84,8 +99,12 @@ const UploadVideoPage = () => {
     const videoData = new FormData();
 
     // Appends the video file and recipient's email to the FormData object
+    videoData.append('video_name', videoName);
     videoData.append('file', backend, 'videoFile.mp4');
     videoData.append('recipient', recipientEmail);
+
+    const tagsPayload = { tags }; // Ensure the payload structure is correct
+    videoData.append('json', new Blob([JSON.stringify(tagsPayload)], { type: "application/json" }));
   
     axios.post(`${IP_ADDRESS}/bucket/upload`, videoData, {
     withCredentials: true,
@@ -96,7 +115,7 @@ const UploadVideoPage = () => {
   .then(response => {
     console.log('Video uploaded successfully', response.data);
     setUploadSuccess(true);
-    navigate(viewSentVideoPath);
+    navigate(receiveAndSendPath);
   })
   .catch(error => {
     console.error('Error uploading video', error);
@@ -140,6 +159,7 @@ const UploadVideoPage = () => {
       setDisable(true);
     }
   }
+
   const handleBlur = () => {
     const videoData = new FormData();
     setLoad(true);
@@ -233,7 +253,7 @@ const UploadVideoPage = () => {
     </Modal>
     }
     <Fade>
-      <div className="position-absolute top-50 start-50 translate-middle text-center">
+      <div className="p-2 text-center">
         <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>
           <ToggleButton id="tbg-radio-1" value={1} onClick={()=>{handleType(1)}}>
             Upload Video
@@ -281,6 +301,7 @@ const UploadVideoPage = () => {
             </div>
           </Form.Group>
           <Form.Group controlId="formRecipientEmail" className="mb-3 mt-3">
+              <Form.Label>Recipient Email</Form.Label>
               <Form.Control 
                 type="email" 
                 required 
@@ -289,6 +310,34 @@ const UploadVideoPage = () => {
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
           </Form.Group>
+          <Form.Group controlId="formVideoName" className="mb-3">
+            <Form.Label>Video Name</Form.Label>
+            <Form.Control 
+              type="text" 
+              placeholder="Enter video name" 
+              value={videoName} 
+              onChange={(e) => setVideoName(e.target.value)} // Update the videoName state when the input changes
+            />{/* */}
+          </Form.Group>
+          <Form.Group controlId="formTags" className="mb-3">
+            <Form.Label>Tags</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Type a tag and press Enter"
+              value={tagsInput} // Controlled component
+              onChange={(e) => setTagsInput(e.target.value)} // Use onChange instead
+              onKeyDown={handleKeyDown}
+            />
+          </Form.Group>
+          {/* Display the tags */}
+          <div className="tags-container">
+            {tags.map((tag, index) => (
+              <div key={index} className="tag-badge">
+                {tag}
+                <button type="button" onClick={() => removeTag(index)}>×</button>
+              </div>
+            ))}
+          </div>
           <Form.Group controlId="formRetentionPeriod" className="mb-3">
             <Form.Label className="text-black">Retention Period in days (1-365)</Form.Label>
             <Form.Control 
@@ -310,17 +359,17 @@ const UploadVideoPage = () => {
           <div className="mb-2"> 
           {capturing? 
             ( <>
-                <Button variant= "danger" active>
-                  <img width="16" height="22" src={record}/> 
-                </Button> {' '}
-                <Button onClick={handleStopRecord}>Stop Recording</Button>
+                <Button variant="danger" onClick={handleStopRecord}>
+                  <Record width="16" height="22"/> {' '}
+                  Stop Recording
+                </Button>
               </>
             ):(
               <> 
-                <Button variant= "secondary" active>
-                  <img width="16" height="22" src={record}/> 
-                </Button> {' '}
-                <Button onClick={handleStartRecord} disabled={disableRecord}>Start Recording</Button>
+                <Button onClick={handleStartRecord} disabled={disableRecord}>
+                  <Record fill={"white"} width="16" height="22"/> {' '}
+                  Start Recording
+                </Button>
               </> 
             )
           }
@@ -349,6 +398,7 @@ const UploadVideoPage = () => {
           )}
           </>
           <Form.Group controlId="formRecipientEmail" className="mb-3 mt-3">
+              <Form.Label>Recipient Email</Form.Label>
               <Form.Control 
                 type="email" 
                 required 
@@ -356,6 +406,45 @@ const UploadVideoPage = () => {
                 value={recipientEmail} 
                 onChange={(e) => setRecipientEmail(e.target.value)} 
               />
+          </Form.Group>
+          <Form.Group controlId="formVideoName" className="mb-3">
+            <Form.Label>Video Name</Form.Label>
+            <Form.Control 
+              type="text" 
+              placeholder="Enter video name" 
+              value={videoName} 
+              onChange={(e) => setVideoName(e.target.value)} // Update the videoName state when the input changes
+            />
+          </Form.Group>
+          <Form.Group controlId="formTags" className="mb-3">
+            <Form.Label>Tags</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Type a tag and press Enter"
+              value={tagsInput} // Controlled component
+              onChange={(e) => setTagsInput(e.target.value)} // Use onChange instead
+              onKeyDown={handleKeyDown}
+            />
+          </Form.Group>
+          {/* Display the tags */}
+          <div className="tags-container">
+            {tags.map((tag, index) => (
+              <div key={index} className="tag-badge">
+                {tag}
+                <button type="button" onClick={() => removeTag(index)}>×</button>
+              </div>
+            ))}
+          </div>
+          <Form.Group controlId="formRetentionPeriod" className="mb-3">
+            <Form.Label className="text-black">Retention Period in days (1-365)</Form.Label>
+            <Form.Control 
+              type="number" 
+              required 
+              min="1" max="365" 
+              placeholder="Enter retention period in days" 
+              value={retentionPeriod} 
+              onChange={(e) => setRetentionPeriod(e.target.value)} 
+            />
           </Form.Group>
           <div className="mt-2">
             <Button onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}

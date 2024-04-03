@@ -10,14 +10,14 @@ import Sidebar from './Sidebar';
 import {
     MessagingPath,
     IP_ADDRESS,
+    loginPath,
   } from "../Path";
 import "./AccountPage.css";
 
 import PasswordCheckList from "react-password-checklist";
 
-const AccountPage = () => {
+const AccountPage = ({currentUser, setCurrentUser}) => {
 const [type, setType] = useState(false)
-const [currentUser, setCurrentUser] = useState(null);
 const [currentFirstName, setCurrentFirstName] = useState(null);
 const [currentLastName, setCurrentLastName] = useState(null);
 const [errorMessage, setErrorMessage] = useState("");

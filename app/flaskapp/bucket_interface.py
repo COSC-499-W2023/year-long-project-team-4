@@ -252,42 +252,61 @@ def retrieve_video():
     # Send the data in the buffer as mp4
     return send_file(video_data, mimetype='video/mp4'), 200
 
-@bucket.route('/getvideos', methods=['GET', 'POST'])
+@bucket.route('/getvideos', methods=['GET'])
 def get_available_videos():
-    # Get videos
-    available_videos = database.query_records(table_name='videos', fields='videoId, videoName, senderEmail, receiverEmail', condition=f'receiverEmail = %s', condition_values=(session['email'],))
+    table_join = 'videos LEFT JOIN tags ON videos.videoId=tags.videoID'
+    fields = 'videos.videoId, videos.videoName, videos.senderEmail, videos.receiverEmail, videos.senderFName, videos.senderLName, tags.tagName'
+    videos_with_tags = database.query_records(table_name=table_join, fields=fields, condition=f'videos.receiverEmail = %s', condition_values=(session['email'],))
 
-    tags = None
-    json_data = request.files.get('json')
-    if json_data:
-        tags = json.loads(json_data.read())['tags']
+    # Since videos to tags are a one to many relationship, the join will return multiple of each video if there are multiple tags
+    # We need to get rid of duplicates and nicely format the tags into one list to go with each video
+    available_videos_consolidated = []
+    video_ids = []
+    for video in videos_with_tags:
+        video_id = video['videoId']
+        tag = video['tagName']
 
-    if tags:
-        condition_statement = 'tagName = %s OR ' * len(tags)
-        condition_statement = condition_statement[:-4]
-        available_by_tags = database.query_records(table_name='tags', fields='videoId', condition=condition_statement, condition_values=tags)
-        available_by_tags = [video['videoId'] for video in available_by_tags]
-        available_videos = [video for video in available_videos if video['videoId'] in available_by_tags]
+        if video_id not in video_ids:
+            video_ids.append(video_id)
+            del video['tagName']
+            video['tags'] = []
+            if tag:
+                video['tags'].append(tag)
+            available_videos_consolidated.append(video)
+        else:
+            for video in available_videos_consolidated:
+                if video['videoId'] == video_id:
+                    video['tags'].append(tag)
 
-    return json.dumps(available_videos), 200
+    return json.dumps(available_videos_consolidated), 200
     
-@bucket.route('/get_sent_videos', methods=['GET', 'POST'])
+@bucket.route('/get_sent_videos', methods=['GET'])
 def get_sent_videos():
-    available_videos = database.query_records(table_name='videos', fields='videoId, videoName, senderEmail, receiverEmail', condition=f'senderEmail = %s', condition_values=(session['email'],))
+    table_join = 'videos LEFT JOIN tags ON videos.videoId=tags.videoID'
+    fields = 'videos.videoId, videos.videoName, videos.senderEmail, videos.receiverEmail, videos.senderFName, videos.senderLName, tags.tagName'
+    videos_with_tags = database.query_records(table_name=table_join, fields=fields, condition=f'videos.senderEmail = %s', condition_values=(session['email'],))
 
-    tags = None
-    json_data = request.files.get('json')
-    if json_data:
-        tags = json.loads(json_data.read())['tags']
+    # Since videos to tags are a one to many relationship, the join will return multiple of each video if there are multiple tags
+    # We need to get rid of duplicates and nicely format the tags into one list to go with each video
+    available_videos_consolidated = []
+    video_ids = []
+    for video in videos_with_tags:
+        video_id = video['videoId']
+        tag = video['tagName']
 
-    if tags:
-        condition_statement = 'tagName = %s OR ' * len(tags)
-        condition_statement = condition_statement[:-4]
-        available_by_tags = database.query_records(table_name='tags', fields='videoId', condition=condition_statement, condition_values=tags)
-        available_by_tags = [video['videoId'] for video in available_by_tags]
-        available_videos = [video for video in available_videos if video['videoId'] in available_by_tags]
+        if video_id not in video_ids:
+            video_ids.append(video_id)
+            del video['tagName']
+            video['tags'] = []
+            if tag:
+                video['tags'].append(tag)
+            available_videos_consolidated.append(video)
+        else:
+            for video in available_videos_consolidated:
+                if video['videoId'] == video_id:
+                    video['tags'].append(tag)
 
-    return json.dumps(available_videos), 200
+    return json.dumps(available_videos_consolidated), 200
 
 def create_chat(video_id, retention_date, sender_email, receiver_email, sender_key, receiver_key):
     chat_json = {

@@ -10,6 +10,7 @@ import { IP_ADDRESS , viewSentVideoPath} from '../Path';
 import Sidebar from './Sidebar';
 import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
+import "./UploadVideoPage.css";
 
 const UploadVideoPage = () => {
   const [type, setType] = useState(1);
@@ -166,7 +167,7 @@ const UploadVideoPage = () => {
     
     </Fade>
     
-    <Offcanvas show={show} onHide={handleClose} backdrop="static">
+    <Offcanvas show={show} onHide={handleClose} backdrop="static" placement="end">
       <Offcanvas.Header closeButton>
             <Offcanvas.Title>How Uploading Videos Works</Offcanvas.Title>
       </Offcanvas.Header>

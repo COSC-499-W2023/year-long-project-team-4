@@ -33,8 +33,7 @@ import ViewSentVideoPage from "./Pages/ViewSentVideoPage";
 function App() {
   return (
     <Router>
-      <Header />
-
+      <Header currentUser={currentUser} setCurrentUser={setCurrentUser} />
       <Routes>
         <Route path={homePath} element={<HomePage />} />
         <Route path={loginPath} element={<LoginHomePage />} />

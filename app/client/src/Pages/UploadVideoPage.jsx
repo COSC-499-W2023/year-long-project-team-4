@@ -179,6 +179,7 @@ const UploadVideoPage = () => {
   return (
   <>
 <Container fluid>
+  
       <Button className="m-2 float-end" variant="outline-dark" onClick={handleShow}>
         <img src={info}></img>
       </Button>
@@ -250,14 +251,15 @@ const UploadVideoPage = () => {
         </Modal.Body>
     </Modal>
     }
-    <Container fluid>
-      <Row>
-      <Col xs={2} >
-        <Fade>
-          <Sidebar />
-        </Fade>
-      </Col>
-      <Col xs={10} style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+
+<Fade Cascade>
+        <Sidebar />
+</Fade>
+
+<Container fluid>
+  <Row>
+               
+      <Col xs={{ span: 10, offset: 2 }} style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
       <div className="p-2 text-center" >
         <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>
           <ToggleButton id="tbg-radio-1" value={1} onClick={()=>{handleType(1)}}>
@@ -466,7 +468,9 @@ const UploadVideoPage = () => {
         </>
       </div>
       </Col>
-      </Row>
+    
+
+  </Row>
     </Container>
   </>
   )

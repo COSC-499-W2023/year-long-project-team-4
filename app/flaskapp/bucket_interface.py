@@ -133,7 +133,6 @@ def upload_video():
     if 'email' in session:
         sender_email = session['email']
         
-        
         sender_public_key = get_public_key(session['email'])
         sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
         if not create_chat(video_id, retention_date, sender_email, recipient_email, sender_public_key, recipient_public_key):

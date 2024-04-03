@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { Fade } from 'react-reveal';
 import { Container, Row, Col, Button, Form, Card, InputGroup, Spinner } from 'react-bootstrap';
-import { viewSentVideoPath,
+import { viewSentVideoPath, uploadVideoPath, 
     IP_ADDRESS,
  } from '../Path';
 import io from 'socket.io-client';
@@ -17,6 +17,8 @@ function MessageSender() {
     const [chatMessages, setChatMessages] = useState([]);
     const [videoURL, setVideoURL] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [currentUser, setCurrentUser] = useState('');
 
     // Use the useLocation hook to access the location object
     const location = useLocation();
@@ -42,19 +44,30 @@ function MessageSender() {
     }, [chatMessages]);
 
     useEffect(() => {
-      // Fetch current user info (simplified)
-      axios.get(`${IP_ADDRESS}/auth/currentuser`, { withCredentials: true })
-        .then(response => {
-          if (response.data.email) { // Assuming email as the identifier
-            setCurrentUser(response.data.email);
-          } else {
-            console.error('No user currently logged in');
+      // Fetch current user on component mount
+      const fetchCurrentUser = async () => {
+          try {
+              const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
+                  withCredentials: true
+              });
+
+              if (response.data.email) {
+                  setCurrentUser(response.data.email);
+                  setIsAuthenticated(true);
+              } else {
+                  console.error('No user currently logged in');
+                  setIsAuthenticated(false);
+              }
+              
+          } catch (error) {
+              navigate(uploadVideoPath);
+              console.error('There was an error fetching the current user', error);
+              setIsAuthenticated(false);
           }
-        })
-        .catch(error => {
-          console.error('There was an error fetching the current user', error);
-        });
-    }, []);
+      };
+
+      fetchCurrentUser();
+  }, []);
 
     // Fetch existing chat messages on component mount
     useEffect(() => {
@@ -150,7 +163,7 @@ function MessageSender() {
               </Col>
               {/* Messages column (40% width) */}
               <Col md={4} style={{ paddingLeft: '15px' }}>
-                <Card className="card-full-height" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <Card className="card-full-height" style={{ height: '84vh', display: 'flex', flexDirection: 'column' }}>
                   <Card.Header className="card-content-padding" style={{ padding: '10px 20px' }}>
                     <Card.Title>Messages</Card.Title>
                   </Card.Header>

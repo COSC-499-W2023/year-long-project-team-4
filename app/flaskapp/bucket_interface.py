@@ -133,8 +133,6 @@ def upload_video():
     if 'email' in session:
         sender_email = session['email']
         
-        if sender_email == recipient_email:
-            return jsonify({'error': 'Can not be the sender and recipient of the video'}),412
         
         sender_public_key = get_public_key(session['email'])
         sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)

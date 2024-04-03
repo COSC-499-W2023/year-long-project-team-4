@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {Alert, Form, Offcanvas, Modal, Button, ToggleButtonGroup, Spinner, ToggleButton} from 'react-bootstrap'
+import {Container, Row, Alert, Form, Offcanvas, Modal, Button, ToggleButtonGroup, Spinner, ToggleButton, Col} from 'react-bootstrap'
 import Webcam from 'react-webcam';
 import  {ReactComponent as Record} from "../Assets/record-btn.svg"
 import axios from "axios";
@@ -115,7 +115,7 @@ const UploadVideoPage = () => {
   .then(response => {
     console.log('Video uploaded successfully', response.data);
     setUploadSuccess(true);
-    navigate(receiveAndSendPath);
+    navigate(viewSentVideoPath);
   })
   .catch(error => {
     console.error('Error uploading video', error);
@@ -178,14 +178,10 @@ const UploadVideoPage = () => {
 
   return (
   <>
-    <Fade>
-    <Sidebar />
-    
+<Container fluid>
       <Button className="m-2 float-end" variant="outline-dark" onClick={handleShow}>
         <img src={info}></img>
       </Button>
-    
-    </Fade>
     
     <Offcanvas show={show} onHide={handleClose} backdrop="static" placement="end">
       <Offcanvas.Header closeButton>
@@ -237,6 +233,8 @@ const UploadVideoPage = () => {
         </p>
       </Offcanvas.Body>
     </Offcanvas>
+   
+    </Container>
     {uploadSuccess && 
     <Modal 
       show={modal}
@@ -252,8 +250,15 @@ const UploadVideoPage = () => {
         </Modal.Body>
     </Modal>
     }
-    <Fade>
-      <div className="p-2 text-center">
+    <Container fluid>
+      <Row>
+      <Col xs={2} >
+        <Fade>
+          <Sidebar />
+        </Fade>
+      </Col>
+      <Col xs={10} style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+      <div className="p-2 text-center" >
         <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>
           <ToggleButton id="tbg-radio-1" value={1} onClick={()=>{handleType(1)}}>
             Upload Video
@@ -460,7 +465,9 @@ const UploadVideoPage = () => {
         }
         </>
       </div>
-    </Fade>
+      </Col>
+      </Row>
+    </Container>
   </>
   )
 }

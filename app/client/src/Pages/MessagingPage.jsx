@@ -9,7 +9,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import './MessagingPage.css';
 
-function MessageSender() {
+function MessageSender({currentUser, setCurrentUser}) {
     const [message, setMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
@@ -128,6 +128,11 @@ function MessageSender() {
     return (
         <>
           <Container fluid className="container-fluid-custom">
+            {/*<Row className="mt-3">
+              <Col className="text-center">
+                <Button variant="secondary" onClick={handleBack} style={{ margin: '20px' }}>Go Back to Videos</Button>
+              </Col>
+    </Row>*/}
             <Row noGutters={true}>
               {/* Video playback column (60% width) */}
               <Col md={7} style={{ paddingRight: '15px' }}>
@@ -191,11 +196,6 @@ function MessageSender() {
                       </InputGroup>
                     </Form>
                 </Card>
-              </Col>
-            </Row>
-            <Row className="mt-3">
-              <Col className="text-center">
-                <Button variant="secondary" onClick={handleBack} style={{ margin: '20px' }}>Go Back to Videos</Button>
               </Col>
             </Row>
             {errorMessage && (

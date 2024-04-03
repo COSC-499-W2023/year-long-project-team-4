@@ -41,7 +41,9 @@ const ViewVideoPage = () => {
     } else {
       const lowercasedSearchTerm = searchTerm.toLowerCase();
       const searchedVideos = videos.filter(video =>
-        video.tags.some(tag => tag.toLowerCase().includes(lowercasedSearchTerm))
+        video.tags.some(tag => tag.toLowerCase().includes(lowercasedSearchTerm)) ||
+        video.senderEmail.toLowerCase().includes(lowercasedSearchTerm) ||
+        (video.senderFName.toLowerCase() + " " + video.senderLName.toLowerCase()).includes(lowercasedSearchTerm)
       );
       setFilteredVideos(searchedVideos);
     }
@@ -65,7 +67,7 @@ const ViewVideoPage = () => {
             <h1 className="text-center">Received Videos</h1>
             <InputGroup id="search-bar" className="mb-3">
               <Form.Control
-                placeholder="Search by tags..."
+                placeholder="Search..."
                 onChange={handleSearchChange}
                 value={searchTerm}
               />
@@ -80,7 +82,7 @@ const ViewVideoPage = () => {
           <Col key={index} md={4} className="col mb-4">
             <Card onClick={() => handleVideoClick(video.videoId)} style={{ cursor: 'pointer' }}>
               <Card.Body>
-                <Card.Title>{video.videoName}</Card.Title>
+                <Card.Title><strong>{video.videoName}</strong></Card.Title>
                 <Card.Text>
                   <strong>Sender's Email: </strong>{video.senderEmail}<br />
                   Sender's Name: {video.senderFName} {video.senderLName}<br />

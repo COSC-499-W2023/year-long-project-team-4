@@ -52,7 +52,7 @@ function App() {
         <Route path={uploadVideoPath} element={<UploadVideoPage />} />
         <Route path={viewVideoPath} element={<ViewVideoPage />} />
         <Route path={registerPath} element={<RegisterPage />} />
-        <Route path={MessagingPath} element={<MessagingPage />} />
+        <Route path={MessagingPath} element={<MessagingPage currentUser={currentUser}/> } />
         <Route path={viewSentVideoPath} element={<ViewSentVideoPage />} />
         <Route element={<PrivateRoute currentUser={currentUser}/>}>
           <Route

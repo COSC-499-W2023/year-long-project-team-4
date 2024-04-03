@@ -8,7 +8,6 @@ import { Fade } from 'react-reveal';
 import { IP_ADDRESS, receiveAndSendPath } from '../Path';
 import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
-import { receiveAndSendPath } from '../Path';
 import "./UploadVideoPage.css";
 
 const UploadVideoPage = () => {

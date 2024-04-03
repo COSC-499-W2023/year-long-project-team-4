@@ -9,6 +9,7 @@ import HomePage from "./Pages/HomePage";
 import MessagingPage from "./Pages/MessagingPage";
 import ForgotPasswordPage from "./Pages/ForgotPasswordPage";
 import PasswordCodePage from "./Pages/PasswordCodePage";
+import axios from "axios";
 import "./app.css";
 import PrivateRoute from "./PrivateRoute";
 import {

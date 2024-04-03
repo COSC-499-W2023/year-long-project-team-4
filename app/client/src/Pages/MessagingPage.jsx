@@ -9,7 +9,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import './MessagingPage.css';
 
-function MessageSender() {
+function MessageSender({currentUser, setCurrentUser}) {
     const [message, setMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);

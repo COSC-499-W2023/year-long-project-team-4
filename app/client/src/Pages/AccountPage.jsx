@@ -1,28 +1,30 @@
 import React, {useState, useEffect} from 'react';
 import {Card, Col, Button, Row, ListGroup, Tab, Form, Modal, Tabs, InputGroup, Alert} from 'react-bootstrap';
-import { homePath, receiveAndSendPath } from '../Path';
+import { homePath, viewSentVideoPath, uploadVideoPath} from '../Path';
 import {Fade} from 'react-reveal';
 import axios from 'axios';
 import see from '../Assets/eye.svg';
 import unSee from '../Assets/eye-slash.svg';
 import {useNavigate} from 'react-router-dom';
+import Sidebar from './Sidebar';
 import {
     MessagingPath,
     IP_ADDRESS,
+    loginPath,
   } from "../Path";
 import "./AccountPage.css";
 
 import PasswordCheckList from "react-password-checklist";
 
-const AccountPage = () => {
+const AccountPage = ({currentUser, setCurrentUser}) => {
 const [type, setType] = useState(false)
-const [currentUser, setCurrentUser] = useState(null);
 const [currentFirstName, setCurrentFirstName] = useState(null);
 const [currentLastName, setCurrentLastName] = useState(null);
 const [errorMessage, setErrorMessage] = useState("");
 const [pass, setPass] = useState("");
 const [key, setKey] = useState('account');
 const navigate = useNavigate();
+const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 const handleSubmit = (e) => {
     e.preventDefault();
@@ -107,34 +109,12 @@ const handleDelete = () => {
 };
 
 const sendMain = () => {
-  navigate(receiveAndSendPath);
+  navigate(viewSentVideoPath);
 }
 
 const email = currentUser;
 
-useEffect(() => {
-        const fetchCurrentUser = async () => {
-            try {
-              const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
-                withCredentials: true
-              });
-              if (response.data.email) {
-                
-                setCurrentUser(response.data.email);
-              if (response.data.email) {
-                setCurrentUser(response.data.email);
-              } else {
-                console.error('No user currently logged in');
-              }
-            }
-            } catch (error) {
-              console.error('There was an error fetching the current user', error);
-            }      
-          } 
-          fetchCurrentUser();
-        }, []);
-
-  useEffect(()=>{
+useEffect(()=>{
   const fetchCurrent =async()=> {
     try {
       const response = await axios.get(`${IP_ADDRESS}/auth/userdetails`, {
@@ -145,16 +125,33 @@ useEffect(() => {
         setCurrentUser(response.data.email);
         setCurrentFirstName(response.data.firstname);
         setCurrentLastName(response.data.lastname);
+        setIsAuthenticated(true);
       } else {
         console.error('No user currently logged in');
       }
     } catch (error) {
-      console.error('There was an error fetching the current user', error);
+        navigate(uploadVideoPath);
+        console.error('There was an error fetching the current user', error);
+        setIsAuthenticated(false);
     }
   };
   fetchCurrent();}, [])
 
+
+const handleStartChat = (e, videoName) => {
+  e.preventDefault();
+  navigate(MessagingPath, { state: { videoName: videoName } });
+};
+
 return (
+  <Fade cascade>
+      <Row>
+            <Col xs={2}>
+                <Fade>
+                <Sidebar />
+                </Fade>
+            </Col>
+            <Col xs={10}>
    <div className="container p-4">
     <Fade>
       <Card>
@@ -253,6 +250,9 @@ return (
       </div>
     </Fade>   
    </div>
+   </Col>   
+    </Row>  
+    </Fade>
   )
 }
 

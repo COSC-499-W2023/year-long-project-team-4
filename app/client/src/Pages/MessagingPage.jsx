@@ -1,20 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { Fade } from 'react-reveal';
 import { Container, Row, Col, Button, Form, Card, InputGroup, Spinner } from 'react-bootstrap';
-import { receiveAndSendPath,
+import { viewSentVideoPath, uploadVideoPath, 
     IP_ADDRESS,
  } from '../Path';
 import io from 'socket.io-client';
+import Sidebar from './Sidebar';
 import axios from 'axios';
+import './MessagingPage.css';
 
 function MessageSender() {
     const [message, setMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
-    const [currentUser, setCurrentUser] = useState(null);
     const [videoURL, setVideoURL] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [currentUser, setCurrentUser] = useState('');
 
     // Use the useLocation hook to access the location object
     const location = useLocation();
@@ -26,7 +30,7 @@ function MessageSender() {
     const messagesEndRef = useRef(null); // Ref for auto-scrolling
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' , block: "end"});
     };
 
     const socket = io(`${IP_ADDRESS}`,  {
@@ -38,6 +42,32 @@ function MessageSender() {
         // Auto-scroll to the bottom whenever messages change
         scrollToBottom();
     }, [chatMessages]);
+
+    useEffect(() => {
+      // Fetch current user on component mount
+      const fetchCurrentUser = async () => {
+          try {
+              const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
+                  withCredentials: true
+              });
+
+              if (response.data.email) {
+                  setCurrentUser(response.data.email);
+                  setIsAuthenticated(true);
+              } else {
+                  console.error('No user currently logged in');
+                  setIsAuthenticated(false);
+              }
+              
+          } catch (error) {
+              navigate(uploadVideoPath);
+              console.error('There was an error fetching the current user', error);
+              setIsAuthenticated(false);
+          }
+      };
+
+      fetchCurrentUser();
+  }, []);
 
     // Fetch existing chat messages on component mount
     useEffect(() => {
@@ -85,7 +115,7 @@ function MessageSender() {
 
     //Navigate back to view videos
     const handleBack = () => {
-        navigate(receiveAndSendPath);
+        navigate(viewSentVideoPath);
     };
 
     // Display error if videoId is not available
@@ -112,11 +142,14 @@ function MessageSender() {
     };
     return (
         <>
-          <Container fluid style={{ marginTop: '20px', padding: '0 20px' }}>
+        <Fade>
+          <Sidebar />
+          </Fade>
+          <Container fluid style={{ marginTop: '20px', padding: '0 20px' }} className="container-fluid-custom">
             <Row noGutters={true}>
               {/* Video playback column (60% width) */}
-              <Col md={7} style={{ paddingRight: '15px' }}>
-                <div className="video-wrapper" style={{ width: '100%', height: 'auto', padding: '10px', backgroundColor: '#f8f9fa' }}>
+              <Col md={{ span: 6, offset: 2 }} style={{ paddingRight: '15px' }}>
+              <div className={isLoading ? "video-wrapper flex-center" : "video-wrapper"}>
                     {isLoading ? (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                         <Spinner animation="border" role="status"/>
@@ -129,25 +162,34 @@ function MessageSender() {
                 </div>
               </Col>
               {/* Messages column (40% width) */}
-              <Col md={5} style={{ paddingLeft: '15px' }}>
-                <Card style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  <Card.Header style={{ padding: '10px 20px' }}>
+              <Col md={4} style={{ paddingLeft: '15px' }}>
+                <Card className="card-full-height" style={{ height: '84vh', display: 'flex', flexDirection: 'column' }}>
+                  <Card.Header className="card-content-padding" style={{ padding: '10px 20px' }}>
                     <Card.Title>Messages</Card.Title>
                   </Card.Header>
-                  <Card.Body style={{ flexGrow: 1, overflowY: 'auto', padding: '10px 20px' }}>
-                    {chatMessages.map((chatMessage, index) => (
-                      <div key={index} className="mb-2">
-                        <Card.Text>
-                          <strong>{chatMessage.sender}</strong>
-                          <small>{new Date(chatMessage.timestamp * 1000).toLocaleString()}</small>
-                        </Card.Text>
-                        <Card.Text>{chatMessage.message}</Card.Text>
-                      </div>
-                    ))}
+                  <Card.Body className="message-area card-content-padding">
+                    <div className='message-area-content'>
+                      {chatMessages.map((chatMessage, index) => {
+                          const isSentByCurrentUser = chatMessage.sender === currentUser;
+                          return (
+                            <div
+                              key={index}
+                              className={`message-bubble ${isSentByCurrentUser ? 'message-bubble-sent' : 'message-bubble-received'}`}
+                            >
+                              <div className="message-info">
+                                <span className="message-sender"><strong>{chatMessage.sender}</strong></span>
+                                <span className="message-timestamp"><small>{new Date(chatMessage.timestamp).toLocaleString()}</small></span>
+                              </div>
+                              <div className="message-content">
+                                <Card.Text>{chatMessage.message}</Card.Text>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
                     <div ref={messagesEndRef} />
                   </Card.Body>
-                  <Card.Footer style={{ padding: '10px 20px' }}>
-                    <Form onSubmit={handleSubmit}>
+                    <Form onSubmit={handleSubmit} className="input-group-custom">
                       <InputGroup>
                         <Form.Control
                           as="textarea"
@@ -156,17 +198,17 @@ function MessageSender() {
                           onChange={(e) => setMessage(e.target.value)}
                           placeholder="Type a message..."
                           style={{ marginRight: '10px' }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                              e.preventDefault(); 
+                              handleSubmit(e); 
+                            }
+                          }}
                         />
                         <Button variant="primary" type="submit">Send</Button>
                       </InputGroup>
                     </Form>
-                  </Card.Footer>
                 </Card>
-              </Col>
-            </Row>
-            <Row className="mt-3">
-              <Col className="text-center">
-                <Button variant="secondary" onClick={handleBack} style={{ margin: '20px' }}>Go Back to Videos</Button>
               </Col>
             </Row>
             {errorMessage && (
@@ -177,6 +219,7 @@ function MessageSender() {
               </Row>
             )}
           </Container>
+         
         </>
       );      
 }

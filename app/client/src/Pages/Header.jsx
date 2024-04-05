@@ -2,37 +2,17 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ReactComponent as Person } from "../Assets/person.svg";
 import { ReactComponent as Logout } from "../Assets/box-arrow-right.svg";
+import { ReactComponent as Logo } from "../Assets/thislogo1.svg";
 import { Navbar, Button, OverlayTrigger, Modal, Tooltip } from "react-bootstrap";
-import { IP_ADDRESS, accountPath, homePath, loginPath, receiveAndSendPath } from "../Path";
+import { IP_ADDRESS, accountPath, loginPath, viewSentVideoPath } from "../Path";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const Header = () => {
+const Header = ({currentUser, setCurrentUser}) => {
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState(null);
-    const [currentUser, setCurrentUser] = useState(null);
     const [modal, setModal] = useState(true);
-  
-    useEffect(() => {
-      const fetchCurrentUser = async () => {
-        try {
-          const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
-            withCredentials: true,
-          });
-  
-          if (response.data.email) {
-            setCurrentUser(response.data.email);
-          } else {
-            console.error("No user currently logged in");
-          }
-        } catch (error) {
-          console.error("There was an error fetching the current user", error);
-        }
-      };
-  
-      fetchCurrentUser();
-    }, []);
-  
+   
     const handleLogout = async () => {
       try {
         const response = await axios.get(`${IP_ADDRESS}/auth/logout`, {
@@ -58,26 +38,32 @@ const Header = () => {
 
     const handleLink = () => {
       if (currentUser) {
-        navigate(receiveAndSendPath);
+        navigate(viewSentVideoPath);
       } else {
         navigate(loginPath);
       }
     }
+
+    const sendAccount = () =>{
+      navigate(accountPath);
+    }
   
   return (
-   <> 
-    <Navbar className="bg-primary">
-    <Navbar.Brand onClick={handleLink}>
-      <div className="display-6 text-white">SafeMov</div>
-    </Navbar.Brand>
     <>
+    <Navbar className="bg-primary" style={{ height: "12vh", padding: "0 20px" }}>
+        
       {currentUser ? (
+        <>
+        <Navbar.Brand onClick={handleLink} className="me-auto" style={{ marginRight: "20px" }}>
+          <Logo />
+        </Navbar.Brand>
+        
         <Navbar.Collapse className="justify-content-end">
           <OverlayTrigger
             placement="bottom"
             overlay={<Tooltip>Account Page</Tooltip>}
           >
-            <Button className="m-2" href={accountPath}>
+            <Button className="m-2" onClick={sendAccount}>
               <Person fill={"white"} height="50" width="50" />
             </Button>
           </OverlayTrigger>
@@ -90,10 +76,11 @@ const Header = () => {
             </Button>
           </OverlayTrigger>
         </Navbar.Collapse>
+        </>
       ) : (
         <></>
       )}
-    </>
+    
   </Navbar>
   {errorMessage && (
     <Modal

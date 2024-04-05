@@ -1,0 +1,38 @@
+.video-cards-container .card:hover {
+    background-color: #f8f9fa; 
+    border-color: #13056be0; 
+    cursor: pointer; 
+    transform: scale(1.02); 
+    transition: transform 0.15s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; 
+}
+#search-bar {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px; 
+    margin-bottom: 10px; 
+}
+  
+.tag-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px;
+    background-color: #e0e0e0;
+    border-radius: 5px; 
+    margin-right: 5px;
+    font-size: 0.85em; 
+}
+
+/* Style for tablets and larger devices */
+@media (min-width: 768px) {
+    #search-bar {
+        width: 50%;
+    }
+}
+  
+  
+  

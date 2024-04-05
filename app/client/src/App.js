@@ -10,6 +10,7 @@ import MessagingPage from "./Pages/MessagingPage";
 import ForgotPasswordPage from "./Pages/ForgotPasswordPage";
 import PasswordCodePage from "./Pages/PasswordCodePage";
 import "./app.css";
+import PrivateRoute from "./PrivateRoute";
 import {
   homePath,
   loginPath,
@@ -29,22 +30,33 @@ import AccountPage from "./Pages/AccountPage";
 import PageNotFound from "./Pages/PageNotFound";
 import AlertGuestPage from "./Pages/AlertGuestPage";
 import ViewSentVideoPage from "./Pages/ViewSentVideoPage";
+import { useState } from "react";
 
 function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+
   return (
     <Router>
-      <Header />
+      <Header currentUser={currentUser} setCurrentUser={setCurrentUser} />
       <Routes>
         <Route path={homePath} element={<HomePage />} />
-        <Route path={loginPath} element={<LoginHomePage />} />
+        <Route
+          path={loginPath}
+          element={<LoginHomePage setCurrentUser={setCurrentUser}/>}
+        />
         <Route path={guestPath} element={<AlertGuestPage />} />
-        <Route path={receiveAndSendPath} element={<ReceiveAndSendPage />} />
         <Route path={uploadVideoPath} element={<UploadVideoPage />} />
         <Route path={viewVideoPath} element={<ViewVideoPage />} />
         <Route path={registerPath} element={<RegisterPage />} />
         <Route path={MessagingPath} element={<MessagingPage />} />
         <Route path={viewSentVideoPath} element={<ViewSentVideoPage />} />
-        <Route path={accountPath} element={<AccountPage />} />
+        <Route element={<PrivateRoute currentUser={currentUser}/>}>
+          <Route
+            path={accountPath}
+            element={<AccountPage currentUser={currentUser}
+            setCurrentUser={setCurrentUser}/>}
+          />
+        </Route>
         <Route path={changePasswordPath} element={<ForgotPasswordPage />} />
         <Route path={passwordCodePath} element={<PasswordCodePage />} />
         {/*Creating a Route element if no Route Path matches*/}

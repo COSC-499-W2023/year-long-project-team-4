@@ -66,7 +66,7 @@ const ReceiveAndSendPage = ({currentUser}) => {
               Upload Video
           </button>
         </div>
-        <div className="tab-content flex-grow-1" id="v-pills-tabContent" style={{ overflowY: 'auto' }}>
+        <div className="tab-content flex-grow-1" id="v-pills-tabContent">
           <div 
             className="tab-pane fade show active" 
             id="uploadedVideos" 
@@ -80,7 +80,7 @@ const ReceiveAndSendPage = ({currentUser}) => {
               <ViewVideoPage />
           </div>
           <div 
-            className="tab-pane fade mb-2" 
+            className="tab-pane fade" 
             id="uploadVideos" 
             role="tabpanel">
               <UploadVideoPage/>

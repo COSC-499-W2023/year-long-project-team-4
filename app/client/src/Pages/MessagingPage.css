@@ -39,7 +39,7 @@
   }
 
   .video-wrapper {
-    height: 600px; /* Same height to align with the messages box */
+    height: 90vh; /* Same height to align with the messages box */
     overflow: hidden; /* Hide overflow to maintain the aspect ratio of the video */
   }
   
@@ -48,7 +48,7 @@
     justify-content: center;
     align-items: center;
     /*height: 100%;*/
-    height: 600px; /* Same height as the messages box */
+    height: 90vh; /* Same height as the messages box */
   }
   
   /*.card-full-height {
@@ -58,7 +58,7 @@
   }*/
 
   .card-full-height {
-    height: 600px; /* This should be the same as the message-area if you want them to match */
+    height: 60vh; /* This should be the same as the message-area if you want them to match */
     overflow: hidden; /* Ensures the card itself doesn't scroll */
   }
   
@@ -86,10 +86,10 @@
 }
 
 
-.message-bubble-sent {
+.message-bubble-received {
     margin-right: auto;
     margin-left: 10px;
-    background-color: #13056b2f; /* Light green background for sent messages */
+    background-color: #f0f0f0; /* Light green background for sent messages */
     border-radius: 0px 15px 15px 0px;
     padding: 10px 15px;
     max-width: 80%;
@@ -97,10 +97,10 @@
     align-self: flex-start; /* Aligns to the left */
 }
 
-.message-bubble-received {
+.message-bubble-sent {
     margin-left: auto;
     margin-right: 10px;
-    background-color: #f0f0f0;
+    background-color: #13056b2f;
     border-radius: 15px 0px 0px 15px;
     padding: 10px 15px;
     max-width: 80%;
@@ -138,7 +138,7 @@
     display: flex;
     flex-direction: column; /* Updated this line */
     overflow-y: auto;
-    height: 600px; /* Set a fixed height */
+    height: 90vh; /* Set a fixed height */
     padding: 10px 0; /* Add padding on top and bottom if needed */
 }
 

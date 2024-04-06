@@ -11,7 +11,7 @@ import Sidebar from './Sidebar';
 import axios from 'axios';
 import './MessagingPage.css';
 
-function MessageSender() {
+function MessageSender({currentUser, setCurrentUser}) {
     const [message, setMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
@@ -37,6 +37,13 @@ function MessageSender() {
         withCredentials: true,
         autoConnect: false
     });
+
+    const UnixTimestampToReadableDate = (unixTimestamp) =>{
+      const date = new Date(unixTimestamp * 1000);
+      const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      const readableDate = date.toLocaleString('en-US', options);
+      return <span>{readableDate}</span>;
+    }
 
     useEffect(() => {
         // Auto-scroll to the bottom whenever messages change
@@ -142,10 +149,12 @@ function MessageSender() {
     };
     return (
         <>
-        <Fade>
-          <Sidebar />
-          </Fade>
-          <Container fluid style={{ marginTop: '20px', padding: '0 20px' }} className="container-fluid-custom">
+          <Container fluid className="container-fluid-custom">
+            {/*<Row className="mt-3">
+              <Col className="text-center">
+                <Button variant="secondary" onClick={handleBack} style={{ margin: '20px' }}>Go Back to Videos</Button>
+              </Col>
+    </Row>*/}
             <Row noGutters={true}>
               {/* Video playback column (60% width) */}
               <Col md={{ span: 6, offset: 2 }} style={{ paddingRight: '15px' }}>
@@ -178,7 +187,9 @@ function MessageSender() {
                             >
                               <div className="message-info">
                                 <span className="message-sender"><strong>{chatMessage.sender}</strong></span>
-                                <span className="message-timestamp"><small>{new Date(chatMessage.timestamp).toLocaleString()}</small></span>
+                                {/*<span className="message-timestamp"><small>{new Date(chatMessage.timestamp).toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}</small></span>*/}
+                                {console.log(chatMessage)}
+                                <span className="message-timestamp"><small>{UnixTimestampToReadableDate(chatMessage.timestamp)}</small></span>
                               </div>
                               <div className="message-content">
                                 <Card.Text>{chatMessage.message}</Card.Text>

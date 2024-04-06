@@ -75,7 +75,7 @@ const Sidebar = () => {
     }
 
     return (
-      <div className="sidebar" style={{ height: '88vh', width: '200px', position: 'fixed', top: 0, left: 0, bottom: 0, overflow: 'hidden' }}>
+      <div className="sidebar" style={{ height: '88vh', width: '25vh', position: 'fixed', top: 0, left: 0, bottom: 0, overflow: 'hidden' }}>
           {currentUser && (
               <>
                   <NavLink

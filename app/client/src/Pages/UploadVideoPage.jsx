@@ -138,6 +138,8 @@ const UploadVideoPage = () => {
   const handleRetake = () => {
     setFile(null);
 
+    setRecordedChunks([]);
+
     setCapturing(false);
     
     setDisableRecord(false);
@@ -145,7 +147,6 @@ const UploadVideoPage = () => {
 
   const handleRecord = async(mediaContent) => {
     try {
-      console.log(time);
       const mediablob = new Blob(mediaContent,{type: "video/mp4"});
       const fixedblob = await ysfixWebmDuration(mediablob,time,{logger:false});
       setBackend(fixedblob);
@@ -159,6 +160,15 @@ const UploadVideoPage = () => {
       setDisable(true);
     }
   }
+
+  // Calls handleRecord() when the data is ready in place of the old "preview video" button
+  useEffect(() => {
+      if (recordedChunks.length > 0) {
+        console.log(recordedChunks);
+        handleRecord(recordedChunks);
+      }
+    }, [recordedChunks]
+  );
 
   const handleBlur = () => {
     const videoData = new FormData();
@@ -454,7 +464,6 @@ const UploadVideoPage = () => {
             />
           </Form.Group>
           <div className="mt-2">
-            <Button onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}
             <Button onClick={()=>{handleRetake()}} disabled={disable}>Retake video</Button> {' '}
             <Button onClick={()=>{handleBlur()}} disabled={disable}>Blur video</Button> {' '}
           </div>

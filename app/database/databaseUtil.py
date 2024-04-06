@@ -481,7 +481,7 @@ def delete_key(videoId:str,sender:bool,receiver:bool) -> int:
             db.close()
     return result  # Return the result
 
-def update_key(videoId:str,sender:bool,receiver:bool, encrpytKey) -> int:
+def update_key(videoId:str,sender:bool,receiver:bool, encryptKey) -> int:
     '''
     Updates a user's ecrytion on a video after password change
 

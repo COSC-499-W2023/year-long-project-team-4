@@ -558,7 +558,7 @@ def change_password_reencrypt():
             sender_encrypted_aes_key = rsa_encrypt_aes256_key(aes_key, sender_public_key)
             
             #Update key
-            update_key = database.update_key(videoId = video_id, sender = True, receiver = False, encrpytKey = sender_encrypted_aes_key)
+            update_key = database.update_key(videoId = video_id, sender = True, receiver = False, encryptKey = sender_encrypted_aes_key)
             if update_key == False:
                 return jsonify({"status": "error",'message': 'Key update failed'}), 502
 

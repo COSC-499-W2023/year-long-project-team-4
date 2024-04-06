@@ -80,7 +80,7 @@ const ReceiveAndSendPage = ({currentUser}) => {
               <ViewVideoPage />
           </div>
           <div 
-            className="tab-pane fade mb-2" 
+            className="tab-pane fade" 
             id="uploadVideos" 
             role="tabpanel">
               <UploadVideoPage/>

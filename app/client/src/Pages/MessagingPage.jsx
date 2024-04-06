@@ -30,7 +30,7 @@ function MessageSender() {
     const messagesEndRef = useRef(null); // Ref for auto-scrolling
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' , block: "end"});
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth'});
     };
 
     const socket = io(`${IP_ADDRESS}`,  {

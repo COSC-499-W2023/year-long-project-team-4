@@ -136,7 +136,7 @@
 
   .message-area {
     display: flex;
-    flex-direction: column-reverse; /* Reverse the order so new messages are at the bottom */
+    flex-direction: column; /* Updated this line */
     overflow-y: auto;
     height: 600px; /* Set a fixed height */
     padding: 10px 0; /* Add padding on top and bottom if needed */

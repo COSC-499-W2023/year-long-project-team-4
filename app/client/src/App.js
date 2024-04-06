@@ -77,7 +77,12 @@ function App() {
         <Route path={registerPath} element={<RegisterPage />} />
         <Route
           path={MessagingPath}
-          element={<MessagingPage currentUser={currentUser} />}
+          element={
+            <MessagingPage
+              currentUser={currentUser}
+              setCurrentUser={setCurrentUser}
+            />
+          }
         />
         <Route path={viewSentVideoPath} element={<ViewSentVideoPage />} />
         <Route element={<PrivateRoute currentUser={currentUser} />}>

@@ -3,28 +3,43 @@ import { Container, Row, Col, Card, Form, InputGroup, Button } from 'react-boots
 import { Fade } from 'react-reveal';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './ViewSentVideoPage.css'; // Ensure this file contains no conflicting styles
-import { MessagingPath, IP_ADDRESS } from "../Path";
+import Sidebar from './Sidebar';
+import './ViewSentVideoPage.css'; 
+import { MessagingPath, IP_ADDRESS, uploadVideoPath } from '../Path';
 
-const ViewSentVideoPage = () => {
-  const [videos, setVideos] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredVideos, setFilteredVideos] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate();
+const ViewVideoPage = () => {
+    const [videos, setVideos] = useState([]);
+    const [selectedVideo, setSelectedVideo] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredVideos, setFilteredVideos] = useState([]);
+    const [showVideoModal, setShowVideoModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, { withCredentials: true })
-      .then(response => {
-        // Assuming the response data includes senderEmail, senderName, and tags
-        setVideos(response.data);
-        setFilteredVideos(response.data);
-      })
-      .catch(error => {
-        console.error('There was an error fetching the videos!', error);
-        setErrorMessage('Error fetching videos');
-      });
-  }, []);
+    useEffect(() => {
+        // Fetch current user on component mount
+        const fetchCurrentUser = async () => {
+            try {
+                const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
+                    withCredentials: true
+                });
+              
+              if (response.data.email) {
+                    setIsAuthenticated(true);
+                } else {
+                    setIsAuthenticated(false);
+                }
+                
+            } catch (error) {
+                navigate(uploadVideoPath);
+                console.error('There was an error fetching the current user', error);
+                setIsAuthenticated(false);
+            }
+        };
+                  
+         fetchCurrentUser();
+    }, []);
 
   useEffect(() => {
     if (!searchTerm) {
@@ -40,17 +55,37 @@ const ViewSentVideoPage = () => {
     }
   }, [searchTerm, videos]);
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
+    useEffect(() => {
+      axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, { withCredentials: true })
+        .then(response => {
+          // Assuming the response data includes senderEmail, senderName, and tags
+          setVideos(response.data);
+          setFilteredVideos(response.data);
+        })
+        .catch(error => {
+          console.error('There was an error fetching the videos!', error);
+          setErrorMessage('Error fetching videos');
+        });
+    }, []);
+  
+    const handleSearchChange = (e) => {
+      setSearchTerm(e.target.value);
+    };
+  
+    const handleVideoClick = (videoId) => {
+      navigate(MessagingPath, { state: { videoId: videoId } });
+    };
 
-  const handleVideoClick = (videoId) => {
-    navigate(MessagingPath, { state: { videoId: videoId } });
-  };
-
-  return (
-    <Fade cascade>
-      <Container className='video-cards-container'>
+    return (
+        <Fade cascade>
+            <Row>
+                <Col xs={2}>
+                    <Fade>
+                        <Sidebar />
+                    </Fade>
+                </Col>
+                <Col xs={10}>
+                <Container className='video-cards-container'>
         <Row className="mb-4">
           <Col>
             <h1 className="text-center">Uploaded Videos</h1>
@@ -89,8 +124,11 @@ const ViewSentVideoPage = () => {
       </Row>
         {errorMessage && <div className="text-center text-danger">{errorMessage}</div>}
       </Container>
-    </Fade>
-  );
-}
+                </Col>   
+            </Row>    
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
+        </Fade>
+    );
+};
 
-export default ViewSentVideoPage;
+export default ViewVideoPage;

@@ -1,39 +1,21 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, InputGroup, Button } from 'react-bootstrap';
-import { receiveAndSendPath } from '../Path';
+import { Fade } from 'react-reveal';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import {Fade} from 'react-reveal';
-import {useNavigate} from 'react-router-dom';
-import {
-    MessagingPath,
-    IP_ADDRESS,
-  } from "../Path";
+import Sidebar from './Sidebar';
+import { MessagingPath, IP_ADDRESS, uploadVideoPath } from '../Path';
 
 const ViewVideoPage = () => {
-  
-  const [videos, setVideos] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredVideos, setFilteredVideos] = useState([]);
-  const [selectedVideo, setSelectedVideo] = useState(null);
-  const [showVideoModal, setShowVideoModal] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+    const [videos, setVideos] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredVideos, setFilteredVideos] = useState([]);
+    const [selectedVideo, setSelectedVideo] = useState(null);
+    const [showVideoModal, setShowVideoModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const navigate = useNavigate();
-  
-  //Fetch videos on component mount
-  useEffect(() => {
-      // Replace with the correct URL of your backend
-      axios.get(`${IP_ADDRESS}/bucket/getvideos`, {
-          withCredentials: true})
-          .then(response => {
-              setVideos(response.data);
-              setFilteredVideos(response.data);
-              console.log(response.data);
-          })
-          .catch(error => {
-              console.error('There was an error fetching the videos!', error);
-          });
-  }, []);
+    const navigate = useNavigate();
 
   useEffect(() => {
     if (!searchTerm) {
@@ -49,19 +31,72 @@ const ViewVideoPage = () => {
     }
   }, [searchTerm, videos]);
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-  
-  // Handles video selection and retrieves video URL
-  const handleVideoClick = (videoId) => {
-    navigate(MessagingPath, { state: { videoId: videoId } });
-  };
-  
+    useEffect(() => {
+        // Fetch videos on component mount
+        axios.get(`${IP_ADDRESS}/bucket/getvideos`, {
+            withCredentials: true
+        })
+        .then(response => {
+            setVideos(response.data);
+            console.log(response.data)
+        })
+        .catch(error => {
+            console.error('There was an error fetching the videos!', error);
+        });
 
-  return (
-    <Fade cascade>
-      <Container className='video-cards-container'>
+        // Fetch current user on component mount
+        const fetchCurrentUser = async () => {
+            try {
+                const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
+                    withCredentials: true
+                });
+
+                if (response.data.email) {
+                    setIsAuthenticated(true);
+                } else {
+                    setIsAuthenticated(false);
+                }
+            } catch (error) {
+                navigate(uploadVideoPath);
+                console.error('There was an error fetching the current user', error);
+                setIsAuthenticated(false);
+            }
+        };
+
+        fetchCurrentUser();
+    }, []);
+
+    useEffect(() => {
+      if (!searchTerm) {
+        setFilteredVideos(videos);
+      } else {
+        const lowercasedSearchTerm = searchTerm.toLowerCase();
+        const searchedVideos = videos.filter(video =>
+          video.tags.some(tag => tag.toLowerCase().includes(lowercasedSearchTerm))
+        );
+        setFilteredVideos(searchedVideos);
+      }
+    }, [searchTerm, videos]);
+  
+    const handleSearchChange = (e) => {
+      setSearchTerm(e.target.value);
+    };
+    
+    // Handles video selection and retrieves video URL
+    const handleVideoClick = (videoId) => {
+      navigate(MessagingPath, { state: { videoId: videoId } });
+    };
+
+    return (
+        <Fade cascade>
+            <Row>
+                <Col xs={2}>
+                    <Fade>
+                        <Sidebar />
+                    </Fade>
+                </Col>
+                <Col xs={10}>
+                <Container className='video-cards-container'>
         <Row className="mb-4">
           <Col>
             <h1 className="text-center">Received Videos</h1>
@@ -100,8 +135,11 @@ const ViewVideoPage = () => {
       </Row>
         {errorMessage && <div className="text-center text-danger">{errorMessage}</div>}
       </Container>
-    </Fade>
-  );
-  }
-  
-  export default ViewVideoPage
+                </Col>   
+            </Row>    
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
+        </Fade>
+    );
+};
+
+export default ViewVideoPage;

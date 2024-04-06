@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { Fade } from 'react-reveal';
 import { Container, Row, Col, Button, Form, Card, InputGroup, Spinner } from 'react-bootstrap';
-import { receiveAndSendPath,
+import { viewSentVideoPath, uploadVideoPath, 
     IP_ADDRESS,
  } from '../Path';
 import io from 'socket.io-client';
+import Sidebar from './Sidebar';
 import axios from 'axios';
 import './MessagingPage.css';
 
@@ -15,6 +17,8 @@ function MessageSender({currentUser, setCurrentUser}) {
     const [chatMessages, setChatMessages] = useState([]);
     const [videoURL, setVideoURL] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [currentUser, setCurrentUser] = useState('');
 
     // Use the useLocation hook to access the location object
     const location = useLocation();
@@ -26,7 +30,7 @@ function MessageSender({currentUser, setCurrentUser}) {
     const messagesEndRef = useRef(null); // Ref for auto-scrolling
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' , block: "end"});
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth'});
     };
 
     const socket = io(`${IP_ADDRESS}`,  {
@@ -47,19 +51,30 @@ function MessageSender({currentUser, setCurrentUser}) {
     }, [chatMessages]);
 
     useEffect(() => {
-      // Fetch current user info (simplified)
-      axios.get(`${IP_ADDRESS}/auth/currentuser`, { withCredentials: true })
-        .then(response => {
-          if (response.data.email) { // Assuming email as the identifier
-            setCurrentUser(response.data.email);
-          } else {
-            console.error('No user currently logged in');
+      // Fetch current user on component mount
+      const fetchCurrentUser = async () => {
+          try {
+              const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
+                  withCredentials: true
+              });
+
+              if (response.data.email) {
+                  setCurrentUser(response.data.email);
+                  setIsAuthenticated(true);
+              } else {
+                  console.error('No user currently logged in');
+                  setIsAuthenticated(false);
+              }
+              
+          } catch (error) {
+              navigate(uploadVideoPath);
+              console.error('There was an error fetching the current user', error);
+              setIsAuthenticated(false);
           }
-        })
-        .catch(error => {
-          console.error('There was an error fetching the current user', error);
-        });
-    }, []);
+      };
+
+      fetchCurrentUser();
+  }, []);
 
     // Fetch existing chat messages on component mount
     useEffect(() => {
@@ -107,7 +122,7 @@ function MessageSender({currentUser, setCurrentUser}) {
 
     //Navigate back to view videos
     const handleBack = () => {
-        navigate(receiveAndSendPath);
+        navigate(viewSentVideoPath);
     };
 
     // Display error if videoId is not available
@@ -142,7 +157,7 @@ function MessageSender({currentUser, setCurrentUser}) {
     </Row>*/}
             <Row noGutters={true}>
               {/* Video playback column (60% width) */}
-              <Col md={7} style={{ paddingRight: '15px' }}>
+              <Col md={{ span: 6, offset: 2 }} style={{ paddingRight: '15px' }}>
               <div className={isLoading ? "video-wrapper flex-center" : "video-wrapper"}>
                     {isLoading ? (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
@@ -156,9 +171,9 @@ function MessageSender({currentUser, setCurrentUser}) {
                 </div>
               </Col>
               {/* Messages column (40% width) */}
-              <Col md={5} style={{ paddingLeft: '15px' }}>
-                <Card className="card-full-height">
-                  <Card.Header className="card-content-padding">
+              <Col md={4} style={{ paddingLeft: '15px' }}>
+                <Card className="card-full-height" style={{ height: '84vh', display: 'flex', flexDirection: 'column' }}>
+                  <Card.Header className="card-content-padding" style={{ padding: '10px 20px' }}>
                     <Card.Title>Messages</Card.Title>
                   </Card.Header>
                   <Card.Body className="message-area card-content-padding">
@@ -215,6 +230,7 @@ function MessageSender({currentUser, setCurrentUser}) {
               </Row>
             )}
           </Container>
+         
         </>
       );      
 }

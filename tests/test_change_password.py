@@ -70,7 +70,7 @@ def test_change_password_reencrypt(client):
     assert not 'error' in response 
     
     # retrieve after re-encryption
-    retrieve_video_post_object = {'video_name': upload_response['video_id']}
+    retrieve_video_post_object = {'video_id': upload_response['video_id']}
     retrieve_response = client.post('/bucket/retrieve', data=retrieve_video_post_object)
     with open(file, 'rb') as test_file:
         assert test_file.read() == retrieve_response.data
@@ -98,9 +98,15 @@ def test_change_password_forgot(client):
     response = json.loads(client.post('/auth/signup', data=post_object).data.decode('utf-8'))
     assert not 'error' in response
     
+    print("before input code")
     inputcode = database.query_records(table_name='userprofile', fields='verifyKey', condition=f'email = %s', condition_values=('fakeusertest987@gmail.com',))[0]['verifyKey']
+    print("After code")
     post_object = {'input_code': f'{inputcode}', 'email': 'fakeusertest987@gmail.com'}
     response = json.loads(client.post('/auth/confirm_user', data=post_object).data.decode('utf-8'))
+    post_object = {'email': 'fakeusertest987@gmail.com', 'password': 'test_Password1@'}
+    response = json.loads(client.post('/auth/login', data=post_object).data.decode('utf-8'))
+    assert not 'error' in response
+    
     assert not 'error' in response
     
     #upload video to not retireve after key zero'd
@@ -129,10 +135,11 @@ def test_change_password_forgot(client):
     retrieve_video_post_object = {'video_name': upload_response['video_id']}
     try:
         retrieve_response = client.post('/bucket/retrieve', data=retrieve_video_post_object)
-        assert False
-    except ValueError:
+    except IndexError:
         assert True
-        
+    else:
+        assert False
+                
     if __name__ == "__main__":
         app = flaskapp.create_app()
         app.config['TESTING'] = True

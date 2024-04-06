@@ -61,6 +61,7 @@ const handleSignup = async (firstname, lastname, email, password) => {
   const data = response.data;
 
   if (email) {
+    setEmail(email);
     setShowVerification(true); // Show verification input
     console.log('Signup successful');
   } else {
@@ -147,7 +148,7 @@ const handleSubmit = (e) => {
         <div><a className="text-primary" href={loginPath}>Have an account?</a></div>
       </Fade>
       {/* Verification Modal */}
-      <Modal show={showVerification} onHide={() => setShowVerification(false)}>
+      <Modal show={showVerification} onHide={() => setShowVerification(false)} backdrop="static">
         <Modal.Header closeButton>
           <Modal.Title>Verify Your Account</Modal.Title>
         </Modal.Header>

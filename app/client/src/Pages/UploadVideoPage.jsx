@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react'
-import {Alert, Form, Offcanvas, Container,Modal, Button, ToggleButtonGroup, Spinner, ToggleButton, Row, Col} from 'react-bootstrap'
+import {Container, Row, Alert, Form, Offcanvas, Modal, Button, ToggleButtonGroup, Spinner, ToggleButton, Col} from 'react-bootstrap'
 import Webcam from 'react-webcam';
 import  {ReactComponent as Record} from "../Assets/record-btn.svg"
 import axios from "axios";
 import info from "../Assets/info-circle.svg"
 import { Fade } from 'react-reveal';
-import { IP_ADDRESS, receiveAndSendPath } from '../Path';
+import { IP_ADDRESS , viewSentVideoPath} from '../Path';
+import Sidebar from './Sidebar';
 import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
 import "./UploadVideoPage.css";
@@ -114,12 +115,16 @@ const UploadVideoPage = () => {
   .then(response => {
     console.log('Video uploaded successfully', response.data);
     setUploadSuccess(true);
-    navigate(receiveAndSendPath);
+    navigate(viewSentVideoPath);
   })
   .catch(error => {
     console.error('Error uploading video', error);
   });
    };
+
+   const sendMain = () => {
+    navigate(viewSentVideoPath);
+  }
 
    const handleChange = (event) => {
     try {
@@ -133,6 +138,8 @@ const UploadVideoPage = () => {
   const handleRetake = () => {
     setFile(null);
 
+    setRecordedChunks([]);
+
     setCapturing(false);
     
     setDisableRecord(false);
@@ -140,7 +147,6 @@ const UploadVideoPage = () => {
 
   const handleRecord = async(mediaContent) => {
     try {
-      console.log(time);
       const mediablob = new Blob(mediaContent,{type: "video/mp4"});
       const fixedblob = await ysfixWebmDuration(mediablob,time,{logger:false});
       setBackend(fixedblob);
@@ -154,6 +160,15 @@ const UploadVideoPage = () => {
       setDisable(true);
     }
   }
+
+  // Calls handleRecord() when the data is ready in place of the old "preview video" button
+  useEffect(() => {
+      if (recordedChunks.length > 0) {
+        console.log(recordedChunks);
+        handleRecord(recordedChunks);
+      }
+    }, [recordedChunks]
+  );
 
   const handleBlur = () => {
     const videoData = new FormData();
@@ -173,10 +188,12 @@ const UploadVideoPage = () => {
 
   return (
   <>
+<Container fluid>
+  
+      <Button className="m-2 float-end" variant="outline-dark" onClick={handleShow}>
+        <img src={info}></img>
+      </Button>
     
-    <Button className="m-2" variant="outline-dark" onClick={handleShow}>
-      <img src={info}></img>
-    </Button>
     <Offcanvas show={show} onHide={handleClose} backdrop="static" placement="end">
       <Offcanvas.Header closeButton>
             <Offcanvas.Title>How Uploading Videos Works</Offcanvas.Title>
@@ -227,10 +244,12 @@ const UploadVideoPage = () => {
         </p>
       </Offcanvas.Body>
     </Offcanvas>
+   
+    </Container>
     {uploadSuccess && 
     <Modal 
       show={modal}
-      onHide={()=>setModal(false)}
+      onHide={()=>navigate(viewSentVideoPath)}
       backdrop="static"
       keyboard={false}
     >
@@ -469,4 +488,4 @@ const UploadVideoPage = () => {
   )
 }
 
-export default UploadVideoPage
+export default UploadVideoPage;

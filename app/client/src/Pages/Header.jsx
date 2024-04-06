@@ -2,9 +2,10 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ReactComponent as Person } from "../Assets/person.svg";
 import { ReactComponent as Logout } from "../Assets/box-arrow-right.svg";
+import { ReactComponent as Logo } from "../Assets/thislogo1.svg";
 import { Navbar, Button, OverlayTrigger, Modal, Tooltip } from "react-bootstrap";
-import { IP_ADDRESS, accountPath, loginPath, receiveAndSendPath } from "../Path";
-import { useState } from "react";
+import { IP_ADDRESS, accountPath, loginPath, viewSentVideoPath } from "../Path";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 const Header = ({currentUser, setCurrentUser}) => {
@@ -37,7 +38,7 @@ const Header = ({currentUser, setCurrentUser}) => {
 
     const handleLink = () => {
       if (currentUser) {
-        navigate(receiveAndSendPath);
+        navigate(viewSentVideoPath);
       } else {
         navigate(loginPath);
       }
@@ -48,13 +49,15 @@ const Header = ({currentUser, setCurrentUser}) => {
     }
   
   return (
-   <> 
-    <Navbar className="bg-primary">
-    <Navbar.Brand onClick={handleLink}>
-      <div className="display-6 text-white">SafeMov</div>
-    </Navbar.Brand>
     <>
+    <Navbar className="bg-primary" style={{ height: "12vh", padding: "0 20px" }}>
+        
       {currentUser ? (
+        <>
+        <Navbar.Brand onClick={handleLink} className="me-auto" style={{ marginRight: "20px" }}>
+          <Logo />
+        </Navbar.Brand>
+        
         <Navbar.Collapse className="justify-content-end">
           <OverlayTrigger
             placement="bottom"
@@ -73,10 +76,11 @@ const Header = ({currentUser, setCurrentUser}) => {
             </Button>
           </OverlayTrigger>
         </Navbar.Collapse>
+        </>
       ) : (
         <></>
       )}
-    </>
+    
   </Navbar>
   {errorMessage && (
     <Modal

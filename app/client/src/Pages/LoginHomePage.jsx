@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom'
 import {Fade} from "react-reveal";
 import {
   guestPath,
-  receiveAndSendPath,
+  viewSentVideoPath,
   registerPath,
   changePasswordPath,
   IP_ADDRESS,
@@ -17,6 +17,8 @@ const LoginHomePage = ({setCurrentUser}) => {
   const navigate = useNavigate();
   const [type, setType] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [activeTab, setActiveTab] = useState(viewSentVideoPath);
+
   const handleLogin = async (email, password) => {
     try {
       const response = await axios.post(`${IP_ADDRESS}/auth/login`, {
@@ -30,7 +32,7 @@ const LoginHomePage = ({setCurrentUser}) => {
       });
       if (response.data.email) {
         setCurrentUser(response.data.email);
-        navigate(receiveAndSendPath);
+        navigate(viewSentVideoPath);
       } else {
         setErrorMessage(response.data.error);
       }

@@ -89,7 +89,7 @@ const ReceiveAndSendPage = ({currentUser}) => {
       </div>
       </div>
     </Fade>
-  )
-}
+  );
+};
 
-export default ReceiveAndSendPage
+export default ReceiveAndSendPage;

@@ -489,7 +489,7 @@ def update_key(videoId:str,sender:bool,receiver:bool, encryptKey) -> int:
         videoId(str): The video's ID where the key will be deleted
         sender(bool): true if the user is the sender
         reciever(bool): true if the user is the reciever
-        encrpytKey: The public key of the sender or receiver
+        encryptKey: The public key of the sender or receiver
 
     Returns:
         int: An integer result code indicating the outcome of the delete operation.
@@ -515,12 +515,12 @@ def update_key(videoId:str,sender:bool,receiver:bool, encryptKey) -> int:
                     else:
                         result = -1
                     query = f"UPDATE videos SET {set_clause} WHERE videoId = %s"
-                    cur.execute(query, (encrpytKey, videoId))   
+                    cur.execute(query, (encryptKey, videoId))   
                     # Check if video has chats associated with it and removes user's access
                     query_results = query_records(table_name = 'chats', fields ='*', condition=f'chatName = %s', condition_values = (videoId,))
                     if query_results:
                         query2 = f"UPDATE chats SET {set_clause} WHERE chatName = %s"
-                        cur.execute(query2, (encrpytKey, videoId))
+                        cur.execute(query2, (encryptKey, videoId))
                     db.commit()
                     cur.close()
                     result = 1  # Set result to 1 to indicate success
@@ -530,9 +530,9 @@ def update_key(videoId:str,sender:bool,receiver:bool, encryptKey) -> int:
                 cur = db.cursor()
                 #Create set clause depending on whether user is sender or receiver
                 if (sender):
-                        set_clause = f"senderEncryption = {encrpytKey}"
+                        set_clause = f"senderEncryption = {encryptKey}"
                 elif (receiver):
-                        set_clause = f"receiverEncryption = {encrpytKey}"
+                        set_clause = f"receiverEncryption = {encryptKey}"
                 else:
                     result = -1
                 query = f"UPDATE videos SET {set_clause} WHERE videoId = %s"

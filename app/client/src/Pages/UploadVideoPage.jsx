@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {Alert, Form, Offcanvas, Modal, Button, ToggleButtonGroup, Spinner, ToggleButton, Row, Col} from 'react-bootstrap'
+import {Alert, Form, Offcanvas, Container,Modal, Button, ToggleButtonGroup, Spinner, ToggleButton, Row, Col} from 'react-bootstrap'
 import Webcam from 'react-webcam';
 import  {ReactComponent as Record} from "../Assets/record-btn.svg"
 import axios from "axios";
@@ -242,7 +242,7 @@ const UploadVideoPage = () => {
         </Modal.Body>
     </Modal>
     }
-    <Fade>
+    <Container fluid>
       <div className="p-2 text-center">
         <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>
           <ToggleButton id="tbg-radio-1" value={1} onClick={()=>{handleType(1)}}>
@@ -294,8 +294,16 @@ const UploadVideoPage = () => {
               </Form.Group>
             </Col>
             <Col className="pt-3">
-              <Row>
-                <Col>
+              <Container fluid>
+                  <Form.Group controlId="formVideoName" className="mb-3">
+                    <Form.Label>Video Name</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      placeholder="Enter video name" 
+                      value={videoName} 
+                      onChange={(e) => setVideoName(e.target.value)} // Update the videoName state when the input changes
+                    />
+                  </Form.Group>
                   <Form.Group controlId="formRecipientEmail" className="mb-3">
                       <Form.Label>Recipient Email</Form.Label>
                       <Form.Control 
@@ -306,33 +314,6 @@ const UploadVideoPage = () => {
                         onChange={(e) => setRecipientEmail(e.target.value)} 
                       />
                   </Form.Group>
-                </Col>
-                <Col>
-                  <Form.Group controlId="formVideoName" className="mb-3">
-                    <Form.Label>Video Name</Form.Label>
-                    <Form.Control 
-                      type="text" 
-                      placeholder="Enter video name" 
-                      value={videoName} 
-                      onChange={(e) => setVideoName(e.target.value)} // Update the videoName state when the input changes
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Form.Group controlId="formTags" className="mb-3">
-                    <Form.Label>Tags</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Type a tag and press Enter"
-                      value={tagsInput} // Controlled component
-                      onChange={(e) => setTagsInput(e.target.value)} // Use onChange instead
-                      onKeyDown={handleKeyDown}
-                    />
-                  </Form.Group>
-                </Col>  
-                <Col>
                   <Form.Group controlId="formRetentionPeriod" className="mb-3">
                     <Form.Label className="text-black">Retention Period in days (1-365)</Form.Label>
                     <Form.Control 
@@ -344,9 +325,16 @@ const UploadVideoPage = () => {
                       onChange={(e) => setRetentionPeriod(e.target.value)} 
                     />
                   </Form.Group>
-                </Col>
-
-              </Row>
+                  <Form.Group controlId="formTags" className="mb-3">
+                    <Form.Label>Tags</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Type a tag and press Enter"
+                      value={tagsInput} // Controlled component
+                      onChange={(e) => setTagsInput(e.target.value)} // Use onChange instead
+                      onKeyDown={handleKeyDown}
+                    />
+                  </Form.Group>
               {/* Display the tags */}
               <div className="tags-container">
                   {tags.map((tag, index) => (
@@ -355,9 +343,11 @@ const UploadVideoPage = () => {
                       <button type="button" onClick={() => removeTag(index)}>×</button>
                     </div>
                 ))}
-                </div>
+              </div>
+              </Container>
             </Col>
           </Row>
+
           <Button onClick={()=>{handleBlur()}} disabled={file? false : true}>Blur video</Button> {' '}
           <Button  variant="info" type="submit">Send video</Button>
         </Form>
@@ -414,9 +404,16 @@ const UploadVideoPage = () => {
                 <Button onClick={()=>{handleBlur()}} disabled={disable}>Blur video</Button> {' '}
               </div>
             </Col>
-            <Col className="pt-3">
-              <Row>
-                <Col>
+            <Col>
+                  <Form.Group controlId="formVideoName" className="mb-3">
+                    <Form.Label>Video Name</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      placeholder="Enter video name" 
+                      value={videoName} 
+                      onChange={(e) => setVideoName(e.target.value)} // Update the videoName state when the input changes
+                    />
+                  </Form.Group>
                   <Form.Group controlId="formRecipientEmail" className="mb-3">
                       <Form.Label>Recipient Email</Form.Label>
                       <Form.Control 
@@ -427,33 +424,6 @@ const UploadVideoPage = () => {
                         onChange={(e) => setRecipientEmail(e.target.value)} 
                       />
                   </Form.Group>
-                </Col>
-                <Col>
-                  <Form.Group controlId="formVideoName" className="mb-3">
-                    <Form.Label>Video Name</Form.Label>
-                    <Form.Control 
-                      type="text" 
-                      placeholder="Enter video name" 
-                      value={videoName} 
-                      onChange={(e) => setVideoName(e.target.value)} // Update the videoName state when the input changes
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Form.Group controlId="formTags" className="mb-3">
-                    <Form.Label>Tags</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Type a tag and press Enter"
-                      value={tagsInput} // Controlled component
-                      onChange={(e) => setTagsInput(e.target.value)} // Use onChange instead
-                      onKeyDown={handleKeyDown}
-                    />
-                  </Form.Group>
-                </Col>  
-                <Col>
                   <Form.Group controlId="formRetentionPeriod" className="mb-3">
                     <Form.Label className="text-black">Retention Period in days (1-365)</Form.Label>
                     <Form.Control 
@@ -465,18 +435,24 @@ const UploadVideoPage = () => {
                       onChange={(e) => setRetentionPeriod(e.target.value)} 
                     />
                   </Form.Group>
-                </Col>
-
-              </Row>
-              {/* Display the tags */}
-              <div className="tags-container">
+                  <Form.Group controlId="formTags" className="mb-3">
+                    <Form.Label>Tags</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Type a tag and press Enter"
+                      value={tagsInput} // Controlled component
+                      onChange={(e) => setTagsInput(e.target.value)} // Use onChange instead
+                      onKeyDown={handleKeyDown}
+                    />
+                  </Form.Group>
+                  <div className="tags-container">
                   {tags.map((tag, index) => (
                     <div key={index} className="tag-badge">
                       {tag}
                       <button type="button" onClick={() => removeTag(index)}>×</button>
                     </div>
-                ))}
-                </div>
+                  ))}
+                  </div>   
             </Col>
             <div className="p-4">
                 <Button type="submit" size="lg" variant="info" disabled={disable}>Send video</Button>
@@ -488,7 +464,7 @@ const UploadVideoPage = () => {
         }
         </>
       </div>
-    </Fade>
+    </Container>
   </>
   )
 }

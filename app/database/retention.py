@@ -18,22 +18,19 @@ DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
 EC2 = os.getenv("EC2_ADDRESS")
-
+TESTDB = os.getenv("TESTDB")
+BUCKET = os.getenv("BUCKETNAME")
 
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
 SESSION_TOKEN = os.getenv('SESSTOKEN')
 TEST = os.getenv('TEST')
 
-# s3_client = boto3.client(
-# 's3',
-# aws_access_key_id=ACCESS_KEY,
-# aws_secret_access_key=SECRET_KEY,
-# aws_session_token=SESSION_TOKEN)
+
 s3_client = boto3.client('s3')
 
 if(TEST.lower() == "true"):
-    DBNAME = "Team4dbTest"
+    DBNAME = TESTDB
 
 def get_passed_retDates() -> list:
     """
@@ -136,11 +133,11 @@ def retention_delete(condition: str, condition_values: tuple, obj_path: str) -> 
                 cur.execute(query1)
                 query2 = f"DELETE FROM videos WHERE {condition}"
                 cur.execute(query2, condition_values)
-                proceed = already_existing_file('team4-s3', obj_path)
+                proceed = already_existing_file(BUCKET, obj_path)
                 
                 if proceed:
                     # Delete the object from S3
-                    s3_client.delete_object(Bucket='team4-s3', Key=obj_path)
+                    s3_client.delete_object(Bucket=BUCKET, Key=obj_path)
                     db.commit()
                     cur.close()
                     result = 1
@@ -155,11 +152,11 @@ def retention_delete(condition: str, condition_values: tuple, obj_path: str) -> 
             cur.execute(query1)
             query2 = f"DELETE FROM videos WHERE {condition}"
             cur.execute(query2, condition_values)
-            proceed = already_existing_file('team4-s3', obj_path)
+            proceed = already_existing_file(BUCKET, obj_path)
             
             if proceed:
                 # Delete the object from S3
-                s3_client.delete_object(Bucket='team4-s3', Key=obj_path)
+                s3_client.delete_object(Bucket=BUCKET, Key=obj_path)
                 db.commit()
                 cur.close()
                 result = 1
@@ -187,7 +184,7 @@ def retention() -> int:
         for items in data:
             retention_delete("videoID = %s", (items,), items)
             # Get how many files have been deleted
-            if (not already_existing_file('team4-s3',items)):
+            if (not already_existing_file(BUCKET,items)):
                 deleted_files += 1
         return deleted_files
     except Exception as e:

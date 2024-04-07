@@ -10,9 +10,9 @@ LOCAL = os.getenv('LOCAL') == 'True'
 if not os.path.isdir('temp'):
     os.mkdir('temp')
 
-# if not LOCAL: # Flag for local or not
-#     # RUN "AWS CONFIGURE SSO" before running code - this one included if local is not set to True 
-#     # boto3.setup_default_session(profile_name='team4-dev')
+if not LOCAL: # Flag for local or not
+    # RUN "AWS CONFIGURE SSO" before running code - this one included if local is not set to True 
+    boto3.setup_default_session(profile_name='team4-dev') # This needs to be renamed to whatever your sso configuration name is. Our .env setup does not seem to work with this variable
 
 
 def detect_faces(VideoFrame):

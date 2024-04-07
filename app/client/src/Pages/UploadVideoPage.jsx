@@ -26,17 +26,31 @@ const UploadVideoPage = () => {
   const [load, setLoad] = useState(false);
   const [modal, setModal] = useState(true);
 
-  //user fields
   const [file, setFile] = useState(null);
   const [recipientEmail, setRecipientEmail] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [tags, setTags] = useState([]);
   const [retentionPeriod, setRetentionPeriod] = useState(90);
   const [videoName, setVideoName] = useState('');
+  const [isMobile, setIsMobile] = useState(false)
 
   let startTime;
   var duration;
   const navigate = useNavigate()
+  const width = 400; 
+  const height = 225;
+
+  const handleResize = () => {
+    if (window.innerWidth < 720) {
+        setIsMobile(true)
+    } else {
+        setIsMobile(false)
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize)
+  })
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && tagsInput.trim()) {
@@ -121,10 +135,6 @@ const UploadVideoPage = () => {
     console.error('Error uploading video', error);
   });
    };
-
-   const sendMain = () => {
-    navigate(viewSentVideoPath);
-  }
 
    const handleChange = (event) => {
     try {
@@ -222,6 +232,13 @@ const UploadVideoPage = () => {
               retry with another file, following 
               step 1 above.
             </li>
+            <li>
+              3. Once done, you must fill out some basic
+              user info such as the name of the video, 
+              the recipient's email, the rentention 
+              of the video in days, and any tags related to
+              the video. 
+            </li>
           </ul>    
         </p>
         <p>
@@ -240,7 +257,21 @@ const UploadVideoPage = () => {
               click retake video, and 
               repeat step 1 and 2. 
             </li>
+            <li>
+              3. Once done, you must fill out some basic
+              user info such as the name of the video, 
+              the recipient's email, the rentention 
+              of the video in days, and any tags related to
+              the video!
+            </li>
           </ul> 
+        </p>
+        <p>
+          When done, you have the option to
+          blur your video. If you choose to,
+          the video will be become blurred!
+          Once satisified you can send the video
+          where it will be viewable in videos uploaded.
         </p>
       </Offcanvas.Body>
     </Offcanvas>
@@ -272,10 +303,10 @@ const UploadVideoPage = () => {
       <Col xs={{ span: 10, offset: 2 }} style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
       <div className="p-2 text-center" >
         <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>
-          <ToggleButton id="tbg-radio-1" value={1} onClick={()=>{handleType(1)}}>
+          <ToggleButton id="tbg1" value={1} onClick={()=>{handleType(1)}}>
             Upload Video
           </ToggleButton>
-          <ToggleButton id="tbg-radio-2" value={2} onClick={()=>{handleType(2)}}>
+          <ToggleButton id="tbg2" value={2} onClick={()=>{handleType(2)}}>
             Record Video
           </ToggleButton>
         </ToggleButtonGroup>
@@ -309,7 +340,7 @@ const UploadVideoPage = () => {
                     <Spinner variant="primary" animation="grow" />
                   </>
                   ):(
-                  <video  width="400" height="225" controls>
+                  <video width={isMobile? height : width} height={isMobile? width : height} controls>
                     <source src={file} type="video/mp4"/>
                   </video>
                   )}
@@ -394,7 +425,7 @@ const UploadVideoPage = () => {
           <>
           {file === null? 
           (<Fade>
-            <Webcam  width="400" height="225" audio={true} ref={webcamRef}/>
+            <Webcam  width={isMobile? height : width} height={isMobile? width : height} audio={true} ref={webcamRef}/>
            </Fade>
             ):(
             <Fade>
@@ -407,7 +438,7 @@ const UploadVideoPage = () => {
                 <Spinner variant="primary" animation="grow" />
               </>
               ):(
-              <video  width="400" height="225" controls>
+              <video  width={isMobile? height : width} height={isMobile? width : height} controls>
                 <source src={file} type="video/mp4"/>
               </video>
               )}
@@ -477,8 +508,6 @@ const UploadVideoPage = () => {
         </>
       </div>
       </Col>
-    
-
   </Row>
     </Container>
   </>

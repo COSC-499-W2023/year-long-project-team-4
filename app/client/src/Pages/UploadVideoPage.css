@@ -20,3 +20,10 @@
     cursor: pointer;
   }
   
+  label.btn.btn-primary:hover{
+    background-color:#13056b93 ;
+  }
+
+  label.btn.btn-primary{
+    background-color: black;
+  }

@@ -19,7 +19,7 @@
 
 
 ## Getting Started
-
+ * At this current time, our platform preforms best on Google Chrome Browsers. Some issues have been noticed on Firefox and Edge. 
 ### Prerequisites
 Before you begin, ensure you have met the following requirements:
 - Access to an AWS S3 bucket to store your images.

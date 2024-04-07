@@ -6,7 +6,7 @@ import axios from 'axios';
 import Sidebar from './Sidebar';
 import { MessagingPath, IP_ADDRESS, uploadVideoPath } from '../Path';
 
-const ViewVideoPage = () => {
+const ViewVideoPage = ({isCollapsed}) => {
     const [videos, setVideos] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredVideos, setFilteredVideos] = useState([]);
@@ -89,17 +89,16 @@ const ViewVideoPage = () => {
 
     return (
         <Fade cascade>
-            <Row>
-                <Col xs={2}>
-                    <Fade>
-                        <Sidebar />
-                    </Fade>
-                </Col>
-                <Col xs={10}>
-                <Container className='video-cards-container'>
-        <Row className="mb-4">
+        <Row>
+            <Col xs={12} md={isCollapsed? 0:2} className={isCollapsed ? 'sidebar-collapsed' : 'sidebar'}>
+                <Fade>
+                    <Sidebar/>
+                </Fade>
+            </Col>
+            <Col xs={12} md={isCollapsed? 12:10}>
+            <Container className='video-cards-container'>
+        <Row className="mb-4 mt-4">
           <Col>
-            <h1 className="text-center">Received Videos</h1>
             <InputGroup id="search-bar" className="mb-3">
               <Form.Control
                 placeholder="Search..."

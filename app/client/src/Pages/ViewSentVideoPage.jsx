@@ -7,7 +7,7 @@ import Sidebar from './Sidebar';
 import './ViewSentVideoPage.css'; 
 import { MessagingPath, IP_ADDRESS, uploadVideoPath } from '../Path';
 
-const ViewVideoPage = () => {
+const ViewVideoPage = ({isCollapsed}) => {
     const [videos, setVideos] = useState([]);
     const [selectedVideo, setSelectedVideo] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -79,16 +79,16 @@ const ViewVideoPage = () => {
     return (
         <Fade cascade>
             <Row>
-                <Col xs={2}>
+                <Col xs={12} md={isCollapsed? 0:2} className={isCollapsed ? 'sidebar-collapsed' : 'sidebar'}>
                     <Fade>
-                        <Sidebar />
+                        <Sidebar/>
                     </Fade>
                 </Col>
-                <Col xs={10}>
+                <Col xs={12} md={isCollapsed? 12:10}>
                 <Container className='video-cards-container'>
-        <Row className="mb-4">
+        <Row className="mb-4 mt-4">
           <Col>
-            <h1 className="text-center">Uploaded Videos</h1>
+            {/*<h1 className="text-center display-6">Uploaded Videos</h1>*/}
             <InputGroup id="search-bar" className="mb-3">
               <Form.Control
                 placeholder="Search..."

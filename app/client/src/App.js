@@ -34,6 +34,7 @@ import ViewSentVideoPage from "./Pages/ViewSentVideoPage";
 import { useEffect, useState } from "react";
 
 function App() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -60,7 +61,7 @@ function App() {
 
   return (
     <Router>
-      <Header currentUser={currentUser} setCurrentUser={setCurrentUser} />
+      <Header currentUser={currentUser} setCurrentUser={setCurrentUser} isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed}/>
       <Routes>
         <Route path={homePath} element={<HomePage />} />
         <Route
@@ -72,8 +73,8 @@ function App() {
           path={receiveAndSendPath}
           element={<ReceiveAndSendPage currentUser={currentUser} />}
         />
-        <Route path={uploadVideoPath} element={<UploadVideoPage />} />
-        <Route path={viewVideoPath} element={<ViewVideoPage />} />
+        <Route path={uploadVideoPath} element={<UploadVideoPage isCollapsed={isCollapsed}/>} />
+        <Route path={viewVideoPath} element={<ViewVideoPage isCollapsed={isCollapsed}/>} />
         <Route path={registerPath} element={<RegisterPage />} />
         <Route
           path={MessagingPath}
@@ -81,10 +82,10 @@ function App() {
             <MessagingPage
               currentUser={currentUser}
               setCurrentUser={setCurrentUser}
-            />
+              isCollapsed={isCollapsed}/>
           }
         />
-        <Route path={viewSentVideoPath} element={<ViewSentVideoPage />} />
+        <Route path={viewSentVideoPath} element={<ViewSentVideoPage isCollapsed={isCollapsed}/>} />
         <Route element={<PrivateRoute currentUser={currentUser} />}>
           <Route
             path={accountPath}

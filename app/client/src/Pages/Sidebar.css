@@ -1,10 +1,11 @@
 
 /* Sidebar.css */
   .sidebar {
-    width: 25vh; 
+    padding-right: 0px !important;
+    /*width: 25vh;*/
     height: 100vh; 
     background-color: #f8f9fa; 
-    position: fixed; 
+    /*position: fixed; */
     top: 0; 
     left: 0; 
     overflow-y: auto; 
@@ -12,6 +13,10 @@
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 
+  }
+
+  @media (max-width: 768px) {
+    
   }
 
   .sidebar .white-button {

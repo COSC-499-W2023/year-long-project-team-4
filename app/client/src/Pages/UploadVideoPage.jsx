@@ -11,7 +11,7 @@ import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
 import "./UploadVideoPage.css";
 
-const UploadVideoPage = () => {
+const UploadVideoPage = ({isCollapsed}) => {
   const [type, setType] = useState(1);
   const [time, setTime] = useState(0);
   const [backend, setBackend] = useState(null);
@@ -188,64 +188,6 @@ const UploadVideoPage = () => {
 
   return (
   <>
-<Container fluid>
-  
-      <Button className="m-2 float-end" variant="outline-dark" onClick={handleShow}>
-        <img src={info}></img>
-      </Button>
-    
-    <Offcanvas show={show} onHide={handleClose} backdrop="static" placement="end">
-      <Offcanvas.Header closeButton>
-            <Offcanvas.Title>How Uploading Videos Works</Offcanvas.Title>
-      </Offcanvas.Header>
-      <Offcanvas.Body>
-        <p>
-          To send a video you have 2 options.
-          Option 1 is to upload a video, or 
-          Option 2, to record a video on the 
-          webapp.
-        </p> 
-        <p>  
-          Option 1 requires you to do the following:
-          <ul>
-            <li>
-              1. upload a video file, where 
-              a preview will show up. If 
-              satisfied, enter the email
-              of the user you wish to send
-              to then click send video to 
-              send the file.  
-            </li>
-            <li>
-              2. If not happy with the video, 
-              simply click upload video to 
-              retry with another file, following 
-              step 1 above.
-            </li>
-          </ul>    
-        </p>
-        <p>
-          Option 2 requires you to do the following:
-          <ul>
-            <li>
-              1. record a video using your camera. 
-              Simply click start record on the 
-              top and click stop record when done.  
-            </li>
-            <li>
-              2. To preview the video, click 
-              preview video. If satisfied, 
-              enter the recipient's email, 
-              and click send video. If not, 
-              click retake video, and 
-              repeat step 1 and 2. 
-            </li>
-          </ul> 
-        </p>
-      </Offcanvas.Body>
-    </Offcanvas>
-   
-    </Container>
     {uploadSuccess && 
     <Modal 
       show={modal}
@@ -261,15 +203,76 @@ const UploadVideoPage = () => {
         </Modal.Body>
     </Modal>
     }
-
 <Fade Cascade>
-  <Sidebar />
-</Fade>
+<Row>
+    <Col xs={12} md={isCollapsed? 0:2} className={isCollapsed ? 'sidebar-collapsed' : 'sidebar'}>
+      <Fade>
+          <Sidebar/>
+      </Fade>
+    </Col>
+  <Col xs={12} md={isCollapsed? 12:10}>
+  <Container fluid>
 
+<Button className="m-2 float-end" variant="outline-dark" onClick={handleShow}>
+  <img src={info}></img>
+</Button>
+
+<Offcanvas show={show} onHide={handleClose} backdrop="static" placement="end">
+<Offcanvas.Header closeButton>
+      <Offcanvas.Title>How Uploading Videos Works</Offcanvas.Title>
+</Offcanvas.Header>
+<Offcanvas.Body>
+  <p>
+    To send a video you have 2 options.
+    Option 1 is to upload a video, or 
+    Option 2, to record a video on the 
+    webapp.
+  </p> 
+  <p>  
+    Option 1 requires you to do the following:
+    <ul>
+      <li>
+        1. upload a video file, where 
+        a preview will show up. If 
+        satisfied, enter the email
+        of the user you wish to send
+        to then click send video to 
+        send the file.  
+      </li>
+      <li>
+        2. If not happy with the video, 
+        simply click upload video to 
+        retry with another file, following 
+        step 1 above.
+      </li>
+    </ul>    
+  </p>
+  <p>
+    Option 2 requires you to do the following:
+    <ul>
+      <li>
+        1. record a video using your camera. 
+        Simply click start record on the 
+        top and click stop record when done.  
+      </li>
+      <li>
+        2. To preview the video, click 
+        preview video. If satisfied, 
+        enter the recipient's email, 
+        and click send video. If not, 
+        click retake video, and 
+        repeat step 1 and 2. 
+      </li>
+    </ul> 
+  </p>
+</Offcanvas.Body>
+</Offcanvas>
+
+</Container>
 <Container fluid>
-  <Row>
+  <Row className='mt-4'>
                
-      <Col xs={{ span: 10, offset: 2 }} style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+      <Col className='upload-record-section' >
       <div className="p-2 text-center" >
         <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>
           <ToggleButton id="tbg-radio-1" value={1} onClick={()=>{handleType(1)}}>
@@ -284,9 +287,8 @@ const UploadVideoPage = () => {
         (
         <Form onSubmit={handleSubmit}>
           <Row>
-            <Col>
+            <Col className='upload-area'>
               <Form.Group controlId="formFileLg" className="d-grid gap-2">
-                <Form.Label className="display-4">Upload Video</Form.Label>
                 <Form.Control 
                   type="file" 
                   required 
@@ -491,7 +493,12 @@ const UploadVideoPage = () => {
         }
         </>
       </div>
+      </Col>
+      </Row>
     </Container>
+    </Col>
+  </Row>
+  </Fade>
   </>
   )
 }

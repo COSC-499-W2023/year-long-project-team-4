@@ -63,13 +63,8 @@ function App() {
         <Route
           path={loginPath}
           element={<LoginHomePage setCurrentUser={setCurrentUser} />}
-          element={<LoginHomePage setCurrentUser={setCurrentUser} />}
         />
         <Route path={guestPath} element={<AlertGuestPage />} />
-        <Route
-          path={receiveAndSendPath}
-          element={<ReceiveAndSendPage currentUser={currentUser} />}
-        />
         <Route path={uploadVideoPath} element={<UploadVideoPage />} />
         <Route
           path={viewVideoPath}
@@ -81,12 +76,6 @@ function App() {
         <Route element={<PrivateRoute currentUser={currentUser} />}>
           <Route
             path={accountPath}
-            element={
-              <AccountPage
-                currentUser={currentUser}
-                setCurrentUser={setCurrentUser}
-              />
-            }
             element={
               <AccountPage
                 currentUser={currentUser}

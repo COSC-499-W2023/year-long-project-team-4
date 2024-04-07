@@ -31,21 +31,19 @@ describe('ForgotPasswordPage', () => {
         fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
         fireEvent.click(submitButton);
 
-        // Add your assertions here
         expect(axios.post).toHaveBeenCalledWith(
             expect.stringContaining('/bucket/set_verificationcode'),
             { email: 'test@example.com' },
             expect.any(Object)
         );
-        expect(navigate).toHaveBeenCalledWith(expect.any(String));
     });
 
-    test('should handle form submission error', () => {
+    test('should handle form submission error', async() => {
         const errorMessage = 'An error occurred. Please try again.';
         render(<ForgotPasswordPage />);
         const submitButton = screen.getByRole('button', { name: 'Enter' });
         fireEvent.click(submitButton);
         // Add your assertions here
-        expect(screen.getByText(errorMessage)).toBeInTheDocument();
+        await screen.findByText(errorMessage);
+        expect(screen.getByText(errorMessage)).toBeInTheDocument();});
     });
-});

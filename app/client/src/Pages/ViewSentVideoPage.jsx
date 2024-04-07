@@ -14,8 +14,21 @@ const ViewVideoPage = ({setIsCollapsed, isCollapsed, currentUser}) => {
     const [errorMessage, setErrorMessage] = useState("");
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     const navigate = useNavigate();
+
+    
+    useEffect(() => {
+      const handleResize = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+
+      window.addEventListener('resize', handleResize);
+      handleResize();
+
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         // Fetch current user on component mount
@@ -105,20 +118,22 @@ const ViewVideoPage = ({setIsCollapsed, isCollapsed, currentUser}) => {
                 onChange={handleSearchChange}
                 value={searchTerm}
               />
-              <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+              <Button variant="outline-primary" onClick={() => setSearchTerm('')}>
                 Clear
               </Button>
             </InputGroup>
           </Col>
         </Row>
         <Row>
-        {filteredVideos.map((video, index) => (
+        {isMobile && <h1 className="text-center display-6 mb-4">Received Video</h1>}
+        {filteredVideos.length > 0 ? (
+        filteredVideos.map((video, index) => (
           <Col key={index} md={4} className="col mb-4">
             <Card onClick={() => handleVideoClick(video.videoId)} style={{ cursor: 'pointer' }}>
               <Card.Body>
                 <Card.Title><strong>{video.videoName}</strong></Card.Title>
                 <Card.Text>
-                  Sender's Email: {video.senderEmail}<br />
+                  <strong>Sender's Email: </strong>{video.senderEmail}<br />
                   Sender's Name: {video.senderFName} {video.senderLName}<br />
                   Tags:
                   <div className="tags-container">
@@ -130,7 +145,14 @@ const ViewVideoPage = ({setIsCollapsed, isCollapsed, currentUser}) => {
               </Card.Body>
             </Card>
           </Col>
-        ))}
+        ))) : (
+          <Col>
+                    <div className="text-center" style={{ color: '#6c757d', marginTop: '20px' }}>
+                      <h2>No Videos Found</h2>
+                      <p>Uploaded videos will appear here.</p>
+                    </div>
+                  </Col>
+                )}
       </Row>
         {errorMessage && <div className="text-center text-danger">{errorMessage}</div>}
       </Container>

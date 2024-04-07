@@ -15,7 +15,9 @@ const Sidebar = ({isCollapsed, setIsCollapsed}) => {
 
     const handleSetActiveTab = (tab) => {
         setActiveTab(tab);
-        setIsCollapsed(true);
+        if (window.innerWidth <= 768) {
+            setIsCollapsed(true);
+        }
     };  
     
     useEffect(() => {

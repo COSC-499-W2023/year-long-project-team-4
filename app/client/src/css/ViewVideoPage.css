@@ -58,5 +58,24 @@
       height: 100vh; /* Full viewport height */
       z-index: 1000; /* Places the sidebar on top of other elements */
     }
-}  
+}
+
+.clear-button {
+    background-color: red !important;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.clear-button:hover {
+    background-color: #f8f9fa !important;
+    border: 1px solid red !important;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+  
   

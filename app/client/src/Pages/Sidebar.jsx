@@ -37,7 +37,7 @@ const Sidebar = () => {
       fetchCurrentUser();
     }, []);
     return (
-      <div className="sidebar" style={{ height: '88vh', width: '15vw', position: 'fixed', top: 0, left: 0, bottom: 0, overflow: 'hidden' }}>
+      <div className="sidebar">
           {currentUser && (
               <>
                   <NavLink

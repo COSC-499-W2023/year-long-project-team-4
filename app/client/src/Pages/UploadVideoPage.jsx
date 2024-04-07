@@ -11,7 +11,7 @@ import ysfixWebmDuration from "fix-webm-duration";
 import { useNavigate } from 'react-router-dom';
 import "./UploadVideoPage.css";
 
-const UploadVideoPage = () => {
+const UploadVideoPage = ({isCollapsed}) => {
   const [type, setType] = useState(1);
   const [time, setTime] = useState(0);
   const [backend, setBackend] = useState(null);
@@ -292,15 +292,76 @@ const UploadVideoPage = () => {
         </Modal.Body>
     </Modal>
     }
-
 <Fade Cascade>
-  <Sidebar />
-</Fade>
+<Row>
+    <Col xs={12} md={isCollapsed? 0:2} className={isCollapsed ? 'sidebar-collapsed' : 'sidebar'}>
+      <Fade>
+          <Sidebar/>
+      </Fade>
+    </Col>
+  <Col xs={12} md={isCollapsed? 12:10}>
+  <Container fluid>
 
+<Button className="m-2 float-end" variant="outline-dark" onClick={handleShow}>
+  <img src={info}></img>
+</Button>
+
+<Offcanvas show={show} onHide={handleClose} backdrop="static" placement="end">
+<Offcanvas.Header closeButton>
+      <Offcanvas.Title>How Uploading Videos Works</Offcanvas.Title>
+</Offcanvas.Header>
+<Offcanvas.Body>
+  <p>
+    To send a video you have 2 options.
+    Option 1 is to upload a video, or 
+    Option 2, to record a video on the 
+    webapp.
+  </p> 
+  <p>  
+    Option 1 requires you to do the following:
+    <ul>
+      <li>
+        1. upload a video file, where 
+        a preview will show up. If 
+        satisfied, enter the email
+        of the user you wish to send
+        to then click send video to 
+        send the file.  
+      </li>
+      <li>
+        2. If not happy with the video, 
+        simply click upload video to 
+        retry with another file, following 
+        step 1 above.
+      </li>
+    </ul>    
+  </p>
+  <p>
+    Option 2 requires you to do the following:
+    <ul>
+      <li>
+        1. record a video using your camera. 
+        Simply click start record on the 
+        top and click stop record when done.  
+      </li>
+      <li>
+        2. To preview the video, click 
+        preview video. If satisfied, 
+        enter the recipient's email, 
+        and click send video. If not, 
+        click retake video, and 
+        repeat step 1 and 2. 
+      </li>
+    </ul> 
+  </p>
+</Offcanvas.Body>
+</Offcanvas>
+
+</Container>
 <Container fluid>
-  <Row>
+  <Row className='mt-4'>
                
-      <Col xs={{ span: 10, offset: 2 }} style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+      <Col className='upload-record-section' >
       <div className="p-2 text-center" >
         <ToggleButtonGroup className="pb-2" type="radio" name="options" defaultValue={1}>
           <ToggleButton id="tbg1" value={1} onClick={()=>{handleType(1)}}>
@@ -327,6 +388,124 @@ const UploadVideoPage = () => {
             <div>
               {file===null ? 
               (
+          <Row>
+            <Col className='upload-area'>
+              <Form.Group controlId="formFileLg" className="d-grid gap-2">
+                <Form.Control 
+                  type="file" 
+                  required 
+                  class="p-2 bg-light border" 
+                  accept="video/*" 
+                  size="lg" 
+                  onChange={handleChange}
+                />
+                <div>
+                  {file===null ? 
+                  (
+                  <>
+                  </>
+                  ):(
+                    <Fade>
+                      {load? (
+                      <>
+                        <Alert className="bg-primary text-white"> 
+                          Your video is in the process of blurring. 
+                          Please wait a until it is finished.
+                        </Alert>
+                        <Spinner variant="primary" animation="grow" />
+                      </>
+                      ):(
+                      <video  width="400" height="225" controls>
+                        <source src={file} type="video/mp4"/>
+                      </video>
+                      )}
+                    </Fade> 
+                  )}
+                </div>
+              </Form.Group>
+            </Col>
+            <Col className="pt-3">
+              <Container fluid>
+                  <Form.Group controlId="formVideoName" className="mb-3">
+                    <Form.Label>Video Name</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      placeholder="Enter video name" 
+                      value={videoName} 
+                      onChange={(e) => setVideoName(e.target.value)} // Update the videoName state when the input changes
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="formRecipientEmail" className="mb-3">
+                      <Form.Label>Recipient Email</Form.Label>
+                      <Form.Control 
+                        type="email" 
+                        required 
+                        placeholder="Enter recipient's email" 
+                        value={recipientEmail} 
+                        onChange={(e) => setRecipientEmail(e.target.value)} 
+                      />
+                  </Form.Group>
+                  <Form.Group controlId="formRetentionPeriod" className="mb-3">
+                    <Form.Label className="text-black">Retention Period in days (1-365)</Form.Label>
+                    <Form.Control 
+                      type="number" 
+                      required 
+                      min="1" max="365" 
+                      placeholder="Enter retention period in days" 
+                      value={retentionPeriod} 
+                      onChange={(e) => setRetentionPeriod(e.target.value)} 
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="formTags" className="mb-3">
+                    <Form.Label>Tags</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Type a tag and press Enter"
+                      value={tagsInput} // Controlled component
+                      onChange={(e) => setTagsInput(e.target.value)} // Use onChange instead
+                      onKeyDown={handleKeyDown}
+                    />
+                  </Form.Group>
+              {/* Display the tags */}
+              <div className="tags-container">
+                  {tags.map((tag, index) => (
+                    <div key={index} className="tag-badge">
+                      {tag}
+                      <button type="button" onClick={() => removeTag(index)}>×</button>
+                    </div>
+                ))}
+              </div>
+              </Container>
+            </Col>
+          </Row>
+
+          <Button onClick={()=>{handleBlur()}} disabled={file? false : true}>Blur video</Button> {' '}
+          <Button  variant="info" type="submit">Send video</Button>
+        </Form>
+        ):
+        (
+        <>
+        <Form onSubmit={handleSubmit}>
+          <Row>
+            <Col>
+              <div className="mb-2"> 
+              {capturing? 
+                ( <>
+                    <Button variant="danger" onClick={handleStopRecord}>
+                      <Record width="16" height="22"/> {' '}
+                      Stop Recording
+                    </Button>
+                  </>
+                ):(
+                  <> 
+                    <Button onClick={handleStartRecord} disabled={disableRecord}>
+                      <Record fill={"white"} width="16" height="22"/> {' '}
+                      Start Recording
+                    </Button>
+                  </> 
+                )
+              }
+              </div> 
               <>
               </>
               ):(
@@ -508,10 +687,11 @@ const UploadVideoPage = () => {
         </>
       </div>
       </Col>
-    
-
-  </Row>
+      </Row>
     </Container>
+    </Col>
+  </Row>
+  </Fade>
   </>
   )
 }

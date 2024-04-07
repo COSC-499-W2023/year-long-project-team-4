@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { ReactComponent as Person } from "../Assets/person.svg";
 import { ReactComponent as Logout } from "../Assets/box-arrow-right.svg";
 import { ReactComponent as Logo } from "../Assets/thislogo1.svg";
+import { ReactComponent as MenuIcon } from "../Assets/hamburger-icon.svg";
 import { Navbar, Button, OverlayTrigger, Modal, Tooltip } from "react-bootstrap";
 import { IP_ADDRESS, accountPath, loginPath, viewSentVideoPath } from "../Path";
-import { useState} from "react";
+import { useState, useEffect } from "react";
+import './Header.css';
 import axios from "axios";
 
-const Header = ({currentUser, setCurrentUser}) => {
+const Header = ({currentUser, setCurrentUser, isCollapsed, setIsCollapsed}) => {
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState(null);
     const [modal, setModal] = useState(true);
@@ -47,38 +49,50 @@ const Header = ({currentUser, setCurrentUser}) => {
     const sendAccount = () =>{
       navigate(accountPath);
     }
+
+    const toggleMenu = () => {
+      setIsCollapsed(!isCollapsed);
+    }
   
   return (
     <>
-    <Navbar className="bg-primary" style={{ height: "12vh", padding: "0 20px" }}>
+    
+    <Navbar className="bg-primary">
         
       {currentUser ? (
         <>
+        <Button className="menu-toggler" type="button" onClick={toggleMenu}>
+            <MenuIcon className="menu-svg"/>
+        </Button>
         <Navbar.Brand onClick={handleLink} className="me-auto" style={{ marginRight: "20px" }}>
-          <Logo />
-        </Navbar.Brand>
+          <Logo className="logo-svg"/>
+      </Navbar.Brand>
         
         <Navbar.Collapse className="justify-content-end">
           <OverlayTrigger
             placement="bottom"
             overlay={<Tooltip>Account Page</Tooltip>}
           >
-            <Button className="m-2" onClick={sendAccount}>
-              <Person fill={"white"} height="50" width="50" />
+            <Button className="m-2 custom-button" onClick={sendAccount}>
+              <Person fill={"white"}/>
             </Button>
           </OverlayTrigger>
           <OverlayTrigger
             placement="bottom"
             overlay={<Tooltip>Logout</Tooltip>}
           >
-            <Button className="m-2" onClick={handleLogout}>
-              <Logout fill={"white"} height="50" width="50" />
+            <Button className="m-2 custom-button" onClick={handleLogout}>
+              <Logout fill={"white"}/>
             </Button>
           </OverlayTrigger>
         </Navbar.Collapse>
         </>
       ) : (
-        <></>
+        <>
+        <Navbar.Brand onClick={handleLink} className="me-auto" style={{ marginRight: "20px" }}>
+          <Logo className="logo-svg"/>
+        </Navbar.Brand>
+        </>
       )}
     
   </Navbar>

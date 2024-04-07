@@ -5,6 +5,11 @@
     transform: scale(1.02); 
     transition: transform 0.15s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; 
 }
+
+.video-cards-container{
+    padding-right: 40px !important;
+}
+
 #search-bar {
     width: 100%;
     margin: 0 auto;
@@ -27,12 +32,32 @@
     font-size: 0.85em; 
 }
 
+.sidebar{
+    display: block;
+    transition: display 5s ease; /* Smooth transition for width changes */
+}
+
+.sidebar-collapsed {
+    display: none; /* Hides the sidebar when collapsed */
+  }
+
 /* Style for tablets and larger devices */
 @media (min-width: 768px) {
     #search-bar {
         width: 50%;
     }
 }
+
+@media (max-width: 768px) {
+    .sidebar {
+      position: fixed; /* Fixed to stay in place during scroll */
+      top: 0;
+      left: 0;
+      width: 100%; /* Full width */
+      height: 100vh; /* Full viewport height */
+      z-index: 1000; /* Places the sidebar on top of other elements */
+    }
+}  
   
   
   

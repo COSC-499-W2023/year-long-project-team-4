@@ -7,7 +7,7 @@ import { ReactComponent as MenuIcon } from "../Assets/hamburger-icon.svg";
 import { Navbar, Button, OverlayTrigger, Modal, Tooltip } from "react-bootstrap";
 import { IP_ADDRESS, accountPath, loginPath, viewSentVideoPath } from "../Path";
 import { useState, useEffect } from "react";
-import './Header.css';
+import "../css/Header.css";
 import axios from "axios";
 
 const Header = ({currentUser, setCurrentUser, isCollapsed, setIsCollapsed}) => {

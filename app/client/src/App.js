@@ -64,15 +64,10 @@ function App() {
         <Route
           path={loginPath}
           element={<LoginHomePage setCurrentUser={setCurrentUser} />}
-          element={<LoginHomePage setCurrentUser={setCurrentUser} />}
         />
         <Route path={guestPath} element={<AlertGuestPage />} />
-        <Route
-          path={receiveAndSendPath}
-          element={<ReceiveAndSendPage currentUser={currentUser} />}
-        />
-        <Route path={uploadVideoPath} element={<UploadVideoPage isCollapsed={isCollapsed}/>} />
-        <Route path={viewVideoPath} element={<ViewVideoPage isCollapsed={isCollapsed}/>} />
+        <Route path={uploadVideoPath} element={<UploadVideoPage isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed}/>} />
+        <Route path={viewVideoPath} element={<ViewVideoPage isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed}/>} />
         <Route path={registerPath} element={<RegisterPage />} />
         <Route
           path={MessagingPath}
@@ -83,7 +78,7 @@ function App() {
               isCollapsed={isCollapsed}/>
           }
         />
-        <Route path={viewSentVideoPath} element={<ViewSentVideoPage isCollapsed={isCollapsed}/>} />
+        <Route path={viewSentVideoPath} element={<ViewSentVideoPage isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed}/>} />
         <Route element={<PrivateRoute currentUser={currentUser} />}>
           <Route
             path={accountPath}
@@ -91,12 +86,8 @@ function App() {
               <AccountPage
                 currentUser={currentUser}
                 setCurrentUser={setCurrentUser}
-              />
-            }
-            element={
-              <AccountPage
-                currentUser={currentUser}
-                setCurrentUser={setCurrentUser}
+                isCollapsed={isCollapsed}
+                setIsCollapsed={setIsCollapsed}
               />
             }
           />

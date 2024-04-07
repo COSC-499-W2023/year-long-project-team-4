@@ -63,7 +63,8 @@
   }
   
   .card-content-padding {
-    padding: 10px 20px;
+    padding-right: 0px !important;
+    padding-left: 0px !important;
   }
 
   .message-bubble {
@@ -189,4 +190,8 @@
 .input-group-custom .input-group-text {
     background-color: transparent; /* No background for the input group addon */
     border: none; /* No borders for the addon */
+}
+
+.video-column{
+  padding-right: 15px;
 }

@@ -1,13 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import './Sidebar.css';
+import '../css/Sidebar.css';
 import { OverlayTrigger, Modal, Tooltip } from "react-bootstrap";
 import { IP_ADDRESS, viewSentVideoPath, viewVideoPath, uploadVideoPath, loginPath} from "../Path";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
 
-const Sidebar = () => {
+const Sidebar = ({isCollapsed, setIsCollapsed}) => {
     const [activeTab, setActiveTab] = useState(viewSentVideoPath);
     const [currentUser, setCurrentUser] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
@@ -15,6 +15,7 @@ const Sidebar = () => {
 
     const handleSetActiveTab = (tab) => {
         setActiveTab(tab);
+        setIsCollapsed(true);
     };  
     
     useEffect(() => {

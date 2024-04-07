@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, InputGroup, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, InputGroup, Button, Spinner } from 'react-bootstrap';
 import { Fade } from 'react-reveal';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from './Sidebar';
-import './ViewSentVideoPage.css'; 
+import '../css/ViewSentVideoPage.css'; 
 import { MessagingPath, IP_ADDRESS, uploadVideoPath } from '../Path';
 
-const ViewVideoPage = ({isCollapsed, currentUser}) => {
+const ViewVideoPage = ({setIsCollapsed, isCollapsed, currentUser}) => {
     const [videos, setVideos] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredVideos, setFilteredVideos] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -43,22 +45,27 @@ const ViewVideoPage = ({isCollapsed, currentUser}) => {
       const searchedVideos = videos.filter(video =>
         video.tags.some(tag => tag.toLowerCase().includes(lowercasedSearchTerm)) ||
         video.senderEmail.toLowerCase().includes(lowercasedSearchTerm) ||
-        (video.senderFName.toLowerCase() + " " + video.senderLName.toLowerCase()).includes(lowercasedSearchTerm)
+        (video.senderFName.toLowerCase() + " " + video.senderLName.toLowerCase()).includes(lowercasedSearchTerm) ||
+        video.videoName.toLowerCase().includes(lowercasedSearchTerm)
       );
       setFilteredVideos(searchedVideos);
     }
   }, [searchTerm, videos]);
 
     useEffect(() => {
+      setIsLoading(true);
+
       axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, { withCredentials: true })
         .then(response => {
           // Assuming the response data includes senderEmail, senderName, and tags
           setVideos(response.data);
           setFilteredVideos(response.data);
+          setIsLoading(false);
         })
         .catch(error => {
           console.error('There was an error fetching the videos!', error);
           setErrorMessage('Error fetching videos');
+          setIsLoading(false);
         });
     }, []);
   
@@ -75,11 +82,20 @@ const ViewVideoPage = ({isCollapsed, currentUser}) => {
             <Row>
                 <Col xs={12} md={isCollapsed? 0:2} className={isCollapsed ? 'sidebar-collapsed' : 'sidebar'}>
                     <Fade>
-                        <Sidebar/>
+                        <Sidebar setIsCollapsed={setIsCollapsed}/>
                     </Fade>
                 </Col>
                 <Col xs={12} md={isCollapsed? 12:10}>
-                <Container className='video-cards-container'>
+                {isLoading ? (
+          // Show spinner when isLoading is true
+          <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
+          </div>
+          ) : (
+            // Show the container with videos when isLoading is false
+            <Container className='video-cards-container'>
         <Row className="mb-4 mt-4">
           <Col>
             {/*<h1 className="text-center display-6">Uploaded Videos</h1>*/}
@@ -118,6 +134,7 @@ const ViewVideoPage = ({isCollapsed, currentUser}) => {
       </Row>
         {errorMessage && <div className="text-center text-danger">{errorMessage}</div>}
       </Container>
+      )}
                 </Col>   
             </Row>    
             {errorMessage && <div className="error-message">{errorMessage}</div>}

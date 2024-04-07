@@ -1,19 +1,13 @@
-// Sidebar.jsx
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom'
 import './Sidebar.css';
-import { Navbar, Button, OverlayTrigger, Modal, Tooltip } from "react-bootstrap";
-import { ReactComponent as Logout } from "../Assets/box-arrow-right.svg";
-import { ReactComponent as Person } from "../Assets/person.svg";
-import { IP_ADDRESS, accountPath, homePath, viewSentVideoPath, viewVideoPath, uploadVideoPath, loginPath} from "../Path";
+import { OverlayTrigger, Modal, Tooltip } from "react-bootstrap";
+import { IP_ADDRESS, viewSentVideoPath, viewVideoPath, uploadVideoPath, loginPath} from "../Path";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import ViewSentVideoPage from './ViewSentVideoPage';
-import ViewVideoPage from './ViewVideoPage';
+
 
 const Sidebar = () => {
-    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState(viewSentVideoPath);
     const [currentUser, setCurrentUser] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
@@ -42,40 +36,8 @@ const Sidebar = () => {
   
       fetchCurrentUser();
     }, []);
-  
-    const handleLogout = async () => {
-      try {
-        const response = await axios.get(`${IP_ADDRESS}/auth/logout`, {
-          withCredentials: true, // Important for handling sessions with cookies
-        });
-  
-        if (response.data.success) {
-          // Handle successful logout
-          console.log("Logged out successfully");
-          setCurrentUser(null);
-          navigate(loginPath);
-        } else {
-          console.error("Logout error:", response.data.error);
-        }
-      } catch (error) {
-        if (error.response && error.response.data.error) {
-          setErrorMessage(error.response.data.error);
-        } else {
-          setErrorMessage("There was an error Logging out");
-        }
-      }
-    };
-
-    const handleLink = () => {
-      if (currentUser) {
-        navigate(viewSentVideoPath);
-      } else {
-        navigate(loginPath);
-      }
-    }
-
     return (
-      <div className="sidebar" style={{ height: '88vh', width: '200px', position: 'fixed', top: 0, left: 0, bottom: 0, overflow: 'hidden' }}>
+      <div className="sidebar" style={{ height: '88vh', width: '15vw', position: 'fixed', top: 0, left: 0, bottom: 0, overflow: 'hidden' }}>
           {currentUser && (
               <>
                   <NavLink

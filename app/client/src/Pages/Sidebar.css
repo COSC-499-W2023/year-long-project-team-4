@@ -1,7 +1,7 @@
 
 /* Sidebar.css */
   .sidebar {
-    width: 200px; 
+    width: 25vh; 
     height: 100vh; 
     background-color: #f8f9fa; 
     position: fixed; 
@@ -36,9 +36,8 @@
   .sidebar .nav-link {
     
     text-align: center;
-    padding: 30px 30px; 
-    margin: 4px 0; 
-    border-radius: 5px; 
+    padding: 4vh 1vh; 
+    border-radius: 1vh; 
     border-bottom: 1px solid #ccc;
 }
   

@@ -5,7 +5,7 @@ import { ReactComponent as Logout } from "../Assets/box-arrow-right.svg";
 import { ReactComponent as Logo } from "../Assets/thislogo1.svg";
 import { Navbar, Button, OverlayTrigger, Modal, Tooltip } from "react-bootstrap";
 import { IP_ADDRESS, accountPath, loginPath, viewSentVideoPath } from "../Path";
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import axios from "axios";
 
 const Header = ({currentUser, setCurrentUser}) => {

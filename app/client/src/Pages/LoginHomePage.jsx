@@ -17,7 +17,6 @@ const LoginHomePage = ({setCurrentUser}) => {
   const navigate = useNavigate();
   const [type, setType] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [activeTab, setActiveTab] = useState(viewSentVideoPath);
 
   const handleLogin = async (email, password) => {
     try {
@@ -63,26 +62,28 @@ const LoginHomePage = ({setCurrentUser}) => {
       <Fade big cascade>
         <Form onSubmit={handleSubmit}>
           <Form.Group className="p-3">
-            <Form.Label>Email</Form.Label>
+            <Form.Label htmlFor="Email">Email</Form.Label>
             <Form.Control
-              id='username'
+              id='Email'
               type="text"
               required
             />
-            <Form.Label>Password</Form.Label>
+            <Form.Label htmlFor="Password">Password</Form.Label>
               <InputGroup>
                 <Form.Control
                   type={type ? "text" : "password"}
                   required
+                  id="Password"
                 />
                 <Button 
                   variant="primary" 
                   onClick={()=> setType(!type)}
+                  aria-label='pass'
                 >
                   {!type? <See fill={"white"}/> :<UnSee fill={"white"}/>}
                 </Button>
               </InputGroup>
-            </Form.Group>   
+          </Form.Group>   
           <Button type="submit" className="mb-2" variant="primary"> Login </Button>
         </Form>
       </Fade>

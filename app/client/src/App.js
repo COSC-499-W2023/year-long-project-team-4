@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./Pages/Header";
 import LoginHomePage from "./Pages/LoginHomePage";
-import ReceiveAndSendPage from "./Pages/ReceiveAndSendPage";
 import UploadVideoPage from "./Pages/UploadVideoPage";
 import ViewVideoPage from "./Pages/ViewVideoPage";
 import RegisterPage from "./Pages/RegisterPage";
@@ -15,7 +14,6 @@ import {
   homePath,
   loginPath,
   guestPath,
-  receiveAndSendPath,
   registerPath,
   viewVideoPath,
   uploadVideoPath,
@@ -24,7 +22,6 @@ import {
   viewSentVideoPath,
   changePasswordPath,
   passwordCodePath,
-  IP_ADDRESS,
 } from "./Path";
 import AccountPage from "./Pages/AccountPage";
 import PageNotFound from "./Pages/PageNotFound";
@@ -42,19 +39,29 @@ function App() {
         <Route path={homePath} element={<HomePage />} />
         <Route
           path={loginPath}
-          element={<LoginHomePage setCurrentUser={setCurrentUser}/>}
+          element={<LoginHomePage setCurrentUser={setCurrentUser} />}
         />
         <Route path={guestPath} element={<AlertGuestPage />} />
         <Route path={uploadVideoPath} element={<UploadVideoPage />} />
-        <Route path={viewVideoPath} element={<ViewVideoPage />} />
+        <Route
+          path={viewVideoPath}
+          element={<ViewVideoPage currentUser={currentUser} />}
+        />
         <Route path={registerPath} element={<RegisterPage />} />
         <Route path={MessagingPath} element={<MessagingPage />} />
-        <Route path={viewSentVideoPath} element={<ViewSentVideoPage />} />
-        <Route element={<PrivateRoute currentUser={currentUser}/>}>
+        <Route
+          path={viewSentVideoPath}
+          element={<ViewSentVideoPage currentUser={currentUser} />}
+        />
+        <Route element={<PrivateRoute currentUser={currentUser} />}>
           <Route
             path={accountPath}
-            element={<AccountPage currentUser={currentUser}
-            setCurrentUser={setCurrentUser}/>}
+            element={
+              <AccountPage
+                currentUser={currentUser}
+                setCurrentUser={setCurrentUser}
+              />
+            }
           />
         </Route>
         <Route path={changePasswordPath} element={<ForgotPasswordPage />} />

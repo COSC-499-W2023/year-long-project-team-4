@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Card, Col, Button, Row, ListGroup, Tab, Form, Modal, Tabs, InputGroup, Alert} from 'react-bootstrap';
+import {Card, Col, Button, Row, ListGroup, Tab, Form, Tabs, InputGroup, Alert} from 'react-bootstrap';
 import { homePath, viewSentVideoPath, uploadVideoPath} from '../Path';
 import {Fade} from 'react-reveal';
 import axios from 'axios';
@@ -10,7 +10,6 @@ import Sidebar from './Sidebar';
 import {
     MessagingPath,
     IP_ADDRESS,
-    loginPath,
   } from "../Path";
 import "./AccountPage.css";
 

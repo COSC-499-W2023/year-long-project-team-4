@@ -6,12 +6,10 @@ import axios from 'axios';
 import Sidebar from './Sidebar';
 import { MessagingPath, IP_ADDRESS, uploadVideoPath } from '../Path';
 
-const ViewVideoPage = () => {
+const ViewVideoPage = ({currentUser}) => {
     const [videos, setVideos] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredVideos, setFilteredVideos] = useState([]);
-    const [selectedVideo, setSelectedVideo] = useState(null);
-    const [showVideoModal, setShowVideoModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -33,11 +31,7 @@ const ViewVideoPage = () => {
         // Fetch current user on component mount
         const fetchCurrentUser = async () => {
             try {
-                const response = await axios.get(`${IP_ADDRESS}/auth/currentuser`, {
-                    withCredentials: true
-                });
-
-                if (response.data.email) {
+                if (currentUser) {
                     setIsAuthenticated(true);
                 } else {
                     setIsAuthenticated(false);

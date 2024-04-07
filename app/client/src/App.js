@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./Pages/Header";
 import LoginHomePage from "./Pages/LoginHomePage";
-import ReceiveAndSendPage from "./Pages/ReceiveAndSendPage";
 import UploadVideoPage from "./Pages/UploadVideoPage";
 import ViewVideoPage from "./Pages/ViewVideoPage";
 import RegisterPage from "./Pages/RegisterPage";
@@ -16,7 +15,6 @@ import {
   homePath,
   loginPath,
   guestPath,
-  receiveAndSendPath,
   registerPath,
   viewVideoPath,
   uploadVideoPath,
@@ -25,7 +23,6 @@ import {
   viewSentVideoPath,
   changePasswordPath,
   passwordCodePath,
-  IP_ADDRESS,
 } from "./Path";
 import AccountPage from "./Pages/AccountPage";
 import PageNotFound from "./Pages/PageNotFound";
@@ -67,6 +64,7 @@ function App() {
         <Route
           path={loginPath}
           element={<LoginHomePage setCurrentUser={setCurrentUser} />}
+          element={<LoginHomePage setCurrentUser={setCurrentUser} />}
         />
         <Route path={guestPath} element={<AlertGuestPage />} />
         <Route
@@ -89,6 +87,12 @@ function App() {
         <Route element={<PrivateRoute currentUser={currentUser} />}>
           <Route
             path={accountPath}
+            element={
+              <AccountPage
+                currentUser={currentUser}
+                setCurrentUser={setCurrentUser}
+              />
+            }
             element={
               <AccountPage
                 currentUser={currentUser}

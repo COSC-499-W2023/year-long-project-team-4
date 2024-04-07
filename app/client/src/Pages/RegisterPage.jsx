@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { Button, Form, InputGroup, Modal} from 'react-bootstrap';
+import { Button, Container, Form, InputGroup, Modal} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom'
 import {
     loginPath,
@@ -89,32 +89,38 @@ const handleSubmit = (e) => {
 };
 
   return (
-  <div className="position-absolute top-50 start-50 translate-middle text-center">          
+  <Container>
+  <div className="p-3 text-center">          
     {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
       <Fade cascade>
         <Form onSubmit={handleSubmit}>
         <Form.Group className="p-3">
-            <Form.Label htmlFor='firstname'>First Name</Form.Label>
+            <Form.Label>First Name</Form.Label>
             <Form.Control
-              id='firstname'
+              data-testid='Firstname'
+              id='Firstname'
               type="text"
               required
             />
             <Form.Label>Last Name</Form.Label>
             <Form.Control
-              id='username'
+              data-testid="Lastname"
+              id='Lastname'
               type="text"
               required
             />
             <Form.Label>Email</Form.Label>
             <Form.Control
-              id='email'
+              data-testid="Email"
+              id='Email'
               type="email"
               required
             />        
             <Form.Label>Password</Form.Label>
               <InputGroup>
                 <Form.Control
+                  data-testid="Password"
+                  id="Password"
                   type={type ? "text" : "password"}
                   required
                   value={password}
@@ -123,6 +129,7 @@ const handleSubmit = (e) => {
                 <Button 
                   variant="primary" 
                   onClick={()=> setType(!type)}
+                  aria-label='pass'
                 >
                   {!type? <See fill={"white"}/> :<UnSee fill={"white"}/>}
                 </Button>
@@ -138,7 +145,7 @@ const handleSubmit = (e) => {
                   maxLength: "Password requires at most 25 characters.",
                   number: "Password must contain at least 1 number.",
                   capital: "Password must contain at least 1 capital letter.",
-                  specialChar: "Password must contain at least 1 special character",
+                  specialChar: "Password must contain at least 1 special character.",
                 }}
                 />
           <Button className="m-2" variant="primary" type="submit"> Register </Button>
@@ -171,7 +178,7 @@ const handleSubmit = (e) => {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowVerification(false)}>
+          <Button aria-label="closeButton"variant="secondary" onClick={() => setShowVerification(false)}>
             Close
           </Button>
           <Button variant="primary" onClick={() => handleVerification(verificationCode)}
@@ -181,6 +188,7 @@ const handleSubmit = (e) => {
         </Modal.Footer>
       </Modal>
   </div>
+  </Container>  
   )
 }
 

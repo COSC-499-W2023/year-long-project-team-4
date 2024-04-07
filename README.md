@@ -49,7 +49,8 @@ CREATE TABLE userprofile (
 );
 
 CREATE TABLE videos (
-    videoName VARCHAR(100) PRIMARY KEY,
+    videoID VARCHAR(100) PRIMARY KEY,
+    videoName VARCHAR(100),
     subDate DATETIME,
     retDate DATETIME,
     senderEmail VARCHAR(100),
@@ -60,15 +61,6 @@ CREATE TABLE videos (
     receiverEncryption VARCHAR(500),
     FOREIGN KEY (senderEmail) REFERENCES userprofile(email) ON DELETE SET NULL ON UPDATE CASCADE,
     FOREIGN KEY (receiverEmail) REFERENCES userprofile(email) ON DELETE SET NULL ON UPDATE CASCADE
-);
-
-CREATE TABLE forms (
-    formID int PRIMARY KEY,
-    subDate DATETIME,
-    senderID int,
-    receiverID int,
-    encrpyt VARCHAR(500),
-    FOREIGN KEY (receiverID) REFERENCES userprofile(id) ON DELETE CASCADE
 );
 
 CREATE TABLE chats (
@@ -89,8 +81,8 @@ CREATE TABLE chats (
 
 CREATE TABLE tags (
     tagName VARCHAR(20),
-    videoName VARCHAR(100),
-    FOREIGN KEY (videoName) REFERENCES videos(videoName) ON DELETE CASCADE ON UPDATE CASCADE
+    videoID VARCHAR(100),
+    FOREIGN KEY (videoID) REFERENCES videos(videoID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 ```
 
@@ -104,24 +96,28 @@ Then install the Python dependencies listed in the `requirements.txt` file.
         
 Then create a .env file in ```year-long-project-team4/app```directory following this example structure: 
 ```
+# If not required to SSH into ec2 - this can be blank
 SSH = "True"/"False" - This flags if you need to SSH into your database or not. 
 SSHUSER=User name that your .pem was given - Default appears to be Ubuntu
 KEYPATH=Path to your .pem file for ssh'ing into your ec2
-ADDRESS=Endpoint of your AWS RDS 
-PORT=For your RDS - the default is 3306
 EC2_ADDRESS=IP address of your ec2 (Public ipv4) 
 
+# Database Information
+ADDRESS=Endpoint of your AWS RDS 
+PORT=For your RDS - the default is 3306
 DBUSER=DATABASE USER NAME
 PASS= Password for the user
 HOST=IP of the database (127.0.0.1)
-MYDB=Database name 
+MYDB=Database name
+TESTDB=Test database name (not production)
 
 BUCKETNAME= S3 bucket name 
 
+# Test is for test database & avoid using production DB, Local flag is to mimic AWS properties such as S3 bucket, and avoiding Email. However no Face blurring.
 TEST=True/False - Uses test database & test options (This assumes you have a development and production database. For simplicity of getting this just running, set Test to False.  
 LOCAL= True/False - Use this to mimic S3 locally 
 
-# These below are to be grabbed from the AWS Console. These are needed for Email to work (along side AWS CLI) or if you do not have AWS CLI then these keys are needed.  
+# Required for AWS calls 
 ACCESSKEY=''
 SECRETKEY=''
 SESSTOKEN=''

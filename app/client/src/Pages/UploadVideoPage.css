@@ -27,3 +27,16 @@
   label.btn.btn-primary{
     background-color: black;
   }
+
+  .upload-area{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .upload-record-section{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  

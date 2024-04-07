@@ -1,0 +1,84 @@
+/* Default styles for mobile */
+.navbar {
+    height: 8vh !important; /* Adjusted for mobile */
+    padding: 0 10px !important; /* Reduced padding */
+  }
+
+.menu-toggler{
+    display: block;
+    margin-right: 10px;
+}
+
+.menu-svg{
+    width: 20px;
+    height: 20px;
+}
+  
+  /* Styles for larger screens */
+  @media (min-width: 768px) {
+    .navbar {
+      height: 12vh !important; /* Original height */
+      padding: 0 20px !important; /* Original padding */
+    }
+    .custom-button  {
+      height: 55px !important; /* Original size */
+      width: 55px !important; /* Original size */
+    }
+    .custom-button .svg { /* Target the SVG inside the button */
+        height: 80px;
+        width: 80px;
+    }
+    .logo-svg {
+      width: 150px !important; /* Original size */
+      height: auto; /* Maintain aspect ratio */
+    }
+    .menu-svg{
+      width: 30px;
+      height: 30px;
+  }
+  }
+
+/* Adjusting button size for mobile */
+.custom-button {
+    height: 45px ; /* Smaller on mobile */
+    width: 45px ; /* Smaller on mobile */
+  }
+
+  .custom-button .svg { /* Target the SVG inside the button */
+    height: 70px;
+    width: 70px;
+}
+
+.logo-svg {
+  width: 100px; /* Example mobile size */
+  height: auto; /* Maintain aspect ratio */
+}
+  
+
+.toggle-button {
+    margin-left: auto;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+    z-index: 1000;
+  }
+
+.sidebar-button{
+    background-color: white !important;
+    /*color: #13056be0;*/
+}
+  
+  
+  .toggle-button:hover {
+    background-color: red; /* Darken the button a bit when hovering */
+  }

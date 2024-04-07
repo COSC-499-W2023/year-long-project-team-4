@@ -491,6 +491,8 @@ const UploadVideoPage = () => {
         }
         </>
       </div>
+      </Col>
+    </Row>
     </Container>
   </>
   )

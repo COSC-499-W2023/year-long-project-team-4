@@ -18,7 +18,7 @@ function MessageSender({currentUser, setCurrentUser}) {
     const [videoURL, setVideoURL] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [currentUser, setCurrentUser] = useState('');
+    //const [currentUser, setCurrentUser] = useState('');
 
     // Use the useLocation hook to access the location object
     const location = useLocation();

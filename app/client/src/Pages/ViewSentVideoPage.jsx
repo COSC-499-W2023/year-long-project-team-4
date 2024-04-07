@@ -31,9 +31,23 @@ const ViewVideoPage = ({currentUser}) => {
                 setIsAuthenticated(false);
             }
         };
-
-        fetchCurrentUser();
+                  
+         fetchCurrentUser();
     }, []);
+
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredVideos(videos);
+    } else {
+      const lowercasedSearchTerm = searchTerm.toLowerCase();
+      const searchedVideos = videos.filter(video =>
+        video.tags.some(tag => tag.toLowerCase().includes(lowercasedSearchTerm)) ||
+        video.senderEmail.toLowerCase().includes(lowercasedSearchTerm) ||
+        (video.senderFName.toLowerCase() + " " + video.senderLName.toLowerCase()).includes(lowercasedSearchTerm)
+      );
+      setFilteredVideos(searchedVideos);
+    }
+  }, [searchTerm, videos]);
 
     useEffect(() => {
       axios.get(`${IP_ADDRESS}/bucket/get_sent_videos`, { withCredentials: true })
@@ -47,18 +61,6 @@ const ViewVideoPage = ({currentUser}) => {
           setErrorMessage('Error fetching videos');
         });
     }, []);
-  
-    useEffect(() => {
-      if (!searchTerm) {
-        setFilteredVideos(videos);
-      } else {
-        const lowercasedSearchTerm = searchTerm.toLowerCase();
-        const searchedVideos = videos.filter(video =>
-          video.tags.some(tag => tag.toLowerCase().includes(lowercasedSearchTerm))
-        );
-        setFilteredVideos(searchedVideos);
-      }
-    }, [searchTerm, videos]);
   
     const handleSearchChange = (e) => {
       setSearchTerm(e.target.value);
@@ -83,7 +85,7 @@ const ViewVideoPage = ({currentUser}) => {
             <h1 className="text-center">Uploaded Videos</h1>
             <InputGroup id="search-bar" className="mb-3">
               <Form.Control
-                placeholder="Search by tags..."
+                placeholder="Search..."
                 onChange={handleSearchChange}
                 value={searchTerm}
               />
@@ -98,9 +100,9 @@ const ViewVideoPage = ({currentUser}) => {
           <Col key={index} md={4} className="col mb-4">
             <Card onClick={() => handleVideoClick(video.videoId)} style={{ cursor: 'pointer' }}>
               <Card.Body>
-                <Card.Title>{video.videoName}</Card.Title>
+                <Card.Title><strong>{video.videoName}</strong></Card.Title>
                 <Card.Text>
-                  <strong>Sender's Email: </strong>{video.senderEmail}<br />
+                  Sender's Email: {video.senderEmail}<br />
                   Sender's Name: {video.senderFName} {video.senderLName}<br />
                   Tags:
                   <div className="tags-container">

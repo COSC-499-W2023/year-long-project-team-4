@@ -425,7 +425,7 @@ const UploadVideoPage = () => {
           <>
           {file === null? 
           (<Fade>
-            <Webcam  width={isMobile? height : width} height={isMobile? width : height} audio={true} ref={webcamRef}/>
+            <Webcam  width="400" height="225" audio={true} ref={webcamRef}/>
            </Fade>
             ):(
             <Fade>
@@ -438,7 +438,7 @@ const UploadVideoPage = () => {
                 <Spinner variant="primary" animation="grow" />
               </>
               ):(
-              <video  width={isMobile? height : width} height={isMobile? width : height} controls>
+              <video  width="400" height="225" controls>
                 <source src={file} type="video/mp4"/>
               </video>
               )}
@@ -508,6 +508,8 @@ const UploadVideoPage = () => {
         </>
       </div>
       </Col>
+    
+
   </Row>
     </Container>
   </>

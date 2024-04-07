@@ -263,7 +263,7 @@ const UploadVideoPage = () => {
     }
 
 <Fade Cascade>
-        <Sidebar />
+  <Sidebar />
 </Fade>
 
 <Container fluid>

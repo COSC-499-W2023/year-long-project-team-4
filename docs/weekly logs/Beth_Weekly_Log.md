@@ -353,3 +353,21 @@ Tasks from project board:
 Completed:
 - Edited Siderbar to show different buttons depending on if user is a guest or not
 - Update change password function, changes were requested
+
+# Week 12: April 1 - April 7
+
+## Tasks Completed:
+
+![2Week12act](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/79421912/3ee1177f-1a4e-4a02-8738-e7ef415ab9ac)
+
+
+## Goal Recap:
+
+Tasks from project board:
+- Final Report and Video
+
+Completed:
+- Last minute tweaks to frontend
+- Solving merge conflicts
+- Testing other members' code
+- Writing report and filming video

@@ -18,6 +18,7 @@ HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
 SSH = os.getenv("SSH") == "True"
 EC2 = os.getenv("EC2_ADDRESS")
+TESTDB = os.getenv("TESTDB")
 
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
@@ -26,16 +27,13 @@ TEST = os.getenv("TEST") == 'True'
 LOCAL = os.getenv('LOCAL') == 'True'
 BUCKETNAME = os.getenv("BUCKETNAME")
 
-s3_client = boto3.client(
-    's3',
-    aws_access_key_id=ACCESS_KEY,
-    aws_secret_access_key=SECRET_KEY,
-    aws_session_token=SESSION_TOKEN
-    )
 
 if not LOCAL:
-    # boto3.setup_default_session(profile_name='team4-dev')
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client('s3',    
+        aws_access_key_id=ACCESS_KEY,
+        aws_secret_access_key=SECRET_KEY,
+        aws_session_token=SESSION_TOKEN
+    )
 else:
     if not os.path.isdir('videos'):
         os.mkdir('videos')
@@ -43,7 +41,7 @@ else:
         os.mkdir('chats')
 
 if(TEST):
-    DBNAME = 'Team4dbTest'
+    DBNAME = TESTDB
 
 def list_buckets():
     """

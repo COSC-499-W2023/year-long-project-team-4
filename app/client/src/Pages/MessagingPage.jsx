@@ -9,16 +9,15 @@ import { viewSentVideoPath, uploadVideoPath,
 import io from 'socket.io-client';
 import Sidebar from './Sidebar';
 import axios from 'axios';
-import './MessagingPage.css';
+import '../css/MessagingPage.css';
 
-function MessageSender() {
+function MessageSender({currentUser, setCurrentUser, isCollapsed}) {
     const [message, setMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [chatMessages, setChatMessages] = useState([]);
     const [videoURL, setVideoURL] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [currentUser, setCurrentUser] = useState('');
 
     // Use the useLocation hook to access the location object
     const location = useLocation();
@@ -30,13 +29,20 @@ function MessageSender() {
     const messagesEndRef = useRef(null); // Ref for auto-scrolling
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' , block: "end"});
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth'});
     };
 
     const socket = io(`${IP_ADDRESS}`,  {
         withCredentials: true,
         autoConnect: false
     });
+
+    const UnixTimestampToReadableDate = (unixTimestamp) =>{
+      const date = new Date(unixTimestamp * 1000);
+      const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      const readableDate = date.toLocaleString('en-US', options);
+      return <span>{readableDate}</span>;
+    }
 
     useEffect(() => {
         // Auto-scroll to the bottom whenever messages change
@@ -142,85 +148,94 @@ function MessageSender() {
     };
     return (
         <>
-        <Fade>
-          <Sidebar />
-          </Fade>
-          <Container fluid style={{ marginTop: '20px', padding: '0 20px' }} className="container-fluid-custom">
-            <Row noGutters={true}>
-              {/* Video playback column (60% width) */}
-              <Col md={{ span: 6, offset: 2 }} style={{ paddingRight: '15px' }}>
-              <div className={isLoading ? "video-wrapper flex-center" : "video-wrapper"}>
-                    {isLoading ? (
-                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                        <Spinner animation="border" role="status"/>
-                        </div>
-                    ) : videoURL ? (
-                        <video src={videoURL} controls autoPlay style={{ width: '100%', height: 'auto' }} />
-                    ) : (
-                        <p>No video to display</p>
-                    )}
-                </div>
-              </Col>
-              {/* Messages column (40% width) */}
-              <Col md={4} style={{ paddingLeft: '15px' }}>
-                <Card className="card-full-height" style={{ height: '84vh', display: 'flex', flexDirection: 'column' }}>
-                  <Card.Header className="card-content-padding" style={{ padding: '10px 20px' }}>
-                    <Card.Title>Messages</Card.Title>
-                  </Card.Header>
-                  <Card.Body className="message-area card-content-padding">
-                    <div className='message-area-content'>
-                      {chatMessages.map((chatMessage, index) => {
-                          const isSentByCurrentUser = chatMessage.sender === currentUser;
-                          return (
-                            <div
-                              key={index}
-                              className={`message-bubble ${isSentByCurrentUser ? 'message-bubble-sent' : 'message-bubble-received'}`}
-                            >
-                              <div className="message-info">
-                                <span className="message-sender"><strong>{chatMessage.sender}</strong></span>
-                                <span className="message-timestamp"><small>{new Date(chatMessage.timestamp).toLocaleString()}</small></span>
-                              </div>
-                              <div className="message-content">
-                                <Card.Text>{chatMessage.message}</Card.Text>
-                              </div>
+        <Fade Cascade>
+          <Row>
+            <Col xs={12} md={isCollapsed? 0:2} className={isCollapsed ? 'sidebar-collapsed' : 'sidebar'}>
+              <Fade>
+                <Sidebar/>
+              </Fade>
+            </Col>
+            <Col xs={12} md={isCollapsed? 12:10}>
+              <Container fluid className="container-fluid-custom">
+                <Row noGutters={true}>
+                  {/* Video playback column (60% width) */}
+                  <Col className="video-column" >
+                  <div className={`${isLoading ? "video-wrapper flex-center" : "video-wrapper"} video-container`}>
+                        {isLoading ? (
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                            <Spinner animation="border" role="status"/>
                             </div>
-                          );
-                        })}
+                        ) : videoURL ? (
+                            <video src={videoURL} controls autoPlay style={{ width: '100%', height: 'auto' }} />
+                        ) : (
+                            <p>No video to display</p>
+                        )}
                     </div>
-                    <div ref={messagesEndRef} />
-                  </Card.Body>
-                    <Form onSubmit={handleSubmit} className="input-group-custom">
-                      <InputGroup>
-                        <Form.Control
-                          as="textarea"
-                          id="message"
-                          value={message}
-                          onChange={(e) => setMessage(e.target.value)}
-                          placeholder="Type a message..."
-                          style={{ marginRight: '10px' }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                              e.preventDefault(); 
-                              handleSubmit(e); 
-                            }
-                          }}
-                        />
-                        <Button variant="primary" type="submit">Send</Button>
-                      </InputGroup>
-                    </Form>
-                </Card>
-              </Col>
-            </Row>
-            {errorMessage && (
-              <Row className="mt-3">
-                <Col>
-                  <div className="alert alert-danger" style={{ margin: '20px' }}>{errorMessage}</div>
-                </Col>
-              </Row>
-            )}
-          </Container>
-         
-        </>
+                  </Col>
+                  {/* Messages column (40% width) */}
+                  <Col md={4} style={{ paddingLeft: '15px' }}>
+                    <Card className="card-full-height" style={{ height: '84vh', display: 'flex', flexDirection: 'column' }}>
+                      <Card.Header className="card-content-padding" style={{ padding: '10px 20px' }}>
+                      <Card.Title style={{ paddingLeft: '20px' }}>Messages</Card.Title>
+                      </Card.Header>
+                      <Card.Body className="message-area card-content-padding">
+                        <div className='message-area-content'>
+                          {chatMessages.map((chatMessage, index) => {
+                              const isSentByCurrentUser = chatMessage.sender === currentUser;
+                              return (
+                                <div
+                                  key={index}
+                                  className={`message-bubble ${isSentByCurrentUser ? 'message-bubble-sent' : 'message-bubble-received'}`}
+                                >
+                                  <div className="message-info">
+                                    <span className="message-sender"><strong>{chatMessage.sender}</strong></span>
+                                    {/*<span className="message-timestamp"><small>{new Date(chatMessage.timestamp).toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}</small></span>*/}
+                                    {console.log(chatMessage)}
+                                    <span className="message-timestamp"><small>{UnixTimestampToReadableDate(chatMessage.timestamp)}</small></span>
+                                  </div>
+                                  <div className="message-content">
+                                    <Card.Text>{chatMessage.message}</Card.Text>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                        </div>
+                        <div ref={messagesEndRef} />
+                      </Card.Body>
+                        <Form onSubmit={handleSubmit} className="input-group-custom">
+                          <InputGroup>
+                            <Form.Control
+                              as="textarea"
+                              id="message"
+                              value={message}
+                              onChange={(e) => setMessage(e.target.value)}
+                              placeholder="Type a message..."
+                              style={{ marginRight: '10px' }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                  e.preventDefault(); 
+                                  handleSubmit(e); 
+                                }
+                              }}
+                            />
+                            <Button variant="primary" type="submit">Send</Button>
+                          </InputGroup>
+                        </Form>
+                    </Card>
+                  </Col>
+                </Row>
+                {errorMessage && (
+                  <Row className="mt-3">
+                    <Col>
+                      <div className="alert alert-danger" style={{ margin: '20px' }}>{errorMessage}</div>
+                    </Col>
+                  </Row>
+                )}
+              </Container>
+          </Col> 
+        </Row>
+        </Fade>
+      </>
       );      
 }
 

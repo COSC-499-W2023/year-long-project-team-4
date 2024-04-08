@@ -61,23 +61,26 @@ const ViewVideoPage = ({setIsCollapsed, isCollapsed, currentUser}) => {
         });
 
         // Fetch current user on component mount
-        const fetchCurrentUser = async () => {
-            try {
-                if (currentUser) {
-                    setIsAuthenticated(true);
-                } else {
-                    setIsAuthenticated(false);
-                }
-            } catch (error) {
-                navigate(uploadVideoPath);
-                console.error('There was an error fetching the current user', error);
-                setIsAuthenticated(false);
+        const fetchCurrent =async()=> {
+          try {
+            const response = await axios.get(`${IP_ADDRESS}/auth/userdetails`, {
+              withCredentials: true
+            });
+            console.log(response);
+            if (response.data.email) {
+              
+              setIsAuthenticated(true);
+            } else {
+              console.error('No user currently logged in');
             }
+          } catch (error) {
+              navigate(uploadVideoPath);
+              console.error('There was an error fetching the current user', error);
+              setIsAuthenticated(false);
+          }
         };
-
-        fetchCurrentUser();
-    }, []);
-
+        fetchCurrent();}, [])
+        
     useEffect(() => {
       if (!searchTerm) {
         setFilteredVideos(videos);

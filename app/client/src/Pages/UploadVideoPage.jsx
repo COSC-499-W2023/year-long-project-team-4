@@ -234,55 +234,76 @@ const UploadVideoPage = ({setIsCollapsed, isCollapsed}) => {
 </Button>
 
 <Offcanvas show={show} onHide={handleClose} backdrop="static" placement="end">
-<Offcanvas.Header closeButton>
-      <Offcanvas.Title>How Uploading Videos Works</Offcanvas.Title>
-</Offcanvas.Header>
-<Offcanvas.Body>
-  <p>
-    To send a video you have 2 options.
-    Option 1 is to upload a video, or 
-    Option 2, to record a video on the 
-    webapp.
-  </p> 
-  <p>  
-    Option 1 requires you to do the following:
-    <ul>
-      <li>
-        1. upload a video file, where 
-        a preview will show up. If 
-        satisfied, enter the email
-        of the user you wish to send
-        to then click send video to 
-        send the file.  
-      </li>
-      <li>
-        2. If not happy with the video, 
-        simply click upload video to 
-        retry with another file, following 
-        step 1 above.
-      </li>
-    </ul>    
-  </p>
-  <p>
-    Option 2 requires you to do the following:
-    <ul>
-      <li>
-        1. record a video using your camera. 
-        Simply click start record on the 
-        top and click stop record when done.  
-      </li>
-      <li>
-        2. To preview the video, click 
-        preview video. If satisfied, 
-        enter the recipient's email, 
-        and click send video. If not, 
-        click retake video, and 
-        repeat step 1 and 2. 
-      </li>
-    </ul> 
-  </p>
-</Offcanvas.Body>
-</Offcanvas>
+      <Offcanvas.Header closeButton>
+            <Offcanvas.Title>How Uploading Videos Works</Offcanvas.Title>
+      </Offcanvas.Header>
+      <Offcanvas.Body>
+        <p>
+          To send a video you have 2 options.
+          Option 1 is to upload a video, or 
+          Option 2, to record a video on the 
+          webapp.
+        </p> 
+        <p>  
+          Option 1 requires you to do the following:
+          <ul>
+            <li>
+              1. upload a video file, where 
+              a preview will show up. If 
+              satisfied, enter the email
+              of the user you wish to send
+              to then click send video to 
+              send the file.  
+            </li>
+            <li>
+              2. If not happy with the video, 
+              simply click upload video to 
+              retry with another file, following 
+              step 1 above.
+            </li>
+            <li>
+              3. Once done, you must fill out some basic
+              user info such as the name of the video, 
+              the recipient's email, the rentention 
+              of the video in days, and any tags related to
+              the video. 
+            </li>
+          </ul>    
+        </p>
+        <p>
+          Option 2 requires you to do the following:
+          <ul>
+            <li>
+              1. record a video using your camera. 
+              Simply click start record on the 
+              top and click stop record when done.  
+            </li>
+            <li>
+              2. To preview the video, click 
+              preview video. If satisfied, 
+              enter the recipient's email, 
+              and click send video. If not, 
+              click retake video, and 
+              repeat step 1 and 2. 
+            </li>
+            <li>
+              3. Once done, you must fill out some basic
+              user info such as the name of the video, 
+              the recipient's email, the rentention 
+              of the video in days, and any tags related to
+              the video!
+            </li>
+          </ul> 
+        </p>
+        <p>
+          When done, you have the option to
+          blur your video. If you choose to,
+          the video will be become blurred!
+          Once satisified you can send the video
+          where it will be viewable in videos uploaded.
+        </p>
+      </Offcanvas.Body>
+    </Offcanvas>
 
 </Container>
 <Container fluid>

@@ -174,5 +174,10 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 - Looking and updating changes made by group members for peer testing changes
 - Finishing up peer testing changes
 - Creating tests to test our code
-
+- 
+  # Term 2 Week 12: March 31st - April 7th
+![2024-04-07 232313](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/b7ef9388-590f-4d8f-b91b-ca27442d4dc2)
+- updated changes made by group members for peer testing changes
+- Finished peer testing changes
+- Created tests for our code
 

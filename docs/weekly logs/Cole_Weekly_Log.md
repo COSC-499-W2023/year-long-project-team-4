@@ -338,3 +338,18 @@ Tasks from the project board relevant to things I worked on:
 Currently working on:
 - Next up is to make UX better for the "stop recording" and "preview video" buttons
 
+
+# Term 2 Week (12): Mar 31 - Apr 7
+
+## Tasks Completed:
+![image](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/11024636/af93f976-68e2-4dba-93c1-d943e9faae11)
+
+## Goal Recap:
+Things I worked on:
+- Fixed bug with re-recording videos
+- Fixed UX with "stop recording" and "preview video" buttons
+- Made final report
+- Did final report video
+  
+Tasks from the project board relevant to things I worked on:
+- Video upload / recording frontend

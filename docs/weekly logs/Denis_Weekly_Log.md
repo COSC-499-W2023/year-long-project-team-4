@@ -441,3 +441,23 @@ Completed:
   
 Additional Context:
 
+# Term 2 Week 13: April 1 - April 7 (Monday to Sunday)
+## Tasks Worked this Week:
+
+![WhatIdid](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/52676747/1377b3ce-a3e9-43f2-bbbf-e64a754ed9c2)
+
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Final Documentation
+- Final platform on the ec2
+- Small front-end edits
+
+Tasks from the Project Board:
+- Final Documentation
+- Final touches 
+Completed:
+- Final Documentation
+- Final Touches 
+  
+Additional Context:

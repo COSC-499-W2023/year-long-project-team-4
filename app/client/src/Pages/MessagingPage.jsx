@@ -176,7 +176,7 @@ function MessageSender({currentUser, setCurrentUser, isCollapsed}) {
                   <Col md={4} style={{ paddingLeft: '15px' }}>
                     <Card className="card-full-height" style={{ height: '84vh', display: 'flex', flexDirection: 'column' }}>
                       <Card.Header className="card-content-padding" style={{ padding: '10px 20px' }}>
-                        <Card.Title>Messages</Card.Title>
+                      <Card.Title style={{ paddingLeft: '20px' }}>Messages</Card.Title>
                       </Card.Header>
                       <Card.Body className="message-area card-content-padding">
                         <div className='message-area-content'>

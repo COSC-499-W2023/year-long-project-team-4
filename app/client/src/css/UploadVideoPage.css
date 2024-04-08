@@ -20,3 +20,23 @@
     cursor: pointer;
   }
   
+  label.btn.btn-primary:hover{
+    background-color:#13056b93 ;
+  }
+
+  label.btn.btn-primary{
+    background-color: black;
+  }
+
+  .upload-area{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .upload-record-section{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  

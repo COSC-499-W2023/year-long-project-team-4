@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Card, Col, Button, Row, ListGroup, Tab, Form, Modal, Tabs, InputGroup, Alert} from 'react-bootstrap';
+import {Card, Col, Button, Row, ListGroup, Tab, Form, Tabs, InputGroup, Alert} from 'react-bootstrap';
 import { homePath, viewSentVideoPath, uploadVideoPath} from '../Path';
 import {Fade} from 'react-reveal';
 import axios from 'axios';
@@ -10,13 +10,12 @@ import Sidebar from './Sidebar';
 import {
     MessagingPath,
     IP_ADDRESS,
-    loginPath,
   } from "../Path";
-import "./AccountPage.css";
+import "../css/AccountPage.css";
 
 import PasswordCheckList from "react-password-checklist";
 
-const AccountPage = ({currentUser, setCurrentUser}) => {
+const AccountPage = ({currentUser, setCurrentUser, setIsCollapsed, isCollapsed}) => {
 const [type, setType] = useState(false)
 const [currentFirstName, setCurrentFirstName] = useState(null);
 const [currentLastName, setCurrentLastName] = useState(null);
@@ -146,12 +145,12 @@ const handleStartChat = (e, videoName) => {
 return (
   <Fade cascade>
       <Row>
-            <Col xs={2}>
-                <Fade>
-                <Sidebar />
-                </Fade>
-            </Col>
-            <Col xs={10}>
+          <Col xs={12} md={isCollapsed? 0:2} className={isCollapsed ? 'sidebar-collapsed' : 'sidebar'}>
+              <Fade>
+                <Sidebar setIsCollapsed={setIsCollapsed}/>
+              </Fade>
+          </Col>
+    <Col xs={12} md={isCollapsed? 12:10}>
    <div className="container p-4">
     <Fade>
       <Card>

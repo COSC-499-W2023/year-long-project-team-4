@@ -1,10 +1,11 @@
 
 /* Sidebar.css */
   .sidebar {
-    width: 200px; 
+    padding-right: 0px !important;
+    /*width: 25vh;*/
     height: 100vh; 
     background-color: #f8f9fa; 
-    position: fixed; 
+    /*position: fixed; */
     top: 0; 
     left: 0; 
     overflow-y: auto; 
@@ -12,6 +13,10 @@
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 
+  }
+
+  @media (max-width: 768px) {
+    
   }
 
   .sidebar .white-button {
@@ -36,9 +41,8 @@
   .sidebar .nav-link {
     
     text-align: center;
-    padding: 30px 30px; 
-    margin: 4px 0; 
-    border-radius: 5px; 
+    padding: 4vh 1vh; 
+    border-radius: 1vh; 
     border-bottom: 1px solid #ccc;
 }
   

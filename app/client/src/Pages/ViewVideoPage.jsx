@@ -87,7 +87,10 @@ const ViewVideoPage = ({setIsCollapsed, isCollapsed, currentUser}) => {
       } else {
         const lowercasedSearchTerm = searchTerm.toLowerCase();
         const searchedVideos = videos.filter(video =>
-          video.tags.some(tag => tag.toLowerCase().includes(lowercasedSearchTerm))
+          video.tags.some(tag => tag.toLowerCase().includes(lowercasedSearchTerm)) ||
+          video.senderEmail.toLowerCase().includes(lowercasedSearchTerm) ||
+          (video.senderFName.toLowerCase() + " " + video.senderLName.toLowerCase()).includes(lowercasedSearchTerm) ||
+          video.videoName.toLowerCase().includes(lowercasedSearchTerm)
         );
         setFilteredVideos(searchedVideos);
       }

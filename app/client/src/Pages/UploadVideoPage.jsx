@@ -426,7 +426,6 @@ const UploadVideoPage = () => {
               )}
               </>
               <div className="mt-2">
-                <Button onClick={()=>{handleRecord(recordedChunks)}}>Preview video</Button> {' '}
                 <Button onClick={()=>{handleRetake()}} disabled={disable}>Retake video</Button> {' '}
                 <Button onClick={()=>{handleBlur()}} disabled={disable}>Blur video</Button> {' '}
               </div>

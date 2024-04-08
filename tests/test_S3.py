@@ -31,7 +31,7 @@ def test_download_file():
     
     
 def test_delete_file():
-    result1 = s3Bucket.delete_file('testFile.txt')
+    result1 = s3Bucket.delete_file('team4-s3','testFile.txt')
     
     assert result1 == True #Assuming upload was successful
 

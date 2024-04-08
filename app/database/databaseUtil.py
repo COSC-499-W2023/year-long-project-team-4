@@ -18,9 +18,10 @@ HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
 TEST = os.getenv("TEST")
 EC2 = os.getenv("EC2_ADDRESS")
+TESTDB = os.getenv("TESTDB")
 
 if(TEST.lower() == "true"):
-    DBNAME = 'Team4dbTest'
+    DBNAME = TESTDB
 
 def insert_user(email:str, password:str, firstname:str, lastname:str, salthash, pubKey, verifyKey, verifiedAcc: bool =False) -> int:
     '''

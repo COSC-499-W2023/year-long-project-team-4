@@ -41,7 +41,7 @@ def test_delete_key():
        
 def test_update_key():
     database.insert_video("TestUpdateKey.mp4", "Testname123","2024-01-24 11:59:00", "updated@example.com", "Test@example.com","1","2")
-    result = database.update_key("TestUpdateKey.mp4", sender = True, receiver = False, encrpytKey = 'fakeEncryptKey')
+    result = database.update_key("TestUpdateKey.mp4", sender = True, receiver = False, encryptKey = 'fakeEncryptKey')
     assert result == 1  # Assuming the update was successful
        
 if __name__ == "__main__":

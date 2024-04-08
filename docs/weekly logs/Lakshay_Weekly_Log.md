@@ -48,9 +48,6 @@ Additional Context:
 # Week 6/7: Oct 8 - Oct 22 (Monday to Sunday (2 weeks worth))
 ## Tasks Worked this Week:
 
-<img width="795" alt="Screen Shot 2023-10-24 at 1 21 01 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/8c8678c4-3298-449d-9748-6121ec6b795f">
-
-
 ## Goal Recap:
 The features that were mine to complete this week were:
 - Creating Tests for the front-end components using Jest
@@ -69,6 +66,7 @@ Completed:
 
 Additional Context:
 - Nothing of note for these two weeks. Worked on testing and understanding the code written by other team members
+
 
 # Week 8: Oct 22 - Oct 29 (Monday to Sunday)
 ## Tasks Worked this Week:
@@ -437,3 +435,4 @@ Completed:
 - Add frontend testing
   
 Additional Context:
+

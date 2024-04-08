@@ -16,6 +16,9 @@ DBUSER = os.getenv("DBUSER")
 DBPASS = os.getenv("PASS")
 HOST = os.getenv("HOST")
 DBNAME = os.getenv("MYDB")
+SSH = os.getenv("SSH") == "True"
+EC2 = os.getenv("EC2_ADDRESS")
+TESTDB = os.getenv("TESTDB")
 
 ACCESS_KEY = os.getenv("ACCESSKEY")
 SECRET_KEY = os.getenv('SECRETKEY')
@@ -24,20 +27,21 @@ TEST = os.getenv("TEST") == 'True'
 LOCAL = os.getenv('LOCAL') == 'True'
 BUCKETNAME = os.getenv("BUCKETNAME")
 
-# s3_client = boto3.client(
-# 's3',
-# aws_access_key_id=ACCESS_KEY,
-# aws_secret_access_key=SECRET_KEY,
-# aws_session_token=SESSION_TOKEN)
+
 if not LOCAL:
-    boto3.setup_default_session(profile_name='team4-dev')
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client('s3',    
+        aws_access_key_id=ACCESS_KEY,
+        aws_secret_access_key=SECRET_KEY,
+        aws_session_token=SESSION_TOKEN
+    )
 else:
     if not os.path.isdir('videos'):
         os.mkdir('videos')
+    if not os.path.isdir('chats'):
+        os.mkdir('chats')
 
 if(TEST):
-    DBNAME = 'Team4dbTest'
+    DBNAME = TESTDB
 
 def list_buckets():
     """
@@ -170,7 +174,6 @@ def get_object_content(obj_path):
 
             content = response['Body'].read().decode('utf-8')
 
-            print(f'Content of {obj_path}:\n{content}')
             return content
         except Exception as e:
             print(f"Error retrieving content from {obj_path}: {e}")
@@ -225,7 +228,7 @@ def list_objs():
         return False
     
     
-def delete_file(obj_path):
+def delete_file(BUCKETNAME, obj_path):
     """
     Deletes a file from an S3 bucket.
 
@@ -245,7 +248,7 @@ def delete_file(obj_path):
         return False
 
 
-def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, receiverEmail, encryptKey, testcase=False):
+def encrypt_insert(file_flag, file_content, file_name, retDate, senderEmail, receiverEmail, senderEncryption, receiverEncryption, videoName = None):
     """
     This handles the insertion of videos into the database but also the s3 bucket. It makes sure that both work before commiting into the database
 
@@ -255,39 +258,115 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
         obj_path (str): the path for the obj to be saved under  
         retDate(dateTime): The date to delete
         senderId(int): The id of the current user trying to submit the video
-        recieverUserName: The user name of the target person to view the video
+        receiverUserName: The user name of the target person to view the video
         encrpytKey: The public key of the sender 
         file_flag: sets the folder to be saved into 
     """
     db = None
-    db_name = 'Team4dbTest' if testcase else DBNAME
-    result = 0
+    result = False
     subDate = datetime.now(timezone.utc)
     try:
-        with SSHTunnelForwarder(('ec2-15-156-66-147.ca-central-1.compute.amazonaws.com'), 
-                ssh_username=SSHUSER,
-                ssh_pkey=KPATH, 
-                remote_bind_address=(ADDRESS,PORT)
-        )as tunnel:
-            print("SSH Tunnel Established")
+        if SSH:
+            with SSHTunnelForwarder((EC2), 
+                    ssh_username=SSHUSER,
+                    ssh_pkey=KPATH, 
+                    remote_bind_address=(ADDRESS,PORT)
+            )as tunnel:
+                print("SSH Tunnel Established")
+                #Db connection string
+                db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=DBNAME)
+                if db:
+                    if db:
+                        cur = db.cursor()
+                        query1 = f"START TRANSACTION"
+                        cur.execute(query1)
+                        
+                        recQuery = "SELECT id, firstname, lastname FROM userprofile WHERE email LIKE %s"
+                        cur.execute(recQuery,(receiverEmail,))
+                        recInfo = cur.fetchall()
+                        
+                        if recInfo:
+                            recID = recInfo[0][0]
+                            recFname = recInfo[0][1]
+                            recLname = recInfo[0][2]
+                            obj_path = f"/{file_flag}/{file_name}"
+                            if LOCAL:
+                                if not os.path.isdir(f"{file_flag}"):
+                                    os.mkdir(f"{file_flag}")
+                        else:
+                            raise ValueError("That email was not found.")
+                        
+                        # Checks to see if guest or not
+                        if senderEmail:
+                            userQuery = "SELECT id, firstname, lastname from userprofile WHERE email = %s"
+                            cur.execute(userQuery,(senderEmail,))
+                            userInfo = cur.fetchall()
+                            
+                            if userInfo:
+                                senderId = userInfo [0][0]
+                                userFname = userInfo[0][1]
+                                userLname = userInfo[0][2]
+                            else:
+                                raise ValueError("Error retrieving current users information.")
+                            
+                            if file_flag == "videos":
+                                insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)"
+                                data = (file_name, videoName, subDate, retDate, senderEmail, userFname, userLname, receiverEmail, senderEncryption, receiverEncryption)
+                                cur.execute(insertQuery, data)
+                                
+                            elif file_flag == "chats":  
+                                insertQuery = "INSERT INTO chats (chatName, timestamp, senderEmail, senderFName, senderLName, receiverEmail, receiverFirstName, receiverLastName, senderEncryption, receiverEncryption, retDate) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s,%s,%s)"
+                                data = (file_name, subDate, senderEmail, userFname, userLname, receiverEmail, recFname, recLname, senderEncryption, receiverEncryption, retDate)
+                                cur.execute(insertQuery, data)
+                                
+                            proceed = already_existing_file(obj_path)
+                            if(not proceed):
+                                upload_file(file_content,store_as=obj_path)
+                                db.commit()
+                                cur.close()
+                                result = True
+                            else:
+                                db.rollback()
+                                result = False
+                        #If guest it does the same calls just without senderId
+                        else: 
+                            if file_flag == 'videos':       
+                                insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s,%s)"
+                                data = (file_name, videoName, subDate, retDate, receiverEmail, receiverEncryption)
+                                cur.execute(insertQuery, data)
+                                
+                            elif file_flag == 'chats':       
+                                insertQuery = "INSERT INTO chats (chatName, timestamp, retDate, receiverEmail, receiverFirstName, receiverLastName, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s)"
+                                data = (file_name, subDate, retDate, receiverEmail, recFname, recLname, receiverEncryption)
+                                cur.execute(insertQuery, data)
+                                
+                            proceed = already_existing_file(obj_path)
+                            if(not proceed):
+                                upload_file(file_content,store_as=obj_path)
+                                db.commit()
+                                cur.close()
+                                result = True
+                            else:
+                                db.rollback()
+                                result = False   
+        else:
             #Db connection string
-            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=tunnel.local_bind_port, database=db_name)
+            db = pymysql.connect(host=HOST, user=DBUSER, password=DBPASS, port=PORT, database=DBNAME)
             if db:
                 if db:
                     cur = db.cursor()
                     query1 = f"START TRANSACTION"
                     cur.execute(query1)
                     
-                    recQuery = "SELECT id FROM userprofile WHERE email LIKE %s"
+                    recQuery = "SELECT id, firstname, lastname FROM userprofile WHERE email LIKE %s"
                     cur.execute(recQuery,(receiverEmail,))
-                    recID = cur.fetchone()
+                    recInfo = cur.fetchall()
                     
-                    if recID:
-                        recID = recID[0]
-                        obj_path = f"/{file_flag}/{receiverEmail}/{obj_path}"
-                        if LOCAL:
-                            if not os.path.isdir(f"{file_flag}/{receiverEmail}"):
-                                os.mkdir(f"{file_flag}/{receiverEmail}")
+                    if recInfo:
+                        recID = recInfo[0][0]
+                        recFname = recInfo[0][1]
+                        recLname = recInfo[0][2]
+                        obj_path = f"/{file_flag}/{file_name}"
                     else:
                         raise ValueError("That email was not found.")
                     
@@ -303,10 +382,17 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
                             userLname = userInfo[0][2]
                         else:
                             raise ValueError("Error retrieving current users information.")
-
-                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, senderID, senderFName, senderLName, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
-                        data = (obj_path, subDate, retDate, senderId, userFname, userLname, recID, encryptKey)
-                        cur.execute(insertQuery, data)
+                        
+                        if file_flag == "videos":
+                            insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, senderEmail, senderFName, senderLName, receiverEmail, senderEncryption, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)"
+                            data = (file_name, videoName, subDate, retDate, senderEmail, userFname, userLname, receiverEmail, senderEncryption, receiverEncryption)
+                            cur.execute(insertQuery, data)
+                            
+                        elif file_flag == "chats":  
+                            insertQuery = "INSERT INTO chats (chatName, timestamp, senderEmail, senderFName, senderLName, receiverEmail, receiverFirstName, receiverLastName, senderEncryption, receiverEncryption, retDate) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s,%s,%s)"
+                            data = (file_name, subDate, senderEmail, userFname, userLname, receiverEmail, recFname, recLname, senderEncryption, receiverEncryption, retDate)
+                            cur.execute(insertQuery, data)
+                            
                         proceed = already_existing_file(obj_path)
                         if(not proceed):
                             upload_file(file_content,store_as=obj_path)
@@ -317,10 +403,17 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
                             db.rollback()
                             result = False
                     #If guest it does the same calls just without senderId
-                    else:        
-                        insertQuery = "INSERT INTO videos (videoName, subDate, retDate, recieverID, encrpyt) VALUES ( %s, %s, %s, %s, %s)"
-                        data = (obj_path, subDate, retDate, recID, encryptKey)
-                        cur.execute(insertQuery, data)
+                    else: 
+                        if file_flag == 'videos':       
+                            insertQuery = "INSERT INTO videos (videoId, videoName, subDate, retDate, receiverEmail, receiverEncryption) VALUES ( %s, %s, %s, %s, %s,%s)"
+                            data = (file_name, videoName, subDate, retDate, receiverEmail, receiverEncryption)
+                            cur.execute(insertQuery, data)
+                            
+                        elif file_flag == 'chats':       
+                            insertQuery = "INSERT INTO chats (chatName, timestamp, retDate, receiverEmail, receiverFirstName, receiverLastName, receiverEncryption) VALUES ( %s, %s, %s, %s, %s, %s, %s)"
+                            data = (file_name, subDate, retDate, receiverEmail, recFname, recLname, receiverEncryption)
+                            cur.execute(insertQuery, data)
+                            
                         proceed = already_existing_file(obj_path)
                         if(not proceed):
                             upload_file(file_content,store_as=obj_path)
@@ -329,7 +422,8 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
                             result = True
                         else:
                             db.rollback()
-                            result = False      
+                            result = False     
+
     except Exception as e:
         print(e)
         db.rollback()
@@ -343,7 +437,7 @@ def encrypt_insert(file_flag, file_content, obj_path, retDate, senderEmail, rece
 if __name__ == "__main__":
     list_buckets()
     list_objs()
-    #encrypt_insert("tests",'test test file for encrpyt', 'testFile.txt', "2022-01-22 11:59:00", "Test@example.com", "Test@example.com", "as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
+    encrypt_insert("videos",'test test file for encrpyt', 'testFile34.txt', "2022-01-22 11:59:00", "Test@example.com", "Test@example.com","234234234asd" ,"as4sdfskrw34erkwxjkdfh#wsdf#sflh!*7sdfs")
     get_object_content("tests/Guest/testFile2.txt")
     delete_file('tests/Test@example.com/testFile.txt')
     delete_file('tests/Guest/testFile2.txt')

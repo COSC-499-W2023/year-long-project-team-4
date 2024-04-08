@@ -1,6 +1,6 @@
 body {
-background: rgb(142,22,5);
-background: linear-gradient(0deg, rgba(142,22,5,1) 24%, rgba(45,147,253,1) 100%);
+background: rgb(79,77,77);
+background: white;
 width: 100vw;
 height: 100vh;
 }
@@ -8,4 +8,8 @@ height: 100vh;
 video {
     object-fit: cover !important;
     border-radius: 10px !important;
+}
+
+.text-primary:hover {
+    color:black !important;
 }

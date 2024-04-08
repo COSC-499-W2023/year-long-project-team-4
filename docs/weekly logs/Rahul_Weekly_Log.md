@@ -39,52 +39,6 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 
 - Creating a send video page to view the video sent to a user.
 
-# Week 8: Oct 22nd - Oct 29th:
-## Tasks Completed:
-![week 8](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/475e7d10-f365-4d87-9eb1-a3184ec962af)
-
-- Created view video page to view videos uploaded to the backend along with cleaning up the register and login page for a live demo.
-
-## In progress:
-
-- Working on connecting the backend and front end together to create a usable web app. 
-
-# Week 9: Oct 30th - Nov 5th:
-## Tasks Completed:
-
-![week 9](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/0b93d6c1-4736-4f37-832f-6aaa35d7c05b)
-- Updated Figma file and helped with creating backgrounds, logos and branding for our application. 
-
-## In progress:
-
-- Finishing up Figma file and working on implementing further additions from our figma file. 
-
-# Week 10: Nov 6th - Nov 12th:
-## Tasks Completed:
-![week10](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/1ea8bb5f-c60c-4520-a758-e83c82ba31f3)
-- Tentatively finished Figma file while starting work on a recording feature for our front end. 
-
-## In progress:
-
-- Finishing up work on the recording function on the front end. 
-
-
-# Week 11-12: Nov 7th - Nov 26th:
-## Tasks Completed:
-![Week11-12](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/badf8958-2c08-4564-869c-89450a07052c)
-- Finished recording function for frontend while also updating the frontend appearance.
-
-## In progress:
-
-- Creating an account page.
-
-# Week 13: Nov 27th - Dec 6th:
-## Tasks Completed:
-![Capture3](https://github.com/COSC-499-W2023/year-long-project-team-4/assets/69950566/5aff4cb8-2ae9-44cd-8360-494c0703ae11)
-- Finished account page
-- Updated and created docs for submission
-
-## In progress:
 
 - Building out the overall aesthetics of the website to fill out the empty spaces in the website.
 
@@ -227,5 +181,3 @@ https://www.figma.com/file/HcChl4V8ED2ErKNlGh9yHa/Wire-frame-for-COSC499-Project
 - Finished peer testing changes
 - Created tests for our code
 
-
-  

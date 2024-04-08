@@ -1,0 +1,42 @@
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px; 
+    margin-bottom: 10px; 
+  }
+  
+  .tag-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px;
+    background-color: #e0e0e0; 
+    border-radius: 5px;
+  }
+  
+  .tag-badge button {
+    background: none;
+    border: none;
+    margin-left: 5px;
+    cursor: pointer;
+  }
+  
+  label.btn.btn-primary:hover{
+    background-color:#13056b93 ;
+  }
+
+  label.btn.btn-primary{
+    background-color: black;
+  }
+
+  .upload-area{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .upload-record-section{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  

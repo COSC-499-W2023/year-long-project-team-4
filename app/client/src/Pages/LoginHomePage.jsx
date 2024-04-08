@@ -1,22 +1,27 @@
-import React, {useEffect, useState} from 'react'
-import {Card, Button, Form} from 'react-bootstrap';
+import React, {useState} from 'react'
+import {Button, InputGroup, Form} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom'
+import {Fade} from "react-reveal";
 import {
-  recieveAndSendPath,
+  guestPath,
+  viewSentVideoPath,
   registerPath,
+  changePasswordPath,
+  IP_ADDRESS,
 } from "../Path";
 import axios from 'axios'
+import {ReactComponent as See} from '../Assets/eye.svg';
+import {ReactComponent as UnSee} from '../Assets/eye-slash.svg';
 
-const LoginHomePage = () => {
-
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
+const LoginHomePage = ({setCurrentUser}) => {
   const navigate = useNavigate();
+  const [type, setType] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  const handleLogin = async (username, password) => {
+  const handleLogin = async (email, password) => {
     try {
-      const response = await axios.post('http://localhost:8080/auth/login', {
-        username: username,
+      const response = await axios.post(`${IP_ADDRESS}/auth/login`, {
+        email: email,
         password: password
       }, {
         headers: {
@@ -24,10 +29,9 @@ const LoginHomePage = () => {
         },
         withCredentials: true
       });
-  
-      if (response.data.username) {
-        setCurrentUser(response.data.username);
-        navigate(recieveAndSendPath);
+      if (response.data.email) {
+        setCurrentUser(response.data.email);
+        navigate(viewSentVideoPath);
       } else {
         setErrorMessage(response.data.error);
       }
@@ -43,37 +47,59 @@ const LoginHomePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const username = e.target.elements[0].value;  // Assuming the first input is the username
-    const password = e.target.elements[1].value;  // Assuming the second input is the password
-    handleLogin(username, password);
+    const email = e.target.elements[0].value;  
+    const password = e.target.elements[1].value; 
+    handleLogin(email, password);
   };
   
   
    return (
-    <div className="position-absolute top-50 start-50 translate-middle">          
-      <Card border="primary" style={{ width: "16rem" }}>  
-        <Card.Body className="text-center">
-          <Card.Title>Login</Card.Title>
-          {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-            <Form onSubmit={handleSubmit}>
-              <Form.Group className="p-3">
-                <Form.Label>Username</Form.Label>
-                  <Form.Control
-                    type="text"
-                    required
-                  />
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    required
-                  />
-              </Form.Group>   
-              <Button type="submit" className="mb-2" variant="primary"> Login </Button>
-            </Form>
-        </Card.Body>
-        <Card.Link className="text-center"  href={recieveAndSendPath}>Use as guest</Card.Link>
-        <Card.Link className="text-center" href={registerPath}>No account?</Card.Link>
-      </Card>
+    <div className="position-absolute top-50 start-50 translate-middle text-center">          
+      <Fade big cascade>
+        <div className="display-3">Login</div>
+      </Fade>
+      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+      <Fade big cascade>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="p-3">
+            <Form.Label htmlFor="Email">Email</Form.Label>
+            <Form.Control
+              id='Email'
+              type="text"
+              required
+            />
+            <Form.Label htmlFor="Password">Password</Form.Label>
+              <InputGroup>
+                <Form.Control
+                  type={type ? "text" : "password"}
+                  required
+                  id="Password"
+                />
+                <Button 
+                  variant="primary" 
+                  onClick={()=> setType(!type)}
+                  aria-label='pass'
+                >
+                  {!type? <See fill={"white"}/> :<UnSee fill={"white"}/>}
+                </Button>
+              </InputGroup>
+          </Form.Group>   
+          <Button type="submit" className="mb-2" variant="primary"> Login </Button>
+        </Form>
+      </Fade>
+      <Fade big cascade>
+        <div className="row">
+          <div className="col"> 
+            <p><a className="text-primary" href={guestPath}>Use as guest</a></p>
+         </div>    
+          <div className="col"> 
+            <p><a className="text-primary" href={registerPath}>No account?</a></p>
+          </div>
+          <div className="col"> 
+            <p><a className="text-primary" href={changePasswordPath}>Forgot password?</a></p>
+          </div>
+        </div>
+      </Fade>
     </div>
   )
 }

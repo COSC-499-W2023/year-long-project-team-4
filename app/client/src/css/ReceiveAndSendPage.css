@@ -1,0 +1,25 @@
+.nav-pills .nav-link.active , .nav-pills .show > .nav-link{
+    background-color: #13056be0 !important;
+}
+
+.nav-pills .nav-link {
+    color:#13056be0;
+}
+
+.nav-pills .nav-link:hover {
+    color: black;
+}
+
+
+
+
+.content-wrapper {
+    display: flex;
+    flex-grow: 1; 
+    overflow: hidden; 
+}
+
+.tab-content-wrapper {
+    flex-grow: 1; 
+    overflow-y: auto;
+}

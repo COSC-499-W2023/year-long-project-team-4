@@ -353,4 +353,3 @@ Things I worked on:
   
 Tasks from the project board relevant to things I worked on:
 - Video upload / recording frontend
-  

@@ -436,3 +436,28 @@ Completed:
   
 Additional Context:
 
+# Term 2 Week 13: April 1 - April 7 (Monday to Sunday)
+## Tasks Worked this Week:
+
+<img width="856" alt="Screenshot 2024-04-09 at 7 03 18 PM" src="https://github.com/COSC-499-W2023/year-long-project-team-4/assets/60047109/acfcac9d-dab0-465f-9503-fb7ccbf291ac">
+
+## Goal Recap:
+The features that were mine to complete this week were:
+- Full Mobile view support for the website
+- Fixes on Messages Page
+- Minor UI/UX changes
+- Frontend testing
+
+Tasks from the Project Board:
+- Mobile view
+- Chats
+- Frontend testing
+Completed:
+- Mobile view
+- Chats
+- Frontend Testing
+  
+Additional Context:
+I wanted to inform that my video presentation is incomplete as I could not show all the features. It happened because I left the recording at the last minute, and while recording, our hosted website had issues; after the fix, the tokens for our AWS service expired. While I was figuring all of this out, it was past 12, and then, due to an error that I could not figure out, my local copy stopped working as well, even though I had been working on it for the last 24 hours.
+
+My team members who had access to the tokens had gone to bed by that time, and I tried solving the error with some good luck at around 2 am. I have finished my recording with whatever I could present and attached it to the report.

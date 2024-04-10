@@ -1,0 +1,15 @@
+body {
+background: rgb(79,77,77);
+background: white;
+width: 100vw;
+height: 100vh;
+}
+
+video {
+    object-fit: cover !important;
+    border-radius: 10px !important;
+}
+
+.text-primary:hover {
+    color:black !important;
+}
